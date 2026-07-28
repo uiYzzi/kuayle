@@ -5,7 +5,7 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.share_link.title': '分享公開連結',
 	'sharedComponents.share_link.description': '建立唯讀公開連結，與任何人分享此檢視。',
 	'sharedComponents.share_link.include_descriptions': '包含描述',
-	'sharedComponents.share_link.description_hint': '啟用後，擁有連結的人均可查看事項描述。如果描述包含敏感資訊，請保持停用。',
+	'sharedComponents.share_link.description_hint': '啟用後，擁有連結的人均可查看議題描述。如果描述包含敏感資訊，請保持停用。',
 	'sharedComponents.share_link.create_new_link': '建立新連結',
 	'sharedComponents.share_link.existing_links': '現有連結',
 	'sharedComponents.share_link.active': '活躍',
@@ -61,7 +61,7 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.filter_builder.assignee': '負責人',
 	'sharedComponents.filter_builder.project': '專案',
 	'sharedComponents.filter_builder.label': '標籤',
-	'sharedComponents.filter_builder.sub_issues': '子事項',
+	'sharedComponents.filter_builder.sub_issues': '子議題',
 	'sharedComponents.filter_builder.search_placeholder': '搜尋...',
 	'sharedComponents.filter_builder.unassigned': '未指派',
 	'sharedComponents.filter_builder.no_project': '無專案',
@@ -74,10 +74,10 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.filter_builder.remove_filter': '移除篩選器',
 	'sharedComponents.filter_builder.filter': '篩選',
 	'sharedComponents.filter_builder.clear_filters': '清除篩選器',
-	'sharedComponents.filter_builder.show_all_issues': '顯示所有事項',
-	'sharedComponents.filter_builder.hide_sub_issues': '隱藏子事項',
-	'sharedComponents.filter_builder.only_sub_issues': '僅子事項',
-	'sharedComponents.filter_builder.has_sub_issues': '有子事項',
+	'sharedComponents.filter_builder.show_all_issues': '顯示所有議題',
+	'sharedComponents.filter_builder.hide_sub_issues': '隱藏子議題',
+	'sharedComponents.filter_builder.only_sub_issues': '僅子議題',
+	'sharedComponents.filter_builder.has_sub_issues': '有子議題',
 	'sharedComponents.filter_builder.statuses_count': '{count} 個狀態',
 	'sharedComponents.filter_builder.priorities_count': '{count} 個優先順序',
 	'sharedComponents.filter_builder.status_type': '狀態類型：{type}',
@@ -111,7 +111,7 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.rich_editor.set_image_width': '設定圖片寬度為 {width}',
 	'sharedComponents.rich_editor.auto': '自動',
 	'sharedComponents.rich_editor.use_original_image_size': '使用原始圖片大小',
-	'sharedComponents.rich_editor.create_issue_from_selection': '從選取內容建立事項',
+	'sharedComponents.rich_editor.create_issue_from_selection': '從選取內容建立議題',
 	'sharedComponents.rich_editor.rework_with_ai': 'AI 重寫',
 
 	// DueDatePickerPanel
@@ -153,16 +153,16 @@ export const sharedComponents: Record<string, string> = {
 
 	// MentionList
 	'sharedComponents.mention_list.members': '成員',
-	'sharedComponents.mention_list.issues': '事項',
+	'sharedComponents.mention_list.issues': '議題',
 	'sharedComponents.mention_list.no_results': '無結果',
 
 	// SlashCommandMenu
 	'sharedComponents.slash_command.no_results': '無結果',
 
 	// CreateIssueDialog
-	'sharedComponents.create_issue.new_issue': '新增事項',
-	'sharedComponents.create_issue.new_sub_issue': '{identifier} 的新子事項',
-	'sharedComponents.create_issue.issue_title_placeholder': '事項標題',
+	'sharedComponents.create_issue.new_issue': '新增議題',
+	'sharedComponents.create_issue.new_sub_issue': '{identifier} 的新子議題',
+	'sharedComponents.create_issue.issue_title_placeholder': '議題標題',
 	'sharedComponents.create_issue.description_placeholder': '新增描述...',
 	'sharedComponents.create_issue.team': '團隊',
 	'sharedComponents.create_issue.template': '模板',
@@ -177,5 +177,5 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.create_issue.cycle': '週期',
 	'sharedComponents.create_issue.due_date_placeholder': '截止日期',
 	'sharedComponents.create_issue.create_more': '繼續建立',
-	'sharedComponents.create_issue.create_issue': '建立事項'
+	'sharedComponents.create_issue.create_issue': '建立議題'
 } as Record<string, string>;

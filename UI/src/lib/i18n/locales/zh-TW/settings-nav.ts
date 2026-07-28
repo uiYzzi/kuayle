@@ -19,7 +19,7 @@ export const settingsNav = {
 	'settings.nav.dev_machines': '開發機',
 	'settings.nav.version': '版本',
 	'settings.nav.licenses': '授權',
-	'settings.nav.issue_statuses': '事項狀態',
+	'settings.nav.issue_statuses': '議題狀態',
 	'settings.nav.settings_navigation': '設定導覽',
 	'settings.nav.navigate_sections': '導覽設定分區。'
 } as Record<string, string>;
