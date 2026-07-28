@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { VelocityPoint } from '$lib/types/cycle';
 	import * as echarts from 'echarts';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		data
@@ -74,19 +75,19 @@
 				textStyle: { color: colorText, fontSize: 11 },
 				formatter: (params: any) => {
 					const name = params[0]?.axisValue ?? '';
-					const completed = params.find((p: any) => p.seriesName === 'Completed')?.value ?? 0;
-					const cancelled = params.find((p: any) => p.seriesName === 'Cancelled')?.value ?? 0;
-					const remaining = params.find((p: any) => p.seriesName === 'Remaining')?.value ?? 0;
+					const completed = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.completed'))?.value ?? 0;
+					const cancelled = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.cancelled'))?.value ?? 0;
+					const remaining = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.remaining'))?.value ?? 0;
 					const total = completed + cancelled + remaining;
 					return `<div><strong>${name}</strong></div>`
-						+ `<div style="margin-top:4px">Completed: ${completed}/${total}</div>`
-						+ `<div>Cancelled: ${cancelled}</div>`
-						+ `<div>Remaining: ${remaining}</div>`;
+						+ `<div style="margin-top:4px">${i18n.t('cycles.chart.velocity_completed')}${completed}/${total}</div>`
+						+ `<div>${i18n.t('cycles.chart.velocity_cancelled')}${cancelled}</div>`
+						+ `<div>${i18n.t('cycles.chart.velocity_remaining')}${remaining}</div>`;
 				}
 			},
 			series: [
 				{
-					name: 'Completed',
+					name: i18n.t('cycles.chart.completed'),
 					type: 'bar',
 					stack: 'total',
 					data: completedData,
@@ -94,14 +95,14 @@
 					barMaxWidth: 32
 				},
 				{
-					name: 'Cancelled',
+					name: i18n.t('cycles.chart.cancelled'),
 					type: 'bar',
 					stack: 'total',
 					data: cancelledData,
 					itemStyle: { color: colorCancelled }
 				},
 				{
-					name: 'Remaining',
+					name: i18n.t('cycles.chart.remaining'),
 					type: 'bar',
 					stack: 'total',
 					data: remainingData,

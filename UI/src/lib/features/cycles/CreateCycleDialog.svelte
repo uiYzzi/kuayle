@@ -7,6 +7,7 @@
 	import DateRangePickerPopover from '$lib/components/shared/DateRangePickerPopover.svelte';
 	import type { Cycle } from '$lib/types/cycle';
 	import type { DateValue } from '@internationalized/date';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		open = $bindable(false),
@@ -28,7 +29,7 @@
 
 	$effect(() => {
 		if (open) {
-			name = `Cycle ${nextNumber}`;
+			name = i18n.t('cycles.title') + ' ' + nextNumber;
 			description = '';
 			goals = '';
 			startDate = '';
@@ -65,54 +66,54 @@
 		<form onsubmit={handleSubmit}>
 			<div class="px-5 pt-5 pb-4 space-y-4">
 				<div>
-					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">Create cycle</h2>
-					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">Cycles help you plan work in time-boxed iterations.</p>
+					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{i18n.t('cycles.create.title')}</h2>
+					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{i18n.t('cycles.create.description')}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Name</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.name')}</Label>
 					<Input
 						bind:value={name}
-						placeholder="e.g. Cycle 1"
+						placeholder={i18n.t('cycles.create.name_placeholder')}
 						required
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Description <span class="text-[var(--color-text-tertiary)]">(optional)</span></Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.description')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.field.optional')}</span></Label>
 					<Input
 						bind:value={description}
-						placeholder="What's the goal for this cycle?"
+						placeholder={i18n.t('cycles.create.description_placeholder')}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Goals <span class="text-[var(--color-text-tertiary)]">(optional)</span></Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.goals')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.field.optional')}</span></Label>
 					<Textarea
 						bind:value={goals}
-						placeholder="e.g. Ship auth flow, fix 20 bugs"
+						placeholder={i18n.t('cycles.create.goals_placeholder')}
 						rows={2}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)] resize-none text-sm"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Date range</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.date_range')}</Label>
 					<DateRangePickerPopover
 						startDate={startDate || null}
 						endDate={endDate || null}
 						onchange={(s, e) => { startDate = s; endDate = e; }}
 						{isDateDisabled}
-						placeholder="Select start and end dates"
+						placeholder={i18n.t('cycles.select_date_range')}
 					/>
 				</div>
 			</div>
 
 			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
-				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>Cancel</Button>
-				<Button size="sm" type="submit" disabled={!name.trim() || !startDate || !endDate}>Create cycle</Button>
+				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>{i18n.t('common.cancel')}</Button>
+				<Button size="sm" type="submit" disabled={!name.trim() || !startDate || !endDate}>{i18n.t('cycles.create.title')}</Button>
 			</div>
 		</form>
 	</Dialog.Content>

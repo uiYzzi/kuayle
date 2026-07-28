@@ -12,6 +12,7 @@ import { sharedComponents } from './zh-TW/shared-components';
 import { teamSettings } from './zh-TW/team-settings';
 import { insights } from './zh-TW/insights';
 import { machines } from './zh-TW/machines';
+import { cycles } from './zh-TW/cycles';
 
 export const zhTW: Record<string, string> = {
 	...settingsNav,
@@ -26,5 +27,6 @@ export const zhTW: Record<string, string> = {
 	...sharedComponents,
 	...teamSettings,
 	...insights,
-	...machines
+	...machines,
+	...cycles
 };

@@ -11,6 +11,7 @@ import { sharedComponents } from './en/shared-components';
 import { teamSettings } from './en/team-settings';
 import { insights } from './en/insights';
 import { machines } from './en/machines';
+import { cycles } from './en/cycles';
 
 export const en = {
 	...settingsNav,
@@ -25,7 +26,8 @@ export const en = {
 	...sharedComponents,
 	...teamSettings,
 	...insights,
-	...machines
+	...machines,
+	...cycles
 } as const;
 
 export type TranslationKey = keyof typeof en;
