@@ -279,7 +279,7 @@
 				applyLocalGroupOrder(reorderedGroup.map((issue) => (issue.id === updatedIssue.id ? updatedIssue : issue)));
 			}
 		} catch {
-			appToast.error('Failed to move issue');
+			appToast.error(i18n.t('common.toast.failed_move_issue'));
 		}
 	}
 
@@ -419,13 +419,13 @@
 				{/if}
 				<span class="flex items-center gap-1.5 font-medium text-[var(--color-text-primary)]">
 					<SquaresSubtract size={14} class="shrink-0" />
-					Issues
+					{i18n.t('common.issues')}
 				</span>
 			</nav>
 			<button
 				onclick={() => (showShareLink = true)}
 				class="rounded-md p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] transition-colors"
-				title="Share public link"
+				title={i18n.t('sharedComponents.share_link.title')}
 			>
 				<Share2 size={14} />
 			</button>

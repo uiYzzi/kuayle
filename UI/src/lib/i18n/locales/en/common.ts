@@ -64,8 +64,10 @@ export const common = {
 
 	// Toast messages (IssueDeletedToast & IssueCreatedToast)
 	'common.toast.issue_deleted': 'Issue deleted',
+	'common.issues': 'Issues',
 	'common.toast.issues_deleted': 'Issues deleted',
 	'common.toast.issues_deleted_count': '{count} issues deleted',
+	'common.toast.failed_move_issue': 'Failed to move issue',
 	'common.toast.issue_created': 'Issue created',
 	'common.toast.view_issue': 'View issue',
 	'common.toast.close_toast': 'Close notification',

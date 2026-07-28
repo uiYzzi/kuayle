@@ -66,8 +66,10 @@ export const common: Record<string, string> = {
 
 	// Toast messages (IssueDeletedToast & IssueCreatedToast)
 	'common.toast.issue_deleted': '议题已删除',
+	'common.issues': '议题',
 	'common.toast.issues_deleted': '议题已删除',
 	'common.toast.issues_deleted_count': '已删除 {count} 个议题',
+	'common.toast.failed_move_issue': '移动议题失败',
 	'common.toast.issue_created': '议题已创建',
 	'common.toast.view_issue': '查看议题',
 	'common.toast.close_toast': '关闭提示',
