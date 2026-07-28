@@ -7,6 +7,7 @@
 	import type { ButtonVariant } from "../button/button.svelte";
 	import { isEqualMonth, type DateValue } from "@internationalized/date";
 	import type { Snippet } from "svelte";
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		ref = $bindable(null),
@@ -16,7 +17,7 @@
 		weekdayFormat = "short",
 		buttonVariant = "ghost",
 		captionLayout = "label",
-		locale = "en-US",
+		locale = i18n.dateLocale,
 		months: monthsProp,
 		years,
 		monthFormat: monthFormatProp,

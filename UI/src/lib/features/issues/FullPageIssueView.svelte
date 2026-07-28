@@ -1078,7 +1078,7 @@
 												{/if}
 											{/each}
 											<span>&middot;</span>
-											<span class="shrink-0">{formatRelativeTime(entry.time)}</span>
+											<span class="shrink-0">{formatRelativeTime(entry.time, i18n.dateLocale)}</span>
 										</div>
 									</div>
 								{/each}
@@ -1112,7 +1112,7 @@
 										{(comment.user?.name ?? 'U').charAt(0).toUpperCase()}
 									</div>
 									<span class="text-[13px] font-medium text-[var(--color-text-primary)]">{comment.user?.name ?? 'User'}</span>
-									<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(comment.created_at)}</span>
+									<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(comment.created_at, i18n.dateLocale)}</span>
 									{#if comment.resolved_at}
 										<span class="text-[11px] font-medium text-green-400">{i18n.t('issue.resolved')}</span>
 									{/if}
@@ -1151,7 +1151,7 @@
 												{(reply.user?.name ?? 'U').charAt(0).toUpperCase()}
 											</div>
 											<span class="text-[13px] font-medium text-[var(--color-text-primary)]">{reply.user?.name ?? 'User'}</span>
-											<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(reply.created_at)}</span>
+											<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(reply.created_at, i18n.dateLocale)}</span>
 										</div>
 										<div class="prose prose-invert prose-sm max-w-none mt-2.5 text-[13px] text-[var(--color-text-primary)] [&>p:first-child]:mt-0 [&>p:last-child]:mb-0" use:mentionInteractivity={{ slug, members, issues: issuesState.issues }}>
 											{@html sanitizeHtml(reply.body ?? '')}

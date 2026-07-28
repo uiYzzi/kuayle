@@ -433,7 +433,7 @@
 												{getNotificationTypeLabel(notification.type)}
 											</span>
 											<span class="shrink-0 text-[11px] tabular-nums text-[var(--color-text-secondary)]">
-												{formatRelativeTime(notification.created_at)}
+												{formatRelativeTime(notification.created_at, i18n.dateLocale)}
 											</span>
 										</div>
 									</div>

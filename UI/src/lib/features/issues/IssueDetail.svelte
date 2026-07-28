@@ -9,6 +9,7 @@
 	import IssueStatusIcon from './IssueStatusIcon.svelte';
 	import IssuePriorityIcon from './IssuePriorityIcon.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
+import { i18n } from '$lib/i18n/index.svelte';
 	import { appToast } from '$lib/features/toast/toast';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { StatusSelector, PrioritySelector } from './selectors';
@@ -227,7 +228,7 @@
 									>{comment.user?.name ?? 'User'}</span
 								>
 								<span class="text-[var(--color-text-tertiary)]"
-									>{formatRelativeTime(comment.created_at)}</span
+									>{formatRelativeTime(comment.created_at, i18n.dateLocale)}</span
 								>
 							</div>
 							<div class="mt-1 prose prose-invert prose-sm max-w-none text-[var(--color-text-secondary)]" use:mentionInteractivity={{ slug, members, issues: issuesState.issues }}>
@@ -294,7 +295,7 @@
 										{/if}
 									{/if}
 									<span class="text-[var(--color-text-tertiary)]">&middot;</span>
-									<span>{formatRelativeTime(entry.created_at)}</span>
+									<span>{formatRelativeTime(entry.created_at, i18n.dateLocale)}</span>
 								</div>
 							</div>
 						{/each}
