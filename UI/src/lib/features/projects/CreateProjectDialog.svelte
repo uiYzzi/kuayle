@@ -6,6 +6,7 @@
 	import { Label } from '$lib/components/ui/label';
 
 	import type { Team } from '$lib/types/team';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		open = $bindable(false),
@@ -32,7 +33,7 @@
 	});
 
 	const selectedTeamLabel = $derived(
-		teamId ? (teams.find((t) => t.id === teamId)?.name ?? 'Select team') : 'No team'
+		teamId ? (teams.find((t) => t.id === teamId)?.name ?? i18n.t('projects.create.select_team')) : i18n.t('projects.create.no_team')
 	);
 
 	function handleSubmit(e: Event) {
@@ -55,18 +56,18 @@
 			<div class="px-5 pt-5 pb-4 space-y-4">
 				<div>
 					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">
-						Create project
+						{i18n.t('projects.create.title')}
 					</h2>
 					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">
-						Projects group related issues together.
+						{i18n.t('projects.create.description')}
 					</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Name</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.name')}</Label>
 					<Input
 						bind:value={name}
-						placeholder="e.g. Q1 Launch"
+						placeholder={i18n.t('projects.create.name_placeholder')}
 						required
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
@@ -75,7 +76,7 @@
 				{#if teams.length > 0}
 					<div class="space-y-1.5">
 						<Label class="text-xs text-[var(--color-text-secondary)]"
-							>Team <span class="text-[var(--color-text-tertiary)]">(optional)</span
+							>{i18n.t('projects.field.team')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.field.optional')}</span
 							></Label
 						>
 						<Select.Root
@@ -89,7 +90,7 @@
 								{selectedTeamLabel}
 							</Select.Trigger>
 							<Select.Content>
-								<Select.Item value="" label="No team">No team</Select.Item>
+								<Select.Item value="" label={i18n.t('projects.create.no_team')}>{i18n.t('projects.create.no_team')}</Select.Item>
 								{#each teams as team}
 									<Select.Item value={team.id} label={team.name}
 										>{team.name}</Select.Item
@@ -102,12 +103,12 @@
 
 				<div class="space-y-1.5">
 					<Label class="text-xs text-[var(--color-text-secondary)]"
-						>Description <span class="text-[var(--color-text-tertiary)]">(optional)</span
+						>{i18n.t('cycles.field.description')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.field.optional')}</span
 						></Label
 					>
 					<Input
 						bind:value={description}
-						placeholder="What is this project about?"
+						placeholder={i18n.t('projects.create.description_placeholder')}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
@@ -115,9 +116,9 @@
 
 			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
 				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}
-					>Cancel</Button
+					>{i18n.t('common.cancel')}</Button
 				>
-				<Button size="sm" type="submit" disabled={!name.trim()}>Create project</Button>
+				<Button size="sm" type="submit" disabled={!name.trim()}>{i18n.t('projects.create.title')}</Button>
 			</div>
 		</form>
 	</Dialog.Content>

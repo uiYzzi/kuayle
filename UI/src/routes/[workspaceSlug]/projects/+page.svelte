@@ -12,6 +12,7 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { Plus } from 'lucide-svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	let projects = $state<Project[]>([]);
@@ -19,12 +20,9 @@
 	let loading = $state(true);
 	let showCreateProject = $state(false);
 
-	const STATUS_LABELS: Record<ProjectStatus, string> = {
-		planned: 'Planned',
-		in_progress: 'In Progress',
-		completed: 'Completed',
-		cancelled: 'Cancelled'
-	};
+	function statusLabel(status: ProjectStatus): string {
+		return i18n.t(`projects.status.${status}`);
+	}
 
 	onMount(async () => {
 		try {
@@ -39,9 +37,9 @@
 			const project = await createProject(slug, data);
 			projects = [...projects, project];
 			sidebarState.addProject(project);
-			appToast.success('Project created');
+			appToast.success(i18n.t('projects.toast.created'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create project');
+			appToast.apiError(err, i18n.t('projects.toast.failed_create'));
 		}
 	}
 
@@ -66,12 +64,12 @@
 	>
 		<div class="flex items-center gap-2">
 			<SidebarToggle />
-			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">Projects</h1>
+			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('projects.title')}</h1>
 		</div>
 		<button
 			onclick={() => (showCreateProject = true)}
 			class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			title="New Project"
+			title={i18n.t('projects.new_project')}
 		>
 			<Plus size={16} />
 		</button>
@@ -79,9 +77,9 @@
 
 	{#if !loading && projects.length === 0}
 		<EmptyState
-			title="No projects yet"
-			description="Create a project to organize your issues"
-			action={{ label: 'New Project', onclick: () => (showCreateProject = true) }}
+			title={i18n.t('projects.no_projects')}
+			description={i18n.t('projects.no_projects_desc')}
+			action={{ label: i18n.t('projects.new_project'), onclick: () => (showCreateProject = true) }}
 		/>
 	{:else}
 		<div class="divide-y divide-[var(--app-border)]">
@@ -94,7 +92,7 @@
 						<div class="flex items-center gap-2">
 							<span class="text-sm font-medium text-[var(--color-text-primary)]">{project.name}</span>
 							<Badge variant={statusVariant(project.status)} class="text-[10px]">
-								{STATUS_LABELS[project.status]}
+								{statusLabel(project.status)}
 							</Badge>
 							{#if project.team_id}
 								{@const team = teams.find(t => t.id === project.team_id)}
