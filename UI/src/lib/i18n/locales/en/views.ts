@@ -8,6 +8,9 @@ export const views = {
 	'views.no_issues_match_desc': 'Adjust the filters or add new issues',
 	'views.no_team_views': 'No views for this team',
 	'views.no_team_views_desc': 'Save filters from the team issues page and choose Team visibility to share views here.',
+	'views.my_views': 'My Views',
+	'views.no_personal_views': 'No personal views',
+	'views.no_personal_views_desc': 'Save filters and choose Personal visibility to keep views here.',
 	'views.delete_title': 'Delete view?',
 	'views.delete_desc': 'This will permanently delete {name}.',
 

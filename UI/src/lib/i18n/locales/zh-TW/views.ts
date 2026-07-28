@@ -10,6 +10,9 @@ export const views: Record<string, string> = {
 	'views.no_issues_match_desc': '調整篩選條件或新增議題',
 	'views.no_team_views': '此團隊暫無視圖',
 	'views.no_team_views_desc': '從團隊議題頁面儲存篩選條件，並選擇團隊可見性以在此處分享視圖。',
+	'views.my_views': '我的視圖',
+	'views.no_personal_views': '沒有個人視圖',
+	'views.no_personal_views_desc': '儲存篩選器並選擇個人可見性，將視圖保留在此處。',
 	'views.delete_title': '刪除視圖？',
 	'views.delete_desc': '這將永久刪除 {name}。',
 
