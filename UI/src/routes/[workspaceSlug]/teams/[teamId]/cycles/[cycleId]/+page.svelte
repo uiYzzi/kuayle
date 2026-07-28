@@ -14,13 +14,14 @@
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Label } from '$lib/types/label';
 	import IssueRow from '$lib/features/issues/IssueRow.svelte';
-import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
+	import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 	import DateRangePickerPopover from '$lib/components/shared/DateRangePickerPopover.svelte';
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
 	import { CheckCircle2, Play, Clock, Trash2, MoreHorizontal, Search, Plus, SquareUser, RefreshCcwDot, ChevronRight } from 'lucide-svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
@@ -77,7 +78,7 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 			// Load issues for this cycle using server-side cycle filter
 			issuesState.load(slug, { cycle: cycleId, per_page: '200' });
 		} catch {
-			appToast.error('Cycle not found');
+			appToast.error(i18n.t('cycles.toast.not_found'));
 			goto(`/${slug}/teams/${teamId}/cycles`);
 		} finally {
 			loading = false;
@@ -121,14 +122,10 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 				carry_over: data.carry_over
 			});
 			cycle = result.cycle;
-			if (result.carried_over_count > 0) {
-				appToast.success(`Cycle completed. ${result.carried_over_count} issue${result.carried_over_count > 1 ? 's' : ''} carried over.`);
-			} else {
-				appToast.success('Cycle completed');
-			}
+			appToast.success(i18n.t('cycles.toast.completed'));
 			issuesState.load(slug, { cycle: cycleId, per_page: '200' });
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to complete cycle');
+			appToast.apiError(err, i18n.t('cycles.toast.failed_complete'));
 		}
 	}
 
@@ -136,9 +133,9 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 		if (!cycle) return;
 		try {
 			cycle = await updateCycle(slug, teamId, cycle.id, { status: 'active' });
-			appToast.success('Cycle activated');
+			appToast.success(i18n.t('cycles.toast.activated'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to activate cycle');
+			appToast.apiError(err, i18n.t('cycles.toast.failed_activate'));
 		}
 	}
 
@@ -146,10 +143,10 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 		if (!cycle) return;
 		try {
 			await deleteCycle(slug, teamId, cycle.id);
-			appToast.success('Cycle deleted');
+			appToast.success(i18n.t('cycles.toast.deleted'));
 			goto(`/${slug}/teams/${teamId}/cycles`);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete cycle');
+			appToast.apiError(err, i18n.t('cycles.toast.failed_delete'));
 		}
 	}
 
@@ -157,9 +154,9 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 		if (!cycle) return;
 		try {
 			cycle = await updateCycle(slug, teamId, cycle.id, { start_date: start, end_date: end });
-			appToast.success('Dates updated');
+			appToast.success(i18n.t('cycles.toast.dates_updated'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update dates');
+			appToast.apiError(err, i18n.t('cycles.toast.failed_update_dates'));
 		}
 	}
 
@@ -169,9 +166,9 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 			// Reload to reflect change
 			issuesState.load(slug, { cycle: cycleId, per_page: '200' });
 			addSearchQuery = '';
-			appToast.success(`Added ${issue.identifier} to cycle`);
+			appToast.success(i18n.t('cycles.toast.added_issue', { identifier: issue.identifier }));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to add issue');
+			appToast.apiError(err, i18n.t('cycles.toast.failed_add_issue'));
 		}
 	}
 
@@ -207,7 +204,7 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 						<ChevronRight size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
 						<a href="/{slug}/teams/{teamId}/cycles" class="flex items-center gap-1.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
 							<RefreshCcwDot size={14} class="shrink-0" />
-							<span class="hidden sm:inline">Cycles</span>
+							<span class="hidden sm:inline">{i18n.t('cycles.title')}</span>
 						</a>
 						<ChevronRight size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
 					{/if}
@@ -221,13 +218,13 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 				{#if cycle.status === 'upcoming'}
 					<Button size="sm" onclick={handleActivate}>
 						<Play size={14} class="mr-1" />
-						Start cycle
+						{i18n.t('cycles.start_cycle')}
 					</Button>
 				{/if}
 				{#if cycle.status === 'active'}
 					<Button size="sm" onclick={handleComplete}>
 						<CheckCircle2 size={14} class="mr-1" />
-						Complete
+						{i18n.t('cycles.complete')}
 					</Button>
 				{/if}
 				<Popover.Root bind:open={actionsOpen}>
@@ -242,7 +239,7 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-hover)]"
 						>
 							<Trash2 size={14} />
-							Delete cycle
+							{i18n.t('cycles.delete_cycle')}
 						</button>
 					</Popover.Content>
 				</Popover.Root>
@@ -257,12 +254,12 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 						startDate={cycle.start_date}
 						endDate={cycle.end_date}
 						onchange={handleDateRangeChange}
-						placeholder="Select dates"
+						placeholder={i18n.t('cycles.select_dates')}
 					/>
 				</div>
 				{#if cycle.progress}
 					<div class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
-						<span>{cycle.progress.completed} of {cycle.progress.total} issues done</span>
+						<span>{i18n.t('cycles.issues_done', { completed: cycle.progress.completed, total: cycle.progress.total })}</span>
 					</div>
 				{/if}
 				{#if cycle.completed_at}
@@ -276,13 +273,13 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 			{/if}
 			{#if cycle.goals}
 				<div class="mt-2">
-					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">Goals</span>
+					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{i18n.t('cycles.goals')}</span>
 					<p class="mt-0.5 text-sm text-[var(--color-text-secondary)]">{cycle.goals}</p>
 				</div>
 			{/if}
 			{#if cycle.retrospective}
 				<div class="mt-2">
-					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">Retrospective</span>
+					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{i18n.t('cycles.retrospective')}</span>
 					<p class="mt-0.5 text-sm text-[var(--color-text-secondary)]">{cycle.retrospective}</p>
 				</div>
 			{/if}
@@ -304,7 +301,7 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 						oninput={() => searchAvailableIssues()}
 						onfocus={() => (addSearchOpen = true)}
 						onblur={() => setTimeout(() => (addSearchOpen = false), 200)}
-						placeholder="Search issues to add to this cycle..."
+						placeholder={i18n.t('cycles.search_issues_placeholder')}
 						class="w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
 					/>
 				</div>
@@ -329,8 +326,8 @@ import CycleProgress from '$lib/features/cycles/CycleProgress.svelte';
 		<div class="flex-1 overflow-y-auto">
 			{#if !issuesState.loading && issuesState.issues.length === 0}
 				<EmptyState
-					title="No issues in this cycle"
-					description="Search and add issues above, or assign issues from the issue detail panel"
+					title={i18n.t('cycles.no_issues')}
+					description={i18n.t('cycles.no_issues_desc')}
 				/>
 			{:else}
 				{#each issuesState.issues as issue (issue.id)}
