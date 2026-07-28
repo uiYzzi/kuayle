@@ -230,7 +230,7 @@
 		if (!dateStr) return null;
 		const d = new Date(dateStr);
 		return {
-			month: d.toLocaleDateString('en-US', { month: 'short' }),
+			month: d.toLocaleDateString(i18n.dateLocale, { month: 'short' }),
 			day: String(d.getDate())
 		};
 	}
