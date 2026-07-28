@@ -1,7 +1,7 @@
 import type { TranslationKey } from '../en';
 
 export const cycles: Record<string, string> = {
-	'cycles.title': '迭代周期',
+	'cycles.title': '周期',
 	'cycles.new_cycle': '新建周期',
 	'cycles.no_cycles': '暂无周期',
 	'cycles.no_cycles_desc': '创建一个周期来规划团队的迭代工作',
@@ -15,13 +15,13 @@ export const cycles: Record<string, string> = {
 	'cycles.complete': '完成',
 	'cycles.select_dates': '选择日期',
 	'cycles.select_date_range': '选择开始和结束日期',
-	'cycles.issues_done': '已完成 {completed} / 共 {total} 个事项',
+	'cycles.issues_done': '已完成 {completed} / 共 {total} 个议题',
 	'cycles.goals': '目标',
 	'cycles.retrospective': '回顾',
 	'cycles.incomplete': '未完成',
-	'cycles.search_issues_placeholder': '搜索要添加到此周期的事项...',
-	'cycles.no_issues': '此周期中没有事项',
-	'cycles.no_issues_desc': '在上方搜索并添加事项，或从事项详情面板中分配',
+	'cycles.search_issues_placeholder': '搜索要添加到此周期的议题...',
+	'cycles.no_issues': '此周期中没有议题',
+	'cycles.no_issues_desc': '在上方搜索并添加议题，或从议题详情面板中分配',
 
 	'cycles.create.title': '创建周期',
 	'cycles.create.description': '周期帮助你在时间限制的迭代中规划工作。',
@@ -39,7 +39,7 @@ export const cycles: Record<string, string> = {
 	'cycles.complete.mark_prefix': '将 ',
 	'cycles.complete.mark_suffix': ' 标记为已完成。',
 	'cycles.complete.carry_over_prefix': '将 ',
-	'cycles.complete.incomplete_to': ' 个未完成事项',
+	'cycles.complete.incomplete_to': ' 个未完成议题',
 	'cycles.complete.to': ' 移至 ',
 	'cycles.complete.no_upcoming_suffix': ' 将保留在此周期中（没有即将到来的周期可以移入）。',
 
@@ -85,5 +85,5 @@ export const cycles: Record<string, string> = {
 	'cycles.toast.failed_activate': '激活周期失败',
 	'cycles.toast.failed_complete': '完成周期失败',
 	'cycles.toast.failed_update_dates': '更新日期失败',
-	'cycles.toast.failed_add_issue': '添加事项失败',
+	'cycles.toast.failed_add_issue': '添加议题失败',
 } as Record<string, string>;

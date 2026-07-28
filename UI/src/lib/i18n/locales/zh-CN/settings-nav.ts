@@ -19,7 +19,7 @@ export const settingsNav = {
 	'settings.nav.dev_machines': '开发机',
 	'settings.nav.version': '版本',
 	'settings.nav.licenses': '许可证',
-	'settings.nav.issue_statuses': '事项状态',
+	'settings.nav.issue_statuses': '议题状态',
 	'settings.nav.settings_navigation': '设置导航',
 	'settings.nav.navigate_sections': '导航设置分区。'
 } as Record<string, string>;

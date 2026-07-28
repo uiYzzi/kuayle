@@ -3,7 +3,7 @@ import type { TranslationKey } from '../en';
 export const sidebar = {
 	// Navigation items
 	'sidebar.inbox': '收件箱',
-	'sidebar.my_issues': '我的事项',
+	'sidebar.my_issues': '我的议题',
 	'sidebar.insights': '洞察',
 	'sidebar.dev_machines': '开发机',
 	'sidebar.my_views': '我的视图',
@@ -16,16 +16,16 @@ export const sidebar = {
 	'sidebar.projects': '项目',
 
 	// Team sub-items
-	'sidebar.issues': '事项',
+	'sidebar.issues': '议题',
 	'sidebar.cycles': '周期',
 	'sidebar.triage': '待处理',
 
 	// Actions
 	'sidebar.search': '搜索',
-	'sidebar.new_issue': '新建事项',
+	'sidebar.new_issue': '新建议题',
 	'sidebar.create_team': '创建团队',
 	'sidebar.create_first_team': '创建你的第一个团队',
-	'sidebar.create_issue': '创建事项',
+	'sidebar.create_issue': '创建议题',
 	'sidebar.cancel': '取消',
 	'sidebar.working': '处理中...',
 
@@ -67,13 +67,13 @@ export const sidebar = {
 	'sidebar.failed_create_team': '创建团队失败',
 	'sidebar.team_deleted': '团队已删除',
 	'sidebar.left_team': '已离开团队',
-	'sidebar.failed_create_issue': '创建事项失败',
+	'sidebar.failed_create_issue': '创建议题失败',
 	'sidebar.failed_leave_team': '离开团队失败',
 	'sidebar.failed_delete_team': '删除团队失败',
 
 	// Shortcut labels
 	'sidebar.go_inbox': '跳转到收件箱',
-	'sidebar.go_my_issues': '跳转到我的事项',
+	'sidebar.go_my_issues': '跳转到我的议题',
 	'sidebar.go_insights': '跳转到洞察',
 	'sidebar.go_projects': '跳转到项目',
 	'sidebar.go_settings': '跳转到设置',
@@ -91,7 +91,7 @@ export const sidebar = {
 	// Workspace switcher
 	'sidebar.workspaces': '工作区',
 	'sidebar.create_workspace': '创建工作区',
-	'sidebar.create_workspace_desc': '为你的团队、项目和事项设置新的工作区。',
+	'sidebar.create_workspace_desc': '为你的团队、项目和议题设置新的工作区。',
 	'sidebar.workspace_name': '工作区名称',
 	'sidebar.workspace_name_placeholder': 'Acme Engineering',
 	'sidebar.workspace_url': '工作区 URL',
@@ -105,19 +105,19 @@ export const sidebar = {
 	'sidebar.type_command': '输入命令或搜索...',
 	'sidebar.cmd_close': '关闭',
 	'sidebar.commands': '命令',
-	'sidebar.no_issues_found': '未找到事项',
+	'sidebar.no_issues_found': '未找到议题',
 	'sidebar.no_results': '未找到结果',
 	'sidebar.cmd_keyboard': '键盘',
 	'sidebar.cmd_move_selection': '移动选择',
 	'sidebar.cmd_open_selected': '打开选中项',
 	'sidebar.search_matches': '搜索匹配',
-	'sidebar.cmd_search_matches_desc': '事项搜索涵盖你通常浏览的详情：标题、描述、状态、项目、指派人、标签、周期、截止日期、团队和优先级。描述匹配包含简短的高亮片段。',
+	'sidebar.cmd_search_matches_desc': '议题搜索涵盖你通常浏览的详情：标题、描述、状态、项目、指派人、标签、周期、截止日期、团队和优先级。描述匹配包含简短的高亮片段。',
 	'sidebar.go_to_team': '跳转到 {name}',
 
 	// Confirm team dialog
 	'sidebar.delete_team_title': '删除团队',
 	'sidebar.leave_team_title': '离开团队',
-	'sidebar.delete_team_desc': '这将永久删除 {name} 及其事项、周期和状态。',
+	'sidebar.delete_team_desc': '这将永久删除 {name} 及其议题、周期和状态。',
 	'sidebar.leave_team_desc': '你将离开 {name}。如果你是最后一个成员或工作区所有者，团队将被删除。',
 	'sidebar.this_team': '此团队',
 
@@ -129,9 +129,9 @@ export const sidebar = {
 
 	// Create team dialog
 	'sidebar.create_team_title': '创建团队',
-	'sidebar.create_team_desc': '团队用于组织事项和成员。',
+	'sidebar.create_team_desc': '团队用于组织议题和成员。',
 	'sidebar.identifier': '标识符',
-	'sidebar.identifier_desc': '用作事项前缀（例如 ENG-123）',
+	'sidebar.identifier_desc': '用作议题前缀（例如 ENG-123）',
 	'sidebar.description_optional': '描述（可选）',
 	'sidebar.team_desc_placeholder': '这个团队负责什么工作？',
 

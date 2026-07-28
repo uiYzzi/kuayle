@@ -1,7 +1,7 @@
 import type { TranslationKey } from '../en';
 
 export const cycles: Record<string, string> = {
-	'cycles.title': '迭代週期',
+	'cycles.title': '週期',
 	'cycles.new_cycle': '新增週期',
 	'cycles.no_cycles': '暫無週期',
 	'cycles.no_cycles_desc': '建立一個週期來規劃團隊的迭代工作',
@@ -15,13 +15,13 @@ export const cycles: Record<string, string> = {
 	'cycles.complete': '完成',
 	'cycles.select_dates': '選擇日期',
 	'cycles.select_date_range': '選擇開始和結束日期',
-	'cycles.issues_done': '已完成 {completed} / 共 {total} 個事項',
+	'cycles.issues_done': '已完成 {completed} / 共 {total} 個議題',
 	'cycles.goals': '目標',
 	'cycles.retrospective': '回顧',
 	'cycles.incomplete': '未完成',
-	'cycles.search_issues_placeholder': '搜尋要新增到此週期的事項...',
-	'cycles.no_issues': '此週期中沒有事項',
-	'cycles.no_issues_desc': '在上方搜尋並新增事項，或從事項詳情面板中指派',
+	'cycles.search_issues_placeholder': '搜尋要新增到此週期的議題...',
+	'cycles.no_issues': '此週期中沒有議題',
+	'cycles.no_issues_desc': '在上方搜尋並新增議題，或從議題詳情面板中指派',
 
 	'cycles.create.title': '建立週期',
 	'cycles.create.description': '週期幫助你在時間限制的迭代中規劃工作。',
@@ -39,7 +39,7 @@ export const cycles: Record<string, string> = {
 	'cycles.complete.mark_prefix': '將 ',
 	'cycles.complete.mark_suffix': ' 標記為已完成。',
 	'cycles.complete.carry_over_prefix': '將 ',
-	'cycles.complete.incomplete_to': ' 個未完成事項',
+	'cycles.complete.incomplete_to': ' 個未完成議題',
 	'cycles.complete.to': ' 移至 ',
 	'cycles.complete.no_upcoming_suffix': ' 將保留在此週期中（沒有即將到來的週期可以移入）。',
 
@@ -85,5 +85,5 @@ export const cycles: Record<string, string> = {
 	'cycles.toast.failed_activate': '啟用週期失敗',
 	'cycles.toast.failed_complete': '完成週期失敗',
 	'cycles.toast.failed_update_dates': '更新日期失敗',
-	'cycles.toast.failed_add_issue': '新增事項失敗',
+	'cycles.toast.failed_add_issue': '新增議題失敗',
 } as Record<string, string>;
