@@ -177,5 +177,18 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.create_issue.cycle': '周期',
 	'sharedComponents.create_issue.due_date_placeholder': '截止日期',
 	'sharedComponents.create_issue.create_more': '继续创建',
-	'sharedComponents.create_issue.create_issue': '创建议题'
+	'sharedComponents.create_issue.create_issue': '创建议题',
+	// IssueSelectors
+	'sharedComponents.selectors.search_statuses': '搜索状态...',
+	'sharedComponents.selectors.search_members': '搜索成员...',
+	'sharedComponents.selectors.search_labels': '搜索标签...',
+	'sharedComponents.selectors.search_projects': '搜索项目...',
+	'sharedComponents.selectors.search_cycles': '搜索周期...',
+	'sharedComponents.selectors.search_teams': '搜索团队...',
+	'sharedComponents.selectors.no_members': '无成员。',
+	'sharedComponents.selectors.no_labels': '无标签。',
+	'sharedComponents.selectors.no_projects': '无项目。',
+	'sharedComponents.selectors.no_cycles': '无周期。',
+	'sharedComponents.selectors.create_label': '创建标签「{name}」',
+	'sharedComponents.selectors.create_label_failed': '创建标签失败',
 } as Record<string, string>;

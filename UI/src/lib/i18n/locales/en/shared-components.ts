@@ -175,5 +175,18 @@ export const sharedComponents = {
 	'sharedComponents.create_issue.cycle': 'Cycle',
 	'sharedComponents.create_issue.due_date_placeholder': 'Due date',
 	'sharedComponents.create_issue.create_more': 'Create more',
-	'sharedComponents.create_issue.create_issue': 'Create issue'
+	'sharedComponents.create_issue.create_issue': 'Create issue',
+	// IssueSelectors
+	'sharedComponents.selectors.search_statuses': 'Search statuses...',
+	'sharedComponents.selectors.search_members': 'Search members...',
+	'sharedComponents.selectors.search_labels': 'Search labels...',
+	'sharedComponents.selectors.search_projects': 'Search projects...',
+	'sharedComponents.selectors.search_cycles': 'Search cycles...',
+	'sharedComponents.selectors.search_teams': 'Search teams...',
+	'sharedComponents.selectors.no_members': 'No members.',
+	'sharedComponents.selectors.no_labels': 'No labels.',
+	'sharedComponents.selectors.no_projects': 'No projects.',
+	'sharedComponents.selectors.no_cycles': 'No cycles.',
+	'sharedComponents.selectors.create_label': 'Create label "{name}"',
+	'sharedComponents.selectors.create_label_failed': 'Failed to create label',
 } as const;

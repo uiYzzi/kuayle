@@ -177,5 +177,18 @@ export const sharedComponents: Record<string, string> = {
 	'sharedComponents.create_issue.cycle': '週期',
 	'sharedComponents.create_issue.due_date_placeholder': '截止日期',
 	'sharedComponents.create_issue.create_more': '繼續建立',
-	'sharedComponents.create_issue.create_issue': '建立議題'
+	'sharedComponents.create_issue.create_issue': '建立議題',
+	// IssueSelectors
+	'sharedComponents.selectors.search_statuses': '搜尋狀態...',
+	'sharedComponents.selectors.search_members': '搜尋成員...',
+	'sharedComponents.selectors.search_labels': '搜尋標籤...',
+	'sharedComponents.selectors.search_projects': '搜尋專案...',
+	'sharedComponents.selectors.search_cycles': '搜尋週期...',
+	'sharedComponents.selectors.search_teams': '搜尋團隊...',
+	'sharedComponents.selectors.no_members': '無成員。',
+	'sharedComponents.selectors.no_labels': '無標籤。',
+	'sharedComponents.selectors.no_projects': '無專案。',
+	'sharedComponents.selectors.no_cycles': '無週期。',
+	'sharedComponents.selectors.create_label': '建立標籤「{name}」',
+	'sharedComponents.selectors.create_label_failed': '建立標籤失敗',
 } as Record<string, string>;

@@ -7,6 +7,7 @@
 	import type { Snippet } from 'svelte';
 	import { Plus } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		open = $bindable(false),
@@ -55,14 +56,14 @@
 			onchange(label.id);
 			open = false;
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create label');
+			appToast.apiError(err, i18n.t('sharedComponents.selectors.create_label_failed'));
 		} finally {
 			creating = false;
 		}
 	}
 </script>
 
-<ComboboxPopover bind:open placeholder="Search labels..." emptyMessage="No labels." {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={i18n.t('sharedComponents.selectors.search_labels')} emptyMessage={i18n.t('sharedComponents.selectors.no_labels')} {width} {align} {shortcutKey} {trigger}>
 	{#snippet children(searchValue: string)}
 		{@const labelName = searchValue.trim()}
 		{@const canCreate = slug && labelName && !visibleLabels.some((label) => label.name.toLowerCase() === labelName.toLowerCase())}
@@ -73,7 +74,7 @@
 				class="flex items-center gap-2"
 			>
 				<Plus size={14} />
-				<span class="truncate">{creating ? 'Creating...' : `Create label "${labelName}"`}</span>
+				<span class="truncate">{creating ? i18n.t('common.creating') : i18n.t('sharedComponents.selectors.create_label', { name: labelName })}</span>
 			</Command.Item>
 		{/if}
 		{#each visibleLabels as label (label.id)}
