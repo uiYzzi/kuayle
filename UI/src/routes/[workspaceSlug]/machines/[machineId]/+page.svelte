@@ -26,6 +26,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Switch } from '$lib/components/ui/switch';
 	import { safeGitHubPullRequestUrl } from '$lib/security/github-url';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	const machineId = $derived(page.params.machineId ?? '');
@@ -558,7 +559,7 @@
 {#if loading}
 	<LoadingState />
 {:else if failed || !machine}
-	<ErrorState message="Unable to load Dev Machine" onretry={load} />
+	<ErrorState message={i18n.t('machines.failed_load_detail')} onretry={load} />
 {:else}
 	<div class="flex h-full flex-col">
 		<header class="flex min-h-[49px] items-center justify-between gap-3 border-b border-[var(--app-border)] px-4">
@@ -567,27 +568,27 @@
 				<Server size={15} />
 				<span class="truncate text-sm font-medium">{machine.name}</span>
 				<MachineStatusBadge status={machine.status} />
-				{#if machine.environment_builder}<span class="text-[10px] font-semibold uppercase text-[var(--app-accent)]">Environment Builder</span>{/if}
+				{#if machine.environment_builder}<span class="text-[10px] font-semibold uppercase text-[var(--app-accent)]">{i18n.t('machines.environment_builder')}</span>{/if}
 				{#if isPending}
 					<span class="inline-flex items-center gap-1 rounded-full border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase text-blue-400">
-						<Loader size={10} class="animate-spin" /> Transitioning
+						<Loader size={10} class="animate-spin" /> {i18n.t('machines.transitioning')}
 					</span>
 				{/if}
 			</div>
 			<div class="flex items-center gap-1">
 				{#if machine.environment_builder && (machine.status === 'paused' || machine.status === 'stopped')}
-					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => { snapshotName = `${machine?.name ?? 'Development'} environment`; snapshotOpen = true; }} title="Save development environment"><Save size={15} /></Button>
+					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => { snapshotName = `${machine?.name ?? 'Development'} environment`; snapshotOpen = true; }} title={i18n.t('machines.save_environment')}><Save size={15} /></Button>
 				{/if}
 				{#if machine.status === 'running' && !isPending}
-					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => lifecycle('pause')} title="Pause"><Pause size={15} /></Button>
-					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => lifecycle('stop')} title="Stop"><Square size={15} /></Button>
+					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => lifecycle('pause')} title={i18n.t('machines.pause')}><Pause size={15} /></Button>
+					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => lifecycle('stop')} title={i18n.t('machines.stop')}><Square size={15} /></Button>
 				{/if}
 				{#if (machine.status === 'paused' || machine.status === 'stopped' || machine.status === 'failed') && !isPending}
-					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => lifecycle('start')} title="Start"><Play size={15} /></Button>
+					<Button variant="ghost" size="icon-sm" disabled={actionBusy} onclick={() => lifecycle('start')} title={i18n.t('machines.start')}><Play size={15} /></Button>
 				{/if}
-				<Button variant="ghost" size="icon-sm" disabled={actionBusy || machine.status === 'destroyed'} onclick={() => (teardownConfirm = true)} title="Teardown runtime"><ServerOff size={15} /></Button>
+				<Button variant="ghost" size="icon-sm" disabled={actionBusy || machine.status === 'destroyed'} onclick={() => (teardownConfirm = true)} title={i18n.t('machines.teardown_runtime')}><ServerOff size={15} /></Button>
 				{#if canAdminDevMachines}
-					<Button variant="destructive" size="icon-sm" disabled={actionBusy} onclick={() => (deleteConfirm = true)} title="Delete permanently"><Trash2 size={15} /></Button>
+					<Button variant="destructive" size="icon-sm" disabled={actionBusy} onclick={() => (deleteConfirm = true)} title={i18n.t('machines.delete_permanently')}><Trash2 size={15} /></Button>
 				{/if}
 			</div>
 		</header>
@@ -595,43 +596,43 @@
 		<div class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 			<div class="mx-auto max-w-6xl space-y-5">
 				<section class="grid gap-3 md:grid-cols-4">
-					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4 md:col-span-2"><p class="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">Repository affinity</p>{#if machine.repo_owner && machine.repo_name}<p class="mt-2 text-sm font-medium">{machine.repo_owner}/{machine.repo_name}</p><p class="mt-1 flex items-center gap-1 text-xs text-[var(--color-text-tertiary)]"><GitBranch size={12} />{checkouts.length} issue {checkouts.length === 1 ? 'branch' : 'branches'}</p>{:else}<p class="mt-2 text-sm text-[var(--color-text-tertiary)]">No repository attached. Open this machine from an issue to prepare a branch.</p>{/if}</div>
-					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><p class="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">CPU / memory</p><p class="mt-2 text-sm font-medium">{latestUsage?.cpu_percent.toFixed(1) ?? '0.0'}% · {bytes(latestUsage?.memory_bytes)}</p><p class="mt-1 text-xs text-[var(--color-text-tertiary)]">Limit {machine.cpu_millis / 1000} CPU / {machine.memory_mb / 1024} GB</p></div>
-					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><p class="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">Workspace disk</p><p class="mt-2 text-sm font-medium">{bytes(latestUsage?.disk_bytes)}</p><p class="mt-1 text-xs text-[var(--color-text-tertiary)]">Hard limit {machine.disk_gb} GB</p></div>
+					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4 md:col-span-2"><p class="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.repository_affinity')}</p>{#if machine.repo_owner && machine.repo_name}<p class="mt-2 text-sm font-medium">{machine.repo_owner}/{machine.repo_name}</p><p class="mt-1 flex items-center gap-1 text-xs text-[var(--color-text-tertiary)]"><GitBranch size={12} />{checkouts.length} issue {checkouts.length === 1 ? 'branch' : 'branches'}</p>{:else}<p class="mt-2 text-sm text-[var(--color-text-tertiary)]">{i18n.t('machines.no_repository_attached')}</p>{/if}</div>
+					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><p class="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.cpu_memory')}</p><p class="mt-2 text-sm font-medium">{latestUsage?.cpu_percent.toFixed(1) ?? '0.0'}% · {bytes(latestUsage?.memory_bytes)}</p><p class="mt-1 text-xs text-[var(--color-text-tertiary)]">Limit {machine.cpu_millis / 1000} CPU / {machine.memory_mb / 1024} GB</p></div>
+					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><p class="text-[10px] uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.workspace_disk')}</p><p class="mt-2 text-sm font-medium">{bytes(latestUsage?.disk_bytes)}</p><p class="mt-1 text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.hard_limit', { disk: machine.disk_gb })}</p></div>
 				</section>
 
 				<Card.Root>
 					<Card.Header>
-						<Card.Title class="text-sm">Developer environment</Card.Title>
-						<Card.Description>Open code-server or a native terminal into the same workspace. Paused machines resume automatically; stopped machines must be started explicitly.</Card.Description>
+						<Card.Title class="text-sm">{i18n.t('machines.developer_environment')}</Card.Title>
+						<Card.Description>{i18n.t('machines.developer_environment_desc')}</Card.Description>
 					</Card.Header>
 					<Card.Content>
 						<div class="grid gap-3 sm:grid-cols-2">
 							<Button variant="outline" class="h-auto justify-start gap-3 p-4" disabled={!ideService || !machineCanAutoLaunch() || (!!ideService && launchBusyFor(ideService))} onclick={() => ideService && launch(ideService)}>
 								<Code2 class="size-5" />
-								<span class="text-left"><span class="block text-sm font-medium">Code Editor</span><span class="block text-xs text-muted-foreground">Generic workspace at /workspace/tasks</span></span>
+								<span class="text-left"><span class="block text-sm font-medium">{i18n.t('machines.code_editor')}</span><span class="block text-xs text-muted-foreground">{i18n.t('machines.code_editor_desc')}</span></span>
 							</Button>
 							<Button variant="outline" class="h-auto justify-start gap-3 p-4" disabled={!terminalService || !machineCanAutoLaunch()} onclick={() => terminalService && launch(terminalService)}>
 								<SquareTerminal class="size-5" />
-								<span class="text-left"><span class="block text-sm font-medium">Native Terminal</span><span class="block text-xs text-muted-foreground">In-app ttyd session at /workspace/tasks</span></span>
+								<span class="text-left"><span class="block text-sm font-medium">{i18n.t('machines.native_terminal')}</span><span class="block text-xs text-muted-foreground">{i18n.t('machines.native_terminal_desc')}</span></span>
 							</Button>
 						</div>
 					</Card.Content>
 				</Card.Root>
 
 				<section class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4">
-					<div class="flex items-center justify-between gap-4"><div><h2 class="text-sm font-semibold">Inactivity</h2><p class="text-xs text-[var(--color-text-tertiary)]">Pause automatically after workspace inactivity unless kept running.</p></div><label class="flex items-center gap-2 text-sm"><span>Keep running</span><Switch aria-label="Keep running" checked={machine.keep_running} onCheckedChange={toggleKeepRunning} /></label></div>
+					<div class="flex items-center justify-between gap-4"><div><h2 class="text-sm font-semibold">{i18n.t('machines.inactivity')}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.inactivity_desc')}</p></div><label class="flex items-center gap-2 text-sm"><span>{i18n.t('machines.keep_running')}</span><Switch aria-label={i18n.t('machines.keep_running')} checked={machine.keep_running} onCheckedChange={toggleKeepRunning} /></label></div>
 				</section>
 
 				<section class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4">
-					<div class="mb-3"><h2 class="text-sm font-semibold">Issue worktrees</h2><p class="text-xs text-[var(--color-text-tertiary)]">Each issue branch has an independent checkout on this machine.</p></div>
+					<div class="mb-3"><h2 class="text-sm font-semibold">{i18n.t('machines.issue_worktrees')}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.issue_worktrees_desc')}</p></div>
 					<div class="space-y-2">
-						{#if checkouts.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">No issue branches prepared yet.</p>{/if}
+						{#if checkouts.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.no_issue_branches')}</p>{/if}
 						{#each checkouts as checkout}
 							<div class="flex flex-col justify-between gap-3 rounded-lg border border-[var(--app-border)] p-3 sm:flex-row sm:items-center">
 								<div class="min-w-0"><p class="truncate text-xs font-medium">{checkout.repository_full_name}</p><p class="mt-1 truncate text-[10px] text-[var(--color-text-tertiary)]">{checkout.working_branch} · {checkout.status}</p>{#if checkout.last_error}<p class="mt-1 text-[10px] text-red-400">{checkout.last_error}</p>{/if}</div>
 								{#if checkout.status === 'ready' && machineCanAutoLaunch()}
-									<div class="flex gap-2"><Button size="sm" variant="outline" disabled={!ideService || (!!ideService && launchBusyFor(ideService, checkout.id))} onclick={() => { if (ideService) launch(ideService, checkout.id); }}><Code2 size={13} />Code Editor</Button><Button size="sm" variant="outline" disabled={!terminalService} onclick={() => { if (terminalService) launch(terminalService, checkout.id); }}><SquareTerminal size={13} />Terminal</Button></div>
+									<div class="flex gap-2"><Button size="sm" variant="outline" disabled={!ideService || (!!ideService && launchBusyFor(ideService, checkout.id))} onclick={() => { if (ideService) launch(ideService, checkout.id); }}><Code2 size={13} />{i18n.t('machines.code_editor')}</Button><Button size="sm" variant="outline" disabled={!terminalService} onclick={() => { if (terminalService) launch(terminalService, checkout.id); }}><SquareTerminal size={13} />{i18n.t('machines.terminal')}</Button></div>
 								{/if}
 							</div>
 						{/each}
@@ -640,9 +641,9 @@
 
 				<section class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4">
 					<div class="mb-3 flex items-center justify-between">
-						<div><h2 class="text-sm font-semibold">Services</h2><p class="text-xs text-[var(--color-text-tertiary)]">All public access is authenticated by the machine gateway.</p></div>
+						<div><h2 class="text-sm font-semibold">{i18n.t('machines.services')}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.services_desc')}</p></div>
 						{#if machine.status === 'running' && !isPending && readyCheckouts.length > 0}
-							<Button size="sm" onclick={() => (runOpen = true)}><Bot size={13} />Run agent</Button>
+							<Button size="sm" onclick={() => (runOpen = true)}><Bot size={13} />{i18n.t('machines.run_agent')}</Button>
 						{/if}
 					</div>
 					<div class="grid gap-2 md:grid-cols-2">
@@ -653,9 +654,9 @@
 									<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]">{service.status} · {service.health_status}{#if service.health_message && service.health_status !== 'healthy'} · {service.health_message}{/if}</p>
 								</div>
 								{#if serviceActionAvailable(service) && service.service_type !== 'ide' && service.service_type !== 'terminal'}
-									<Button variant="ghost" size="icon-sm" disabled={launchBusyFor(service)} onclick={() => launch(service)} title="Open service"><ExternalLink size={14} /></Button>
+									<Button variant="ghost" size="icon-sm" disabled={launchBusyFor(service)} onclick={() => launch(service)} title={i18n.t('machines.open_service')}><ExternalLink size={14} /></Button>
 								{:else if serviceActionAvailable(service) && (machine.environment_builder || checkouts.length === 0) && (service.service_type === 'ide' || service.service_type === 'terminal')}
-									<Button variant="ghost" size="icon-sm" disabled={launchBusyFor(service)} onclick={() => launch(service)} title={service.service_type === 'ide' ? 'Open Code Editor' : 'Open Terminal'}>{#if service.service_type === 'ide'}<Code2 size={14} />{:else}<SquareTerminal size={14} />{/if}</Button>
+									<Button variant="ghost" size="icon-sm" disabled={launchBusyFor(service)} onclick={() => launch(service)} title={service.service_type === 'ide' ? i18n.t('machines.open_code_editor') : i18n.t('machines.open_terminal')}>{#if service.service_type === 'ide'}<Code2 size={14} />{:else}<SquareTerminal size={14} />{/if}</Button>
 								{/if}
 							</div>
 						{/each}
@@ -663,14 +664,14 @@
 				</section>
 
 				<section id="agent-runs" class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4 scroll-mt-4">
-					<h2 class="text-sm font-semibold">Agent runs</h2>
+					<h2 class="text-sm font-semibold">{i18n.t('machines.agent_runs')}</h2>
 					<div class="mt-3 space-y-2">
-						{#if runs.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">No agent runs yet.</p>{/if}
+						{#if runs.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.no_agent_runs')}</p>{/if}
 						{#each runs as run}
 							{@const trustedPullRequestUrl = pullRequestUrl(run)}
 							<article id={`agent-run-${run.id}`} class="rounded-lg border border-[var(--app-border)] p-3 transition-colors hover:bg-[var(--color-bg-hover)] scroll-mt-4">
 								<div class="flex items-start gap-2">
-									<button type="button" class="min-w-0 flex-1 text-left" onclick={() => openTrace(run.id)} aria-label={`View ${run.provider_id} agent run activity`}>
+									<button type="button" class="min-w-0 flex-1 text-left" onclick={() => openTrace(run.id)} aria-label={i18n.t('machines.view_agent_activity', { provider: run.provider_id })}>
 										<span class="flex items-center justify-between gap-2">
 											<span><span class="text-xs font-medium">{run.provider_id}</span><span class="ml-2 text-[10px] uppercase text-[var(--color-text-tertiary)]">{run.mode}</span></span>
 											<span class="text-[10px] font-semibold uppercase">{run.status}</span>
@@ -679,20 +680,20 @@
 									</button>
 									{#if ['queued', 'starting', 'running', 'waiting_input'].includes(run.status)}
 										<Button variant="ghost" size="xs" disabled={cancelBusy[run.id]} onclick={() => doCancelAgentRun(run.id)} class="shrink-0 text-red-400">
-											{cancelBusy[run.id] ? 'Cancelling...' : 'Cancel'}
+											{cancelBusy[run.id] ? i18n.t('machines.cancelling') : i18n.t('common.cancel')}
 										</Button>
 									{/if}
 								</div>
-								{#if trustedPullRequestUrl}<a href={trustedPullRequestUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-[var(--app-accent)]">Pull request <ExternalLink size={11} /></a>{/if}
+								{#if trustedPullRequestUrl}<a href={trustedPullRequestUrl} target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-xs text-[var(--app-accent)]">{i18n.t('machines.pull_request')} <ExternalLink size={11} /></a>{/if}
 								{#if run.risk_notes?.length}<div class="mt-2 text-xs text-amber-400">{run.risk_notes.join(' · ')}</div>{/if}
 							</article>
 						{/each}
-						{#if runsHasMore}<Button variant="outline" size="sm" disabled={runsLoading} onclick={loadMoreRuns}>{runsLoading ? 'Loading...' : 'Load older runs'}</Button>{/if}
+						{#if runsHasMore}<Button variant="outline" size="sm" disabled={runsLoading} onclick={loadMoreRuns}>{runsLoading ? i18n.t('common.loading') : i18n.t('machines.load_older_runs')}</Button>{/if}
 					</div>
 				</section>
 
 				<section id="activity" class="grid gap-5 lg:grid-cols-2 scroll-mt-4">
-					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><h2 class="text-sm font-semibold">Activity ({events.length})</h2>{#if eventsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="machine-events-retention">Showing the latest {DEV_MACHINE_EVENT_RETENTION} entries; older activity is omitted from this live view.</p>{/if}<div class="mt-3 max-h-96 space-y-3 overflow-y-auto">{#if events.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">No activity yet.</p>{/if}{#each events as event}
+					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><h2 class="text-sm font-semibold">{i18n.t('machines.activity')} ({events.length})</h2>{#if eventsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="machine-events-retention">{i18n.t('machines.events_retention', { count: DEV_MACHINE_EVENT_RETENTION })}</p>{/if}<div class="mt-3 max-h-96 space-y-3 overflow-y-auto">{#if events.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.no_activity')}</p>{/if}{#each events as event}
 						{#if event.agent_run_id}
 							<button type="button" class="block w-full border-l border-[var(--app-border)] pl-3 text-left transition-colors hover:border-[var(--app-accent)]" onclick={() => openTrace(event.agent_run_id!)} aria-label={`View agent activity for ${event.event_type}`}>
 								<span class="block text-xs font-medium">{event.event_type.replaceAll('_', ' ')}</span>
@@ -705,7 +706,7 @@
 							</div>
 						{/if}
 					{/each}</div></div>
-					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><h2 class="text-sm font-semibold">Logs ({logs.length})</h2>{#if logsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="machine-logs-retention">Showing the latest {DEV_MACHINE_LOG_RETENTION} chunks; older logs are omitted from this live view.</p>{/if}<pre class="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-black/30 p-3 text-[11px] leading-relaxed text-zinc-300">{logs.length ? logs.map((chunk) => `[${chunk.stream}] ${chunk.content}`).join('\n') : 'No logs yet.'}</pre></div>
+					<div class="rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-4"><h2 class="text-sm font-semibold">{i18n.t('machines.logs')} ({logs.length})</h2>{#if logsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="machine-logs-retention">{i18n.t('machines.logs_retention', { count: DEV_MACHINE_LOG_RETENTION })}</p>{/if}<pre class="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-lg bg-black/30 p-3 text-[11px] leading-relaxed text-zinc-300">{logs.length ? logs.map((chunk) => `[${chunk.stream}] ${chunk.content}`).join('\n') : i18n.t('machines.no_logs')}</pre></div>
 				</section>
 			</div>
 		</div>
@@ -715,7 +716,7 @@
 
 	<AgentRunTraceSheet bind:open={traceOpen} {slug} runId={traceRunId} {machine} {checkouts} onclose={closeTrace} />
 
-	<AlertDialog.Root bind:open={teardownConfirm}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>Teardown Dev Machine?</AlertDialog.Title><AlertDialog.Description>This removes containers, the isolated network, workspace volume, and active access sessions while retaining the machine history.</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel>Cancel</AlertDialog.Cancel><AlertDialog.Action onclick={teardown}>Teardown</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
-	<AlertDialog.Root bind:open={deleteConfirm}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>Delete Dev Machine permanently?</AlertDialog.Title><AlertDialog.Description>This tears down any running resources, then permanently removes machine history, logs, agent runs, issue worktrees, and volumes. This cannot be undone.</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel>Cancel</AlertDialog.Cancel><AlertDialog.Action variant="destructive" onclick={removeMachine} disabled={actionBusy}>{actionBusy ? 'Deleting...' : 'Delete permanently'}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
-	<Dialog.Root bind:open={snapshotOpen}><Dialog.Content class="sm:max-w-md"><Dialog.Header><Dialog.Title>Save development environment</Dialog.Title><Dialog.Description>Capture the paused developer container as an immutable local image. Repositories, volumes, and secrets are excluded.</Dialog.Description></Dialog.Header><label class="space-y-1.5"><Label for="snapshot-name">Environment name</Label><Input id="snapshot-name" bind:value={snapshotName} /></label><Dialog.Footer><Button variant="outline" onclick={() => (snapshotOpen = false)}>Cancel</Button><Button onclick={saveSnapshot} disabled={snapshotBusy || !snapshotName.trim()}>{snapshotBusy ? 'Queuing...' : 'Save snapshot'}</Button></Dialog.Footer></Dialog.Content></Dialog.Root>
+	<AlertDialog.Root bind:open={teardownConfirm}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>{i18n.t('machines.teardown_title')}</AlertDialog.Title><AlertDialog.Description>{i18n.t('machines.teardown_desc')}</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel>{i18n.t('common.cancel')}</AlertDialog.Cancel><AlertDialog.Action onclick={teardown}>{i18n.t('machines.teardown_action')}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
+	<AlertDialog.Root bind:open={deleteConfirm}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>{i18n.t('machines.delete_title')}</AlertDialog.Title><AlertDialog.Description>{i18n.t('machines.delete_desc')}</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel>{i18n.t('common.cancel')}</AlertDialog.Cancel><AlertDialog.Action variant="destructive" onclick={removeMachine} disabled={actionBusy}>{actionBusy ? i18n.t('machines.deleting') : i18n.t('machines.delete_action')}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
+	<Dialog.Root bind:open={snapshotOpen}><Dialog.Content class="sm:max-w-md"><Dialog.Header><Dialog.Title>{i18n.t('machines.snapshot_title')}</Dialog.Title><Dialog.Description>{i18n.t('machines.snapshot_desc')}</Dialog.Description></Dialog.Header><label class="space-y-1.5"><Label for="snapshot-name">{i18n.t('machines.environment_name')}</Label><Input id="snapshot-name" bind:value={snapshotName} /></label><Dialog.Footer><Button variant="outline" onclick={() => (snapshotOpen = false)}>{i18n.t('common.cancel')}</Button><Button onclick={saveSnapshot} disabled={snapshotBusy || !snapshotName.trim()}>{snapshotBusy ? i18n.t('machines.queuing') : i18n.t('machines.save_snapshot')}</Button></Dialog.Footer></Dialog.Content></Dialog.Root>
 {/if}

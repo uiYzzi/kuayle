@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue, RelationType, IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Label } from '$lib/types/label';
@@ -192,7 +192,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] {issue.priority === value ? 'bg-[var(--color-bg-hover)]' : ''}"
 						>
 							<IssuePriorityIcon priority={value} size={14} />
-							{PRIORITY_LABELS[value]}
+							{getPriorityLabel(value)}
 						</button>
 					{/each}
 				</Popover.Content>

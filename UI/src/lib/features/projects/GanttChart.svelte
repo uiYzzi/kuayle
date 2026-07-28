@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue, IssueStatus } from '$lib/types/issue';
-	import { STATUS_LABELS } from '$lib/types/issue';
+	import { getStatusLabel } from '$lib/types/issue';
 	import type { Cycle } from '$lib/types/cycle';
 	import * as echarts from 'echarts';
 	import { Filter, X } from 'lucide-svelte';
@@ -444,7 +444,7 @@
 						onclick={() => toggleStatus(s)}
 						class="rounded-md px-2 py-0.5 text-[11px] {filterStatus.has(s) ? 'bg-[var(--app-accent)] text-white' : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]'}"
 					>
-						{STATUS_LABELS[s]}
+						{getStatusLabel(s)}
 					</button>
 				{/each}
 			</div>

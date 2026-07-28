@@ -1,10 +1,11 @@
 <script lang="ts">
 	import type { DevMachineStatus } from '$lib/types/dev-machine';
 	import { Badge } from '$lib/components/ui/badge';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let { status }: { status: DevMachineStatus } = $props();
 
-	const label = $derived(status.replaceAll('_', ' '));
+	const label = $derived(i18n.t('machines.status_' + status) || status.replaceAll('_', ' '));
 	const style = $derived(
 		status === 'running'
 			? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'

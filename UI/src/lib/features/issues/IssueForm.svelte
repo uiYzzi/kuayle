@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CreateIssueRequest, IssuePriority } from '$lib/types/issue';
 	import type { Team } from '$lib/types/team';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabels } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 
 	let {
@@ -76,7 +76,7 @@
 			bind:value={priority}
 			class="rounded border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-2 py-1.5 text-sm text-[var(--color-text-secondary)]"
 		>
-			{#each Object.entries(PRIORITY_LABELS) as [value, label]}
+			{#each Object.entries(getPriorityLabels()) as [value, label]}
 				<option value={Number(value)}>{label}</option>
 			{/each}
 		</select>

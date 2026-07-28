@@ -2,7 +2,7 @@
 	import ComboboxPopover from '$lib/components/shared/ComboboxPopover.svelte';
 	import * as Command from '$lib/components/ui/command/index.js';
 	import IssuePriorityIcon from '$lib/features/issues/IssuePriorityIcon.svelte';
-	import { PRIORITY_LABELS, type IssuePriority } from '$lib/types/issue';
+	import { getPriorityLabel, type IssuePriority } from '$lib/types/issue';
 	import type { Snippet } from 'svelte';
 
 	let {
@@ -29,13 +29,13 @@
 <ComboboxPopover bind:open showSearch={false} {width} {align} {shortcutKey} {trigger}>
 	{#each priorityValues as p (p)}
 		<Command.Item
-			value={PRIORITY_LABELS[p]}
+			value={getPriorityLabel(p)}
 			onSelect={() => { onchange(p); open = false; }}
 			data-checked={value === p}
 			class="flex items-center gap-2"
 		>
 			<IssuePriorityIcon priority={p} size={14} />
-			{PRIORITY_LABELS[p]}
+			{getPriorityLabel(p)}
 		</Command.Item>
 	{/each}
 </ComboboxPopover>

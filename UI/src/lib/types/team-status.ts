@@ -1,3 +1,6 @@
+import { i18n } from '$lib/i18n/index.svelte';
+import type { TranslationKey } from '$lib/i18n/locales/en';
+
 export type StatusCategory = 'backlog' | 'unstarted' | 'started' | 'completed' | 'cancelled';
 
 export interface TeamStatus {
@@ -16,10 +19,17 @@ export interface TeamStatus {
 
 export const CATEGORY_ORDER: StatusCategory[] = ['backlog', 'unstarted', 'started', 'completed', 'cancelled'];
 
-export const CATEGORY_LABELS: Record<StatusCategory, string> = {
-	backlog: 'Backlog',
-	unstarted: 'Unstarted',
-	started: 'Started',
-	completed: 'Completed',
-	cancelled: 'Cancelled',
-};
+export function getCategoryLabel(category: StatusCategory): string {
+	const key = `common.category.${category}` as TranslationKey;
+	return i18n.t(key);
+}
+
+export function getCategoryLabels(): Record<StatusCategory, string> {
+	return {
+		backlog: i18n.t('common.category.backlog'),
+		unstarted: i18n.t('common.category.unstarted'),
+		started: i18n.t('common.category.started'),
+		completed: i18n.t('common.category.completed'),
+		cancelled: i18n.t('common.category.cancelled')
+	};
+}

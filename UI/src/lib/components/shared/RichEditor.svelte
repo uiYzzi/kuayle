@@ -38,6 +38,7 @@
 		Paperclip
 	} from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import { sanitizeEditorOutput } from '$lib/security/sanitize';
 	import { createSlashCommandExtension } from './slash-command/slash-command.extension';
 	import { filterSlashItems, flatFilteredItems, type SlashMenuItem } from './slash-command/slash-items';
@@ -204,8 +205,8 @@
 				handle.type = 'button';
 				handle.className = 'image-resize-handle';
 				handle.contentEditable = 'false';
-				handle.setAttribute('aria-label', 'Resize image');
-				handle.title = 'Drag to resize. Use arrow keys for 5% steps.';
+				handle.setAttribute('aria-label', i18n.t('sharedComponents.rich_editor.resize_image'));
+				handle.title = i18n.t('sharedComponents.rich_editor.drag_to_resize');
 
 				function currentPercent(): number {
 					const stored = Number.parseFloat(String(currentNode.attrs.width ?? ''));
@@ -899,73 +900,73 @@
 	{#if showStaticToolbar}
 		<!-- Toolbar -->
 		<div class="flex items-center gap-0.5 border-b border-[var(--app-border)] px-2 py-1">
-			<button type="button" onclick={toggleBold} class={btnClass(editor?.isActive('bold') ?? false)} title="Bold">
+			<button type="button" onclick={toggleBold} class={btnClass(editor?.isActive('bold') ?? false)} title={i18n.t('sharedComponents.rich_editor.bold')}>
 				<Bold size={14} />
 			</button>
-			<button type="button" onclick={toggleItalic} class={btnClass(editor?.isActive('italic') ?? false)} title="Italic">
+			<button type="button" onclick={toggleItalic} class={btnClass(editor?.isActive('italic') ?? false)} title={i18n.t('sharedComponents.rich_editor.italic')}>
 				<Italic size={14} />
 			</button>
-			<button type="button" onclick={toggleStrike} class={btnClass(editor?.isActive('strike') ?? false)} title="Strikethrough">
+			<button type="button" onclick={toggleStrike} class={btnClass(editor?.isActive('strike') ?? false)} title={i18n.t('sharedComponents.rich_editor.strikethrough')}>
 				<Strikethrough size={14} />
 			</button>
-			<button type="button" onclick={toggleCode} class={btnClass(editor?.isActive('code') ?? false)} title="Inline code">
+			<button type="button" onclick={toggleCode} class={btnClass(editor?.isActive('code') ?? false)} title={i18n.t('sharedComponents.rich_editor.inline_code')}>
 				<Code size={14} />
 			</button>
 
 			<Separator orientation="vertical" class="mx-1 h-4" />
 
-			<button type="button" onclick={toggleH1} class={btnClass(editor?.isActive('heading', { level: 1 }) ?? false)} title="Heading 1">
+			<button type="button" onclick={toggleH1} class={btnClass(editor?.isActive('heading', { level: 1 }) ?? false)} title={i18n.t('sharedComponents.rich_editor.heading_1')}>
 				<Heading1 size={14} />
 			</button>
-			<button type="button" onclick={toggleH2} class={btnClass(editor?.isActive('heading', { level: 2 }) ?? false)} title="Heading 2">
+			<button type="button" onclick={toggleH2} class={btnClass(editor?.isActive('heading', { level: 2 }) ?? false)} title={i18n.t('sharedComponents.rich_editor.heading_2')}>
 				<Heading2 size={14} />
 			</button>
 
 			<Separator orientation="vertical" class="mx-1 h-4" />
 
-			<button type="button" onclick={toggleBulletList} class={btnClass(editor?.isActive('bulletList') ?? false)} title="Bullet list">
+			<button type="button" onclick={toggleBulletList} class={btnClass(editor?.isActive('bulletList') ?? false)} title={i18n.t('sharedComponents.rich_editor.bullet_list')}>
 				<List size={14} />
 			</button>
-			<button type="button" onclick={toggleOrderedList} class={btnClass(editor?.isActive('orderedList') ?? false)} title="Ordered list">
+			<button type="button" onclick={toggleOrderedList} class={btnClass(editor?.isActive('orderedList') ?? false)} title={i18n.t('sharedComponents.rich_editor.ordered_list')}>
 				<ListOrdered size={14} />
 			</button>
-			<button type="button" onclick={toggleTaskList} class={btnClass(editor?.isActive('taskList') ?? false)} title="Task list">
+			<button type="button" onclick={toggleTaskList} class={btnClass(editor?.isActive('taskList') ?? false)} title={i18n.t('sharedComponents.rich_editor.task_list')}>
 				<ListChecks size={14} />
 			</button>
 
 			<Separator orientation="vertical" class="mx-1 h-4" />
 
-			<button type="button" onclick={toggleLink} class={btnClass(editor?.isActive('link') ?? false)} title="Link">
+			<button type="button" onclick={toggleLink} class={btnClass(editor?.isActive('link') ?? false)} title={i18n.t('sharedComponents.rich_editor.link')}>
 				<LinkIcon size={14} />
 			</button>
-			<button type="button" onclick={toggleCodeBlock} class={btnClass(editor?.isActive('codeBlock') ?? false)} title="Code block">
+			<button type="button" onclick={toggleCodeBlock} class={btnClass(editor?.isActive('codeBlock') ?? false)} title={i18n.t('sharedComponents.rich_editor.code_block')}>
 				<Code2 size={14} />
 			</button>
 			{#if uploadUrl}
-				<button type="button" onclick={() => chooseFiles(true)} class={btnClass(false)} title="Upload image">
+				<button type="button" onclick={() => chooseFiles(true)} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.upload_image')}>
 					<ImagePlus size={14} />
 				</button>
-				<button type="button" onclick={() => chooseFiles()} class={btnClass(false)} title="Attach files">
+				<button type="button" onclick={() => chooseFiles()} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.attach_files')}>
 					<Paperclip size={14} />
 				</button>
 			{/if}
 
 			<div class="flex-1"></div>
 
-			<button type="button" onclick={undo} class={btnClass(false)} title="Undo">
+			<button type="button" onclick={undo} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.undo')}>
 				<Undo2 size={14} />
 			</button>
-			<button type="button" onclick={redo} class={btnClass(false)} title="Redo">
+			<button type="button" onclick={redo} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.redo')}>
 				<Redo2 size={14} />
 			</button>
 		</div>
 	{/if}
 	{#if editable && uploadUrl && bubbleMenu}
 		<div class="flex items-center justify-end gap-0.5 px-1 py-0.5">
-			<button type="button" onclick={() => chooseFiles(true)} class={btnClass(false)} title="Upload image" aria-label="Upload image">
+			<button type="button" onclick={() => chooseFiles(true)} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.upload_image')} aria-label={i18n.t('sharedComponents.rich_editor.upload_image')}>
 				<ImagePlus size={14} />
 			</button>
-			<button type="button" onclick={() => chooseFiles()} class={btnClass(false)} title="Attach files" aria-label="Attach files">
+			<button type="button" onclick={() => chooseFiles()} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.attach_files')} aria-label={i18n.t('sharedComponents.rich_editor.attach_files')}>
 				<Paperclip size={14} />
 			</button>
 		</div>
@@ -982,7 +983,7 @@
 			{#if reworkingSelection}
 				<div class="ai-rewrite-overlay" aria-live="polite">
 					<Sparkles size={14} class="ai-rewrite-spinner" />
-					<span>Reworking selection...</span>
+					<span>{i18n.t('sharedComponents.rich_editor.reworking_selection')}</span>
 				</div>
 			{/if}
 		</div>
@@ -1013,56 +1014,56 @@
 	{#if bubbleMenu && editor && editable}
 		<BubbleMenu {editor} shouldShow={shouldShowBubble}>
 			{#snippet children()}
-				<div class="bubble-toolbar" role="toolbar" aria-label="Editor formatting" tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
+				<div class="bubble-toolbar" role="toolbar" aria-label={i18n.t('sharedComponents.rich_editor.editor_formatting')} tabindex="-1" onpointerdown={(event) => event.preventDefault()}>
 					{#if editor?.isActive('image')}
-						<span class="bubble-image-label">Image size</span>
+						<span class="bubble-image-label">{i18n.t('sharedComponents.rich_editor.image_size')}</span>
 						{#each ['25%', '50%', '75%', '100%'] as width}
-							<button type="button" onclick={() => setImageWidth(width)} class={btnClass(editor?.getAttributes('image').width === width)} title={`Set image width to ${width}`}>
+							<button type="button" onclick={() => setImageWidth(width)} class={btnClass(editor?.getAttributes('image').width === width)} title={i18n.t('sharedComponents.rich_editor.set_image_width', { width })}>
 								{width}
 							</button>
 						{/each}
-						<button type="button" onclick={() => setImageWidth(null)} class={btnClass(!editor?.getAttributes('image').width)} title="Use original image size">Auto</button>
+						<button type="button" onclick={() => setImageWidth(null)} class={btnClass(!editor?.getAttributes('image').width)} title={i18n.t('sharedComponents.rich_editor.use_original_image_size')}>{i18n.t('sharedComponents.rich_editor.auto')}</button>
 					{:else}
-					<button type="button" onclick={toggleBold} class={btnClass(editor?.isActive('bold') ?? false)} title="Bold">
+					<button type="button" onclick={toggleBold} class={btnClass(editor?.isActive('bold') ?? false)} title={i18n.t('sharedComponents.rich_editor.bold')}>
 						<Bold size={14} />
 					</button>
-					<button type="button" onclick={toggleItalic} class={btnClass(editor?.isActive('italic') ?? false)} title="Italic">
+					<button type="button" onclick={toggleItalic} class={btnClass(editor?.isActive('italic') ?? false)} title={i18n.t('sharedComponents.rich_editor.italic')}>
 						<Italic size={14} />
 					</button>
-					<button type="button" onclick={toggleStrike} class={btnClass(editor?.isActive('strike') ?? false)} title="Strikethrough">
+					<button type="button" onclick={toggleStrike} class={btnClass(editor?.isActive('strike') ?? false)} title={i18n.t('sharedComponents.rich_editor.strikethrough')}>
 						<Strikethrough size={14} />
 					</button>
-					<button type="button" onclick={toggleUnderline} class={btnClass(editor?.isActive('underline') ?? false)} title="Underline">
+					<button type="button" onclick={toggleUnderline} class={btnClass(editor?.isActive('underline') ?? false)} title={i18n.t('sharedComponents.rich_editor.underline')}>
 						<UnderlineIcon size={14} />
 					</button>
 
 					<div class="bubble-separator"></div>
 
-					<button type="button" onclick={toggleLink} class={btnClass(editor?.isActive('link') ?? false)} title="Link">
+					<button type="button" onclick={toggleLink} class={btnClass(editor?.isActive('link') ?? false)} title={i18n.t('sharedComponents.rich_editor.link')}>
 						<LinkIcon size={14} />
 					</button>
-					<button type="button" onclick={toggleBlockquote} class={btnClass(editor?.isActive('blockquote') ?? false)} title="Blockquote">
+					<button type="button" onclick={toggleBlockquote} class={btnClass(editor?.isActive('blockquote') ?? false)} title={i18n.t('sharedComponents.rich_editor.blockquote')}>
 						<Quote size={14} />
 					</button>
-					<button type="button" onclick={toggleCode} class={btnClass(editor?.isActive('code') ?? false)} title="Inline code">
+					<button type="button" onclick={toggleCode} class={btnClass(editor?.isActive('code') ?? false)} title={i18n.t('sharedComponents.rich_editor.inline_code')}>
 						<Code size={14} />
 					</button>
-					<button type="button" onclick={toggleCodeBlock} class={btnClass(editor?.isActive('codeBlock') ?? false)} title="Code block">
+					<button type="button" onclick={toggleCodeBlock} class={btnClass(editor?.isActive('codeBlock') ?? false)} title={i18n.t('sharedComponents.rich_editor.code_block')}>
 						<Code2 size={14} />
 					</button>
-					<button type="button" onclick={toggleBulletList} class={btnClass(editor?.isActive('bulletList') ?? false)} title="Bullet list">
+					<button type="button" onclick={toggleBulletList} class={btnClass(editor?.isActive('bulletList') ?? false)} title={i18n.t('sharedComponents.rich_editor.bullet_list')}>
 						<List size={14} />
 					</button>
 
 					{#if oncreateissue}
 						<div class="bubble-separator"></div>
-						<button type="button" onclick={createIssueFromSelection} class={btnClass(false)} title="Create issue from selection">
+						<button type="button" onclick={createIssueFromSelection} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.create_issue_from_selection')}>
 							<SquareArrowOutUpRight size={14} />
 						</button>
 					{/if}
 					{#if onreworkselection}
 						<div class="bubble-separator"></div>
-						<button type="button" onpointerdown={(e) => e.preventDefault()} onclick={reworkSelection} class={btnClass(false)} title="Rework with AI" disabled={reworkingSelection}>
+						<button type="button" onpointerdown={(e) => e.preventDefault()} onclick={reworkSelection} class={btnClass(false)} title={i18n.t('sharedComponents.rich_editor.rework_with_ai')} disabled={reworkingSelection}>
 							<Sparkles size={14} class={reworkingSelection ? 'ai-rewrite-icon-loading' : ''} />
 						</button>
 					{/if}

@@ -16,6 +16,7 @@
 	import type { Issue } from '$lib/types/issue';
 	import MachineStatusBadge from './MachineStatusBadge.svelte';
 	import { useTerminalDock } from './terminal-dock-context.svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		open = $bindable(false),
@@ -46,7 +47,7 @@
 	let activePopupGeneration = 0;
 
 	const selectedMachine = $derived(machines.find((machine) => machine.id === selectedMachineId));
-	const actionLabel = $derived(intent === 'ide' ? 'Open Code Editor' : intent === 'terminal' ? 'Open Terminal' : 'Continue to Agent');
+	const actionLabel = $derived(intent === 'ide' ? i18n.t('machines.open_code_editor_action') : intent === 'terminal' ? i18n.t('machines.open_terminal_action') : i18n.t('machines.run_agent_action'));
 
 	$effect(() => {
 		const currentOpen = open;
@@ -177,12 +178,12 @@
 <Dialog.Root bind:open>
 	<Dialog.Content class="sm:max-w-xl">
 		<Dialog.Header>
-			<Dialog.Title>Choose Dev Machine</Dialog.Title>
-			<Dialog.Description>Select where to prepare {issue.identifier}. Checkout creation starts only after confirmation.</Dialog.Description>
+			<Dialog.Title>{i18n.t('machines.choose_machine')}</Dialog.Title>
+			<Dialog.Description>{i18n.t('machines.choose_machine_desc', { identifier: issue.identifier })}</Dialog.Description>
 		</Dialog.Header>
 
 		{#if loading}
-			<div class="flex min-h-40 items-center justify-center text-sm text-[var(--color-text-tertiary)]"><LoaderCircle class="mr-2 size-4 animate-spin" />Loading Dev Machines...</div>
+			<div class="flex min-h-40 items-center justify-center text-sm text-[var(--color-text-tertiary)]"><LoaderCircle class="mr-2 size-4 animate-spin" />{i18n.t('machines.loading_machines')}</div>
 		{:else}
 			<div class="max-h-[min(50vh,420px)] space-y-2 overflow-y-auto pr-1" role="radiogroup" aria-label="Existing Dev Machines">
 				{#each machines as machine (machine.id)}
@@ -198,7 +199,7 @@
 						<span class="min-w-0">
 							<span class="block truncate text-sm font-medium">{machine.name}</span>
 							<span class="mt-1 block truncate text-xs text-[var(--color-text-tertiary)]">
-								{machine.repo_owner && machine.repo_name ? `${machine.repo_owner}/${machine.repo_name}` : 'Available for a repository checkout'}
+								{machine.repo_owner && machine.repo_name ? `${machine.repo_owner}/${machine.repo_name}` : i18n.t('machines.available_for_checkout')}
 							</span>
 							{#if reason}<span class="mt-1 block text-xs text-amber-500">{reason}</span>{/if}
 						</span>
@@ -206,7 +207,7 @@
 					</button>
 				{/each}
 				{#if machines.length === 0 && !errorMessage}
-					<div class="rounded-lg border border-dashed border-[var(--app-border)] p-6 text-center text-sm text-[var(--color-text-tertiary)]">No reusable Dev Machines are available.</div>
+					<div class="rounded-lg border border-dashed border-[var(--app-border)] p-6 text-center text-sm text-[var(--color-text-tertiary)]">{i18n.t('machines.no_reusable_machines')}</div>
 				{/if}
 			</div>
 		{/if}
@@ -215,19 +216,19 @@
 			<div class="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
 				<p>{errorMessage}</p>
 				{#if errorMessage.toLowerCase().includes('development repository')}
-					<Button class="mt-2" size="sm" variant="outline" onclick={openRepositorySettings}><Settings2 class="size-3.5" />Set Development Defaults</Button>
+					<Button class="mt-2" size="sm" variant="outline" onclick={openRepositorySettings}><Settings2 class="size-3.5" />{i18n.t('machines.set_defaults')}</Button>
 				{/if}
 			</div>
 		{/if}
 
 		<Dialog.Footer class="gap-2 sm:justify-between">
 			<div class="flex gap-2">
-				<Button variant="outline" onclick={openCreate}><Plus class="size-3.5" />New machine</Button>
-				<Button variant="ghost" onclick={openRepositorySettings}><Settings2 class="size-3.5" />Defaults</Button>
+				<Button variant="outline" onclick={openCreate}><Plus class="size-3.5" />{i18n.t('machines.new_machine')}</Button>
+				<Button variant="ghost" onclick={openRepositorySettings}><Settings2 class="size-3.5" />{i18n.t('machines.defaults')}</Button>
 			</div>
 			<Button onclick={confirmSelection} disabled={!selectedMachine || !!disabledReason(selectedMachine) || submitting || loading}>
 				{#if submitting}<LoaderCircle class="size-3.5 animate-spin" />{:else if intent === 'terminal'}<SquareTerminal class="size-3.5" />{:else}<ExternalLink class="size-3.5" />{/if}
-				{submitting ? 'Preparing...' : actionLabel}
+				{submitting ? i18n.t('machines.preparing') : actionLabel}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

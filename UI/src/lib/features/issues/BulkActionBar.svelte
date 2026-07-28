@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue, IssuePriority, RelationType } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import type { Label } from '$lib/types/label';
 	import type { Cycle } from '$lib/types/cycle';
 	import type { WorkspaceMember } from '$lib/types/workspace';
@@ -108,7 +108,7 @@
 	let filteredPriorities = $derived.by(() => {
 		const term = searchQuery.trim().toLowerCase();
 		if (!term) return priorityValues;
-		return priorityValues.filter((priority) => PRIORITY_LABELS[priority].toLowerCase().includes(term));
+		return priorityValues.filter((priority) => getPriorityLabel(priority).toLowerCase().includes(term));
 	});
 	let filteredLabels = $derived.by(() => {
 		const term = searchQuery.trim().toLowerCase();
@@ -651,7 +651,7 @@
 							{#each filteredPriorities as priority, index (priority)}
 								<button id={`bulk-action-row-${index}`} class={optionButtonClass} data-selected={selectedIndex === index} onpointerenter={() => (selectedIndex = index)} onclick={() => bulkSetPriority(priority)}>
 									<IssuePriorityIcon {priority} size={14} />
-									<span class="truncate">{PRIORITY_LABELS[priority]}</span>
+									<span class="truncate">{getPriorityLabel(priority)}</span>
 								</button>
 							{/each}
 						{/if}

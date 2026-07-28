@@ -1,0 +1,21 @@
+export const login = {
+	'login.error_generic': 'Something went wrong',
+	'login.subtitle.signin': 'Sign in to your account',
+	'login.subtitle.register': 'Create a new account',
+	'login.name': 'Name',
+	'login.email': 'Email',
+	'login.password': 'Password',
+	'login.button.signin': 'Sign in',
+	'login.button.create_account': 'Create account',
+	'login.no_account': "Don't have an account?",
+	'login.has_account': 'Already have an account?',
+	'login.button.sign_up': 'Sign up',
+	'login.logo_alt': 'Kuayle logo',
+	'login.demo.aria_details': 'Demo login details',
+	'login.demo.title': 'Demo login',
+	'login.demo.description': 'Pick a seeded user to fill the login form.',
+	'login.demo.aria_close': 'Close demo login drawer',
+	'login.demo.close': 'Close',
+	'login.demo.use': 'Use',
+	'login.demo.users_button': 'Demo users'
+} as const;

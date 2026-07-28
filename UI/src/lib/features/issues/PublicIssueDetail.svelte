@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PublicIssue } from '$lib/types/shared-link';
 	import type { IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import IssueStatusIcon from './IssueStatusIcon.svelte';
 	import IssuePriorityIcon from './IssuePriorityIcon.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
@@ -140,7 +140,7 @@
 					<Tooltip.Trigger>
 						<span class="flex items-center gap-1.5 rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-2 py-1 text-xs text-[var(--color-text-secondary)]">
 							<IssuePriorityIcon priority={issue.priority as IssuePriority} size={12} />
-							{PRIORITY_LABELS[issue.priority as IssuePriority]}
+							{getPriorityLabel(issue.priority as IssuePriority)}
 						</span>
 					</Tooltip.Trigger>
 					<Tooltip.Content>Priority</Tooltip.Content>

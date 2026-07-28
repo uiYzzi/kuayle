@@ -10,6 +10,7 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Select from '$lib/components/ui/select';
 	import { Trash2 } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	let workspace = $state<Workspace | null>(null);
@@ -23,11 +24,11 @@
 	let deleteConfirm = $state('');
 	let deleting = $state(false);
 
-	const minRoleOptions = [
-		{ value: 'owner', label: 'Owner' },
-		{ value: 'admin', label: 'Admin' },
-		{ value: 'member', label: 'Member' }
-	];
+	const minRoleOptions = $derived([
+		{ value: 'owner', label: i18n.t('settings.role_owner') },
+		{ value: 'admin', label: i18n.t('settings.role_admin') },
+		{ value: 'member', label: i18n.t('settings.role_member') }
+	]);
 
 	onMount(async () => {
 		workspace = await getWorkspace(slug);
@@ -52,9 +53,9 @@
 		try {
 			workspace = await updateWorkspace(slug, { name: wsName.trim() });
 			wsName = workspace.name;
-			appToast.success('Workspace name updated');
+			appToast.success(i18n.t('settings.general.workspace_name_updated'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update workspace name');
+			appToast.apiError(err, i18n.t('settings.general.failed_update_name'));
 			wsName = workspace.name;
 		} finally {
 			savingName = false;
@@ -69,9 +70,9 @@
 		try {
 			workspace = await updateWorkspace(slug, { logo_url: next });
 			logoUrl = workspace.logo_url ?? '';
-			appToast.success('Workspace logo updated');
+			appToast.success(i18n.t('settings.general.logo_updated'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update workspace logo');
+			appToast.apiError(err, i18n.t('settings.general.failed_update_logo'));
 			logoUrl = workspace.logo_url ?? '';
 		} finally {
 			savingLogo = false;
@@ -84,9 +85,9 @@
 		try {
 			workspace = await updateWorkspace(slug, { share_link_min_role: value });
 			shareLinkMinRole = workspace.share_link_min_role;
-			appToast.success('Shared link minimum role updated');
+			appToast.success(i18n.t('settings.general.role_updated'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update minimum role');
+			appToast.apiError(err, i18n.t('settings.general.failed_update_role'));
 			shareLinkMinRole = workspace.share_link_min_role ?? 'admin';
 		} finally {
 			savingRole = false;
@@ -95,17 +96,17 @@
 
 	async function handleDelete() {
 		if (deleteConfirm !== workspace?.slug) {
-			appToast.error('Type the workspace slug to confirm deletion');
+			appToast.error(i18n.t('settings.general.type_slug_confirm'));
 			return;
 		}
 		deleting = true;
 		try {
 			await deleteWorkspace(slug);
-			appToast.success('Workspace deleted');
+			appToast.success(i18n.t('settings.general.workspace_deleted'));
 			showDelete = false;
 			goto('/');
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete workspace');
+			appToast.apiError(err, i18n.t('settings.general.failed_delete'));
 		} finally {
 			deleting = false;
 		}
@@ -113,15 +114,15 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">General</h1>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.general.title')}</h1>
 
 	{#if workspace}
 		<div class="mt-8 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<!-- Workspace name -->
 			<div class="flex items-center justify-between px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Workspace name</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">The name of your workspace visible to all members.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.workspace_name')}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.general.workspace_name_desc')}</p>
 				</div>
 				<input
 					type="text"
@@ -137,8 +138,8 @@
 			<!-- Workspace URL -->
 			<div class="flex items-center justify-between px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Workspace URL</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">The unique identifier for your workspace.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.workspace_url')}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.general.workspace_url_desc')}</p>
 				</div>
 				<span class="text-sm text-[var(--color-text-tertiary)]">{workspace.slug}</span>
 			</div>
@@ -148,8 +149,8 @@
 			<!-- Logo URL -->
 			<div class="flex items-center justify-between px-5 py-4">
 				<div class="min-w-0">
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Logo URL</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Public URL to an image used as the workspace logo.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.logo_url')}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.general.logo_url_desc')}</p>
 				</div>
 				<input
 					type="url"
@@ -166,15 +167,15 @@
 			<!-- Owner -->
 			<div class="flex items-center justify-between px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Owner</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">The user who owns this workspace.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.owner')}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.general.owner_desc')}</p>
 				</div>
 				<div class="flex items-center gap-2">
 					<div class="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--app-accent)] text-[10px] font-medium text-[var(--app-accent-foreground)]">
 						{(workspace.owner?.name ?? workspace.owner?.email ?? 'U').charAt(0).toUpperCase()}
 					</div>
 					<span class="text-sm text-[var(--color-text-secondary)]">
-						{workspace.owner?.name ?? workspace.owner?.email ?? 'Unknown'}
+						{workspace.owner?.name ?? workspace.owner?.email ?? i18n.t('settings.unknown')}
 					</span>
 				</div>
 			</div>
@@ -184,8 +185,8 @@
 			<!-- Shared link min role -->
 			<div class="flex items-center justify-between px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Shared link minimum role</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Minimum role required to create shared links.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.shared_link_role')}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.general.shared_link_role_desc')}</p>
 				</div>
 				<Select.Root
 					type="single"
@@ -207,25 +208,25 @@
 
 		{#if !isOwner}
 			<p class="mt-3 text-xs text-[var(--color-text-tertiary)]">
-				Only the workspace owner can edit these settings.
+				{i18n.t('settings.general.only_owner_edit')}
 			</p>
 		{/if}
 
 		<!-- Danger zone -->
 		{#if isOwner}
 			<div class="mt-10">
-				<h2 class="text-base font-medium text-[var(--color-text-primary)]">Danger zone</h2>
+				<h2 class="text-base font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.danger_zone')}</h2>
 				<div class="mt-3 rounded-lg border border-red-500/30 bg-[var(--color-bg-secondary)]">
 					<div class="flex items-center justify-between px-5 py-4">
 						<div>
-							<p class="text-sm font-medium text-[var(--color-text-primary)]">Delete workspace</p>
+							<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.general.delete_workspace')}</p>
 							<p class="text-xs text-[var(--color-text-tertiary)]">
-								Permanently delete this workspace, its teams, projects, and issues. This action cannot be undone.
+								{i18n.t('settings.general.delete_workspace_desc')}
 							</p>
 						</div>
 						<Button variant="destructive" onclick={() => (showDelete = true)}>
 							<Trash2 size={14} />
-							Delete workspace
+							{i18n.t('settings.general.delete_workspace')}
 						</Button>
 					</div>
 				</div>
@@ -241,14 +242,14 @@
 <Dialog.Root bind:open={showDelete}>
 	<Dialog.Content class="sm:max-w-md border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<Dialog.Header>
-			<Dialog.Title>Delete workspace</Dialog.Title>
+			<Dialog.Title>{i18n.t('settings.general.delete_workspace')}</Dialog.Title>
 			<Dialog.Description>
-				This will permanently delete <span class="font-medium text-[var(--color-text-primary)]">{workspace?.name}</span> and all of its teams, projects, issues, and members.
+				{i18n.t('settings.general.delete_workspace_desc')}
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="space-y-2 py-4">
 			<label for="delete-confirm" class="block text-sm text-[var(--color-text-secondary)]">
-				Type <span class="font-mono text-[var(--color-text-primary)]">{workspace?.slug}</span> to confirm
+				{i18n.t('settings.general.type_slug_confirm')}
 			</label>
 			<input
 				id="delete-confirm"
@@ -259,13 +260,13 @@
 			/>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (showDelete = false)} disabled={deleting}>Cancel</Button>
+			<Button variant="outline" onclick={() => (showDelete = false)} disabled={deleting}>{i18n.t('settings.cancel')}</Button>
 			<Button
 				variant="destructive"
 				onclick={handleDelete}
 				disabled={deleting || deleteConfirm !== workspace?.slug}
 			>
-				{deleting ? 'Deleting...' : 'Delete workspace'}
+				{deleting ? i18n.t('settings.deleting') : i18n.t('settings.general.delete_workspace')}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
