@@ -1327,7 +1327,7 @@ test('bounds machine and agent trace telemetry during long-running sessions', as
 	const activity = page.locator('#activity').locator('> div').first();
 	const machineLogPanel = page.locator('#activity').locator('> div').nth(1);
 	await expect(activity.getByRole('heading', { name: 'Activity (200)' })).toBeVisible();
-	await expect(activity.getByTestId('machine-events-retention')).toContainText('older activity is omitted');
+	await expect(activity.getByTestId('machine-events-retention')).toContainText('older events are omitted');
 	await expect(activity.getByText('machine event 1', { exact: true })).toHaveCount(0);
 	await expect(activity.getByText('machine event 450', { exact: true })).toBeVisible();
 	await expect(machineLogPanel.getByRole('heading', { name: 'Logs (500)' })).toBeVisible();

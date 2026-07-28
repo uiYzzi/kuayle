@@ -59,7 +59,7 @@ export const machines = {
 	'machines.cancelling': 'Cancelling...',
 	'machines.load_older_runs': 'Load older runs',
 	'machines.activity': 'Activity',
-	'machines.events_retention': 'Showing the latest {count} entries; older activity is omitted from this live view.',
+	'machines.events_retention': 'Showing the latest {count} entries; older events are omitted from this live view.',
 	'machines.logs': 'Logs',
 	'machines.logs_retention': 'Showing the latest {count} chunks; older logs are omitted from this live view.',
 	'machines.no_activity': 'No activity yet.',

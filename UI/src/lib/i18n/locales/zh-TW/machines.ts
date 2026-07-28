@@ -61,7 +61,7 @@ export const machines: Record<string, string> = {
 	'machines.cancelling': '取消中...',
 	'machines.load_older_runs': '載入更早的執行記錄',
 	'machines.activity': '活動',
-	'machines.events_retention': '顯示最新的 {count} 條記錄；更早的活動已從此即時檢視中省略。',
+	'machines.events_retention': '顯示最新的 {count} 條記錄；更早的事件已從此即時檢視中省略。',
 	'machines.logs': '日誌',
 	'machines.logs_retention': '顯示最新的 {count} 個片段；更早的日誌已從此即時檢視中省略。',
 	'machines.no_activity': '暫無活動。',
