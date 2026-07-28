@@ -4,12 +4,13 @@
 	import { CalendarDate } from '@internationalized/date';
 	import type { DateValue } from '@internationalized/date';
 	import { CalendarDays, X } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		value = null,
 		onchange,
 		close,
-		clearLabel = 'No due date'
+		clearLabel
 	}: {
 		value: string | null;
 		onchange: (date: string | null) => void | Promise<void>;
@@ -17,10 +18,12 @@
 		clearLabel?: string;
 	} = $props();
 
+	const effectiveClearLabel = $derived(clearLabel ?? i18n.t('sharedComponents.due_date_picker.no_due_date'));
+
 	const presets = $derived([
-		{ label: 'Today', value: formatLocalDate(new Date()) },
-		{ label: 'Tomorrow', value: formatLocalDate(addDays(new Date(), 1)) },
-		{ label: 'Next week', value: formatLocalDate(addDays(new Date(), 7)) },
+		{ label: i18n.t('sharedComponents.due_date_picker.today'), value: formatLocalDate(new Date()) },
+		{ label: i18n.t('sharedComponents.due_date_picker.tomorrow'), value: formatLocalDate(addDays(new Date(), 1)) },
+		{ label: i18n.t('sharedComponents.due_date_picker.next_week'), value: formatLocalDate(addDays(new Date(), 7)) },
 	]);
 	const recentDueDates = $derived(preferencesState.recentDueDates.filter((date) => !presets.some((preset) => preset.value === date)));
 	const calendarValue = $derived.by(() => {
@@ -52,7 +55,7 @@
 	}
 
 	function formatDisplayDate(date: string) {
-		return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
+		return new Date(`${date}T00:00:00`).toLocaleDateString(i18n.dateLocale, {
 			month: 'short',
 			day: 'numeric',
 			year: 'numeric'
@@ -64,7 +67,7 @@
 	<div class="min-w-0 space-y-2">
 		{#if recentDueDates.length > 0}
 			<div>
-				<div class="px-2 pb-1 text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">Recent</div>
+				<div class="px-2 pb-1 text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('sharedComponents.due_date_picker.recent')}</div>
 				<div class="space-y-0.5">
 					{#each recentDueDates as date (date)}
 						<button
@@ -81,7 +84,7 @@
 		{/if}
 
 		<div>
-			<div class="px-2 pb-1 text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">Presets</div>
+			<div class="px-2 pb-1 text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('sharedComponents.due_date_picker.presets')}</div>
 			<div class="space-y-0.5">
 				{#each presets as preset (preset.label)}
 					<button
@@ -100,7 +103,7 @@
 					onclick={() => selectDate(null)}
 				>
 					<X size={13} />
-					{clearLabel}
+					{effectiveClearLabel}
 				</button>
 			</div>
 		</div>

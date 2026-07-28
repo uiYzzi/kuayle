@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import * as echarts from 'echarts';
 	import type { AnalyticsBurnup } from '$lib/api/analytics';
 	import { getAnalyticsChartTheme, observeAnalyticsTheme } from './chart-theme';
@@ -36,7 +37,7 @@
 				textStyle: { color: theme.textPrimary, fontSize: 11 }
 			},
 			legend: {
-				data: ['Total created', 'Total completed', 'Scope'],
+				data: [i18n.t('insights.total_created'), i18n.t('insights.total_completed'), i18n.t('insights.scope')],
 				left: 12,
 				top: 8,
 				icon: 'circle',
@@ -69,7 +70,7 @@
 			},
 			series: [
 				{
-					name: 'Total created',
+					name: i18n.t('insights.total_created'),
 					type: 'line',
 					data: totalCreated,
 					smooth: true,
@@ -86,7 +87,7 @@
 					}
 				},
 				{
-					name: 'Total completed',
+					name: i18n.t('insights.total_completed'),
 					type: 'line',
 					data: totalCompleted,
 					smooth: true,
@@ -103,7 +104,7 @@
 					}
 				},
 				{
-					name: 'Scope',
+					name: i18n.t('insights.scope'),
 					type: 'line',
 					data: scope,
 					smooth: true,
@@ -151,12 +152,12 @@
 
 <div class="relative rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 	<div class="border-b border-[var(--app-border)] px-3 py-2">
-		<span class="text-xs font-medium text-[var(--color-text-secondary)]">Burn-up</span>
+		<span class="text-xs font-medium text-[var(--color-text-secondary)]">{i18n.t('insights.burnup')}</span>
 	</div>
 	<div bind:this={container} class="h-72 w-full {burnup?.points?.length ? '' : 'invisible'}"></div>
 	{#if !burnup?.points?.length}
 		<div class="absolute inset-x-0 bottom-0 flex h-72 items-center justify-center">
-			<p class="text-sm text-[var(--color-text-tertiary)]">No burn-up data available</p>
+			<p class="text-sm text-[var(--color-text-tertiary)]">{i18n.t('insights.no_burnup_data')}</p>
 		</div>
 	{/if}
 </div>

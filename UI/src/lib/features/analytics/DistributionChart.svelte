@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import * as echarts from 'echarts';
 	import type { AnalyticsDistribution } from '$lib/api/analytics';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
-	import { CATEGORY_LABELS, type StatusCategory } from '$lib/types/team-status';
+	import { getPriorityLabel, type IssuePriority } from '$lib/types/issue';
+	import { getCategoryLabel, type StatusCategory } from '$lib/types/team-status';
 	import {
 		getAnalyticsChartTheme,
 		observeAnalyticsTheme,
@@ -33,7 +34,7 @@
 				: {
 						...status,
 						status_id: status.category,
-						name: CATEGORY_LABELS[status.category as StatusCategory] ?? status.category,
+						name: getCategoryLabel(status.category as StatusCategory) ?? status.category,
 						color: null
 					};
 			const existing = groups.get(key);
@@ -110,7 +111,7 @@
 	function buildPriorityOption() {
 		const theme = getAnalyticsChartTheme();
 		const items = priorityData;
-		const names = items.map((d) => PRIORITY_LABELS[d.priority as keyof typeof PRIORITY_LABELS] ?? `P${d.priority}`);
+		const names = items.map((d) => getPriorityLabel(d.priority as IssuePriority) ?? `P${d.priority}`);
 		const counts = items.map((d) => d.count);
 
 		return {
@@ -188,7 +189,7 @@
 				? 'bg-[var(--app-accent)]/10 text-[var(--color-text-primary)]'
 				: 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'}"
 		>
-			{teamScoped ? 'By Status' : 'By Status Type'}
+			{teamScoped ? i18n.t('insights.by_status') : i18n.t('insights.by_status_type')}
 		</button>
 		<button
 			onclick={() => (activeTab = 'priority')}
@@ -196,7 +197,7 @@
 				? 'bg-[var(--app-accent)]/10 text-[var(--color-text-primary)]'
 				: 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'}"
 		>
-			By Priority
+			{i18n.t('insights.by_priority')}
 		</button>
 	</div>
 	<div bind:this={container} class="h-60 w-full"></div>

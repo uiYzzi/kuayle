@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import type { SlashGroup, SlashMenuItem } from './slash-items';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		groups,
@@ -107,7 +108,7 @@
 		</div>
 	{/each}
 	{#if flatItems.length === 0}
-		<div class="slash-empty">No results</div>
+		<div class="slash-empty">{i18n.t('sharedComponents.slash_command.no_results')}</div>
 	{/if}
 </div>
 

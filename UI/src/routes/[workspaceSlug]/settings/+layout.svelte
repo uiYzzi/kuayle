@@ -28,6 +28,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { authState } from '$lib/features/auth/auth.state.svelte';
 	import { demoMode } from '$lib/demo';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	function slideFade(node: HTMLElement, params: { duration?: number } = {}) {
 		const duration = params.duration ?? 200;
@@ -81,30 +82,30 @@
 
 	const sectionGroups = $derived([
 		{
-			label: 'Personal',
+			label: i18n.t('settings.nav.personal'),
 			items: [
-				{ label: 'Profile', href: `/${slug}/settings/profile`, icon: User },
-				{ label: 'Preferences', href: `/${slug}/settings/preferences`, icon: Settings2 }
+				{ label: i18n.t('settings.nav.profile'), href: `/${slug}/settings/profile`, icon: User },
+				{ label: i18n.t('settings.nav.preferences'), href: `/${slug}/settings/preferences`, icon: Settings2 }
 			]
 		},
 		{
-			label: 'Workspace',
+			label: i18n.t('settings.nav.workspace'),
 			items: [
-				{ label: 'General', href: `/${slug}/settings`, icon: Settings, exact: true },
-				{ label: 'Members', href: `/${slug}/settings/members`, icon: Users },
-				{ label: 'Labels', href: `/${slug}/settings/labels`, icon: Tag },
-				{ label: 'Webhooks', href: `/${slug}/settings/webhooks`, icon: Webhook },
-				{ label: 'GitHub', href: `/${slug}/settings/github`, icon: GithubLogoIcon },
-				{ label: 'Templates', href: `/${slug}/settings/templates`, icon: FileText },
-				{ label: 'AI', href: `/${slug}/settings/ai`, icon: Sparkles },
-				...(canUseDevMachines ? [{ label: 'Dev Machines', href: `/${slug}/settings/dev-machines`, icon: SlidersHorizontal }] : [])
+				{ label: i18n.t('settings.nav.general'), href: `/${slug}/settings`, icon: Settings, exact: true },
+				{ label: i18n.t('settings.nav.members'), href: `/${slug}/settings/members`, icon: Users },
+				{ label: i18n.t('settings.nav.labels'), href: `/${slug}/settings/labels`, icon: Tag },
+				{ label: i18n.t('settings.nav.webhooks'), href: `/${slug}/settings/webhooks`, icon: Webhook },
+				{ label: i18n.t('settings.nav.github'), href: `/${slug}/settings/github`, icon: GithubLogoIcon },
+				{ label: i18n.t('settings.nav.templates'), href: `/${slug}/settings/templates`, icon: FileText },
+				{ label: i18n.t('settings.nav.ai'), href: `/${slug}/settings/ai`, icon: Sparkles },
+				...(canUseDevMachines ? [{ label: i18n.t('settings.nav.dev_machines'), href: `/${slug}/settings/dev-machines`, icon: SlidersHorizontal }] : [])
 			]
 		},
 		{
-			label: 'System',
+			label: i18n.t('settings.nav.system'),
 			items: [
-				{ label: 'Version', href: `/${slug}/settings/version`, icon: RefreshCw },
-				{ label: 'Licenses', href: `/${slug}/settings/licenses`, icon: ScrollText }
+				{ label: i18n.t('settings.nav.version'), href: `/${slug}/settings/version`, icon: RefreshCw },
+				{ label: i18n.t('settings.nav.licenses'), href: `/${slug}/settings/licenses`, icon: ScrollText }
 			]
 		}
 	]);
@@ -124,11 +125,11 @@
 		<a
 			href="/{slug}/my-issues"
 			class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			title="Back"
+			title={i18n.t('settings.back')}
 		>
 			<ArrowLeft size={16} />
 		</a>
-		<span class="text-sm font-medium text-[var(--color-text-primary)]">Settings</span>
+		<span class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.title')}</span>
 	</div>
 
 	<nav class="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2">
@@ -186,7 +187,7 @@
 									: 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 							>
 								<SlidersHorizontal size={13} />
-								General
+									{i18n.t('settings.nav.general')}
 							</a>
 							<a
 								href="/{slug}/settings/teams/{team.id}/statuses"
@@ -197,7 +198,7 @@
 									: 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 							>
 								<CircleDot size={13} />
-								Issue statuses
+									{i18n.t('settings.nav.issue_statuses')}
 							</a>
 						</div>
 					{/if}
@@ -212,10 +213,10 @@
 	<div
 		class="flex h-12 shrink-0 items-center gap-2 border-b border-[var(--app-border)] bg-[var(--color-bg)] px-3 md:hidden"
 	>
-		<Button variant="ghost" size="icon-lg" onclick={() => (showMobileNav = true)} aria-label="Open settings menu">
+		<Button variant="ghost" size="icon-lg" onclick={() => (showMobileNav = true)} aria-label={i18n.t('settings.open_menu')}>
 			<Menu size={18} />
 		</Button>
-		<span class="text-sm font-medium text-[var(--color-text-primary)]">Settings</span>
+		<span class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.title')}</span>
 	</div>
 
 	<div class="flex min-h-0 flex-1">
@@ -230,8 +231,8 @@
 		<Sheet.Root bind:open={showMobileNav}>
 			<Sheet.Content side="left" class="w-[min(88vw,320px)] p-0 [&>button]:hidden" showCloseButton={false}>
 				<Sheet.Header class="sr-only">
-					<Sheet.Title>Settings navigation</Sheet.Title>
-					<Sheet.Description>Navigate settings sections.</Sheet.Description>
+					<Sheet.Title>{i18n.t('settings.nav.settings_navigation')}</Sheet.Title>
+					<Sheet.Description>{i18n.t('settings.nav.navigate_sections')}</Sheet.Description>
 				</Sheet.Header>
 				<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 				<div

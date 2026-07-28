@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { i18n } from '$lib/i18n/index.svelte';
 	import type { AnalyticsOverview } from '$lib/api/analytics';
 
 	let { overview, teamScoped = false }: { overview: AnalyticsOverview | null; teamScoped?: boolean } = $props();
@@ -24,17 +25,17 @@
 	}
 
 	const cards: { label: string; value: string; sub?: string }[] = $derived([
-		{ label: 'Total issues', value: fmt(overview?.total_issues) },
-		{ label: 'Open', value: fmt(overview?.open_issues) },
-		{ label: 'Completed', value: fmt(overview?.completed_issues) },
-		{ label: 'Overdue', value: fmt(overview?.overdue_issues) },
-		{ label: 'Started', value: fmt(overview?.started_issues) },
-		{ label: 'Unassigned', value: fmt(overview?.unassigned_issues) },
-		{ label: 'Completion rate', value: pct(overview?.completion_rate) },
-		{ label: 'Avg lead time', value: hours(overview?.avg_lead_time_hours) },
-		{ label: 'Avg cycle time', value: hours(overview?.avg_cycle_time_hours) },
-		{ label: 'Projects', value: fmt(overview?.total_projects) },
-		{ label: teamScoped ? 'Team members' : 'Members', value: fmt(overview?.total_members) }
+		{ label: i18n.t('insights.total_issues'), value: fmt(overview?.total_issues) },
+		{ label: i18n.t('insights.open_issues'), value: fmt(overview?.open_issues) },
+		{ label: i18n.t('insights.completed_issues'), value: fmt(overview?.completed_issues) },
+		{ label: i18n.t('insights.overdue_issues'), value: fmt(overview?.overdue_issues) },
+		{ label: i18n.t('insights.started_issues'), value: fmt(overview?.started_issues) },
+		{ label: i18n.t('insights.unassigned_issues'), value: fmt(overview?.unassigned_issues) },
+		{ label: i18n.t('insights.completion_rate'), value: pct(overview?.completion_rate) },
+		{ label: i18n.t('insights.avg_lead_time'), value: hours(overview?.avg_lead_time_hours) },
+		{ label: i18n.t('insights.avg_cycle_time'), value: hours(overview?.avg_cycle_time_hours) },
+		{ label: i18n.t('insights.total_projects'), value: fmt(overview?.total_projects) },
+		{ label: teamScoped ? i18n.t('insights.team_members') : i18n.t('insights.members'), value: fmt(overview?.total_members) }
 	]);
 </script>
 

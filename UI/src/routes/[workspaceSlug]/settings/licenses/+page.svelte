@@ -1,6 +1,7 @@
 <script lang="ts">
 	import packageLock from '../../../../../package-lock.json';
 	import { Search } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	type LockPackage = {
 		version?: string;
@@ -32,7 +33,7 @@
 
 	function licenseText(pkg: LockPackage): string {
 		if (Array.isArray(pkg.licenses)) return pkg.licenses.join(', ');
-		return pkg.license ?? pkg.licenses ?? 'Unknown';
+		return pkg.license ?? pkg.licenses ?? i18n.t('settings.licenses.unknown');
 	}
 
 	const packages = (packageLock as { packages: Record<string, LockPackage> }).packages;
@@ -66,31 +67,28 @@
 </script>
 
 <div class="mx-auto max-w-4xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">Open source licenses</h1>
-	<p class="mt-2 text-sm text-[var(--color-text-tertiary)]">
-		Automatically generated from the UI package lockfile. Includes direct and transitive open source packages bundled
-		with the app.
-	</p>
+		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.licenses.title')}</h1>
+		<p class="mt-2 text-sm text-[var(--color-text-tertiary)]">{i18n.t('settings.licenses.desc')}</p>
 
-	<div class="mt-6 flex items-center justify-between gap-4">
+		<div class="mt-6 flex items-center justify-between gap-4">
 		<div class="relative w-full max-w-sm">
 			<Search size={14} class="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
 			<input
 				bind:value={query}
-				placeholder="Search package or license"
+				placeholder={i18n.t('settings.licenses.search')}
 				class="h-8 w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] pl-7 pr-2 text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--app-accent)]"
 			/>
 		</div>
-		<p class="shrink-0 text-xs text-[var(--color-text-tertiary)]">{filteredEntries.length} packages</p>
+		<p class="shrink-0 text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.licenses.n_packages', { count: filteredEntries.length })}</p>
 	</div>
 
 	<div class="mt-4 overflow-hidden rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<div
 			class="grid grid-cols-[minmax(0,1fr)_120px_160px] gap-3 border-b border-[var(--app-border)] px-4 py-2 text-xs font-medium text-[var(--color-text-tertiary)]"
 		>
-			<span>Package</span>
-			<span>Version</span>
-			<span>License</span>
+			<span>{i18n.t('settings.licenses.package')}</span>
+			<span>{i18n.t('settings.licenses.version')}</span>
+			<span>{i18n.t('settings.licenses.license')}</span>
 		</div>
 		<div class="divide-y divide-[var(--app-border)]">
 			{#each filteredEntries as entry}
@@ -110,8 +108,8 @@
 						{/if}
 						{#if entry.dev || entry.optional}
 							<p class="mt-0.5 text-[10px] text-[var(--color-text-tertiary)]">
-								{entry.dev ? 'Development dependency' : ''}{entry.dev && entry.optional ? ' · ' : ''}{entry.optional
-									? 'Optional'
+								{entry.dev ? i18n.t('settings.licenses.dev_dep') : ''}{entry.dev && entry.optional ? ' · ' : ''}{entry.optional
+									? i18n.t('settings.licenses.optional')
 									: ''}
 							</p>
 						{/if}

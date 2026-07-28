@@ -7,6 +7,7 @@
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
 	import IssuePriorityIcon from '$lib/features/issues/IssuePriorityIcon.svelte';
 	import { LoaderCircle } from 'lucide-svelte';
+import { i18n } from '$lib/i18n/index.svelte';
 	import { onMount } from 'svelte';
 
 	let {
@@ -59,13 +60,13 @@
 
 	const commands: CommandItem[] = $derived.by(() => {
 		const items: CommandItem[] = [
-			{ label: 'Create issue', description: 'New issue', keys: ['C'], action: createIssue },
-			{ label: 'Go to Inbox', keys: ['G', 'I'], action: () => navigate(`/${slug}/inbox`) },
-			{ label: 'Go to My Issues', keys: ['G', 'M'], action: () => navigate(`/${slug}/my-issues`) },
-			{ label: 'Go to Projects', keys: ['G', 'P'], action: () => navigate(`/${slug}/projects`) },
-			{ label: 'Go to Settings', keys: ['G', 'S'], action: () => navigate(`/${slug}/settings`) },
+			{ label: i18n.t('sidebar.create_issue'), description: i18n.t('sidebar.new_issue'), keys: ['C'], action: createIssue },
+			{ label: i18n.t('sidebar.go_inbox'), keys: ['G', 'I'], action: () => navigate(`/${slug}/inbox`) },
+			{ label: i18n.t('sidebar.go_my_issues'), keys: ['G', 'M'], action: () => navigate(`/${slug}/my-issues`) },
+			{ label: i18n.t('sidebar.go_projects'), keys: ['G', 'P'], action: () => navigate(`/${slug}/projects`) },
+			{ label: i18n.t('sidebar.go_settings'), keys: ['G', 'S'], action: () => navigate(`/${slug}/settings`) },
 			...teams.map((t) => ({
-				label: `Go to ${t.name}`,
+				label: i18n.t('sidebar.go_to_team', { name: t.name }),
 				description: t.key,
 				action: () => navigate(`/${slug}/teams/${t.id}`)
 			}))
@@ -77,9 +78,9 @@
 
 	const totalItems = $derived(commands.length + issueResults.length);
 	const shortcuts = [
-		{ keys: ['↑', '↓'], label: 'Move selection' },
-		{ keys: ['Enter'], label: 'Open selected' },
-		{ keys: ['Esc'], label: 'Close' }
+		{ keys: ['↑', '↓'], label: i18n.t('sidebar.cmd_move_selection') },
+		{ keys: ['Enter'], label: i18n.t('sidebar.cmd_open_selected') },
+		{ keys: ['Esc'], label: i18n.t('sidebar.cmd_close') }
 	];
 	const hanRegex = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
 
@@ -224,7 +225,7 @@
 		style="background: rgba(0,0,0,{visible ? 0.5 : 0}); transition: background {ANIM_DURATION}ms ease;"
 		onclick={close}
 		tabindex={-1}
-		aria-label="Close"
+		aria-label={i18n.t('sidebar.cmd_close')}
 	></button>
 
 	<!-- Dialog -->
@@ -240,14 +241,14 @@
 				<input
 					type="text"
 					bind:value={search}
-					placeholder="Type a command or search..."
+					placeholder={i18n.t('sidebar.type_command')}
 					autofocus
 					class="w-full border-b border-[var(--app-border)] bg-transparent px-4 py-4 text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
 				/>
 				<div class="max-h-[68vh] min-h-[28rem] overflow-y-auto py-2">
 					{#if commands.length > 0}
 						<div class="px-3 py-1">
-							<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">Commands</span>
+							<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('sidebar.commands')}</span>
 						</div>
 						{#each commands as cmd, i}
 							<button
@@ -278,7 +279,7 @@
 
 					{#if canSearchIssues(search) && (issueLoading || issueResults.length > 0 || commands.length > 0)}
 						<div class="px-3 py-1 {commands.length > 0 ? 'mt-1 border-t border-[var(--app-border)] pt-2' : ''}">
-							<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">Issues</span>
+							<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('sidebar.issues')}</span>
 						</div>
 						{#if issueLoading}
 							<div class="flex items-center justify-center py-4">
@@ -323,12 +324,12 @@
 								</button>
 							{/each}
 						{:else}
-							<p class="px-4 py-2 text-sm text-[var(--color-text-tertiary)]">No issues found</p>
+							<p class="px-4 py-2 text-sm text-[var(--color-text-tertiary)]">{i18n.t('sidebar.no_issues_found')}</p>
 						{/if}
 					{/if}
 
 					{#if commands.length === 0 && issueResults.length === 0 && !issueLoading}
-						<p class="px-4 py-2 text-sm text-[var(--color-text-tertiary)]">No results found</p>
+						<p class="px-4 py-2 text-sm text-[var(--color-text-tertiary)]">{i18n.t('sidebar.no_results')}</p>
 					{/if}
 				</div>
 			</div>
@@ -354,9 +355,9 @@
 				</div>
 
 				<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]/70 p-3">
-					<div class="text-xs font-medium text-[var(--color-text-primary)]">Search matches</div>
+					<div class="text-xs font-medium text-[var(--color-text-primary)]">{i18n.t('sidebar.search_matches')}</div>
 					<p class="mt-1 text-xs leading-5 text-[var(--color-text-tertiary)]">
-						Issue search looks across the details you usually scan: title, description, status, project, assignees,
+						{i18n.t('sidebar.cmd_search_matches_desc')}
 						labels, cycle, due date, team, and priority. Description matches include a short highlighted snippet.
 					</p>
 				</div>

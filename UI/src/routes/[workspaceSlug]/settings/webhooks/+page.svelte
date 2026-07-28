@@ -12,6 +12,7 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
 	import { Plus, Trash2, ExternalLink } from 'lucide-svelte';
 
@@ -60,9 +61,9 @@
 			webhooks = [w, ...webhooks];
 			showCreate = false;
 			resetForm();
-			appToast.success('Webhook created');
+			appToast.success(i18n.t('settings.webhooks.created_toast'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create webhook');
+			appToast.apiError(err, i18n.t('settings.webhooks.failed_create'));
 		}
 	}
 
@@ -70,9 +71,9 @@
 		try {
 			const updated = await updateWebhook(slug, webhook.id, { is_active: !webhook.is_active });
 			webhooks = webhooks.map((w) => (w.id === webhook.id ? updated : w));
-			appToast.success(updated.is_active ? 'Webhook enabled' : 'Webhook disabled');
+			appToast.success(updated.is_active ? i18n.t('settings.webhooks.enabled') : i18n.t('settings.webhooks.disabled'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update webhook');
+			appToast.apiError(err, i18n.t('settings.webhooks.failed_update'));
 		}
 	}
 
@@ -80,9 +81,9 @@
 		try {
 			await deleteWebhook(slug, id);
 			webhooks = webhooks.filter((w) => w.id !== id);
-			appToast.success('Webhook deleted');
+			appToast.success(i18n.t('settings.webhooks.deleted'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete webhook');
+			appToast.apiError(err, i18n.t('settings.webhooks.failed_delete'));
 		}
 	}
 
@@ -97,13 +98,13 @@
 
 <div class="mx-auto max-w-2xl px-8 py-10">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">Webhooks</h1>
+		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.webhooks.title')}</h1>
 		<button
 			onclick={() => { resetForm(); showCreate = true; }}
 			class="flex items-center gap-1 rounded-md bg-[var(--app-accent)] px-3 py-1.5 text-sm text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)]"
 		>
 			<Plus size={14} />
-			New Webhook
+			{i18n.t('settings.webhooks.new')}
 		</button>
 	</div>
 
@@ -113,9 +114,9 @@
 			</div>
 		{:else if webhooks.length === 0}
 			<EmptyState
-				title="No webhooks configured"
-				description="Webhooks notify external services when events happen in your workspace"
-				action={{ label: 'New Webhook', onclick: () => { resetForm(); showCreate = true; } }}
+				title={i18n.t('settings.webhooks.no_webhooks')}
+				description={i18n.t('settings.webhooks.no_webhooks_desc')}
+				action={{ label: i18n.t('settings.webhooks.new'), onclick: () => { resetForm(); showCreate = true; } }}
 			/>
 		{:else}
 			<div class="rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
@@ -126,7 +127,7 @@
 								<ExternalLink size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
 								<span class="truncate text-sm font-medium text-[var(--color-text-primary)]">{webhook.url}</span>
 								{#if !webhook.is_active}
-									<Badge variant="outline" class="text-[10px]">Inactive</Badge>
+									<Badge variant="outline" class="text-[10px]">{i18n.t('settings.webhooks.inactive')}</Badge>
 								{/if}
 							</div>
 							<div class="mt-1 flex flex-wrap items-center gap-1.5">
@@ -135,7 +136,7 @@
 								{/each}
 							</div>
 							<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">
-								Created {formatRelativeTime(webhook.created_at)}
+								{i18n.t('settings.webhooks.created')} {formatRelativeTime(webhook.created_at)}
 							</p>
 						</div>
 						<div class="flex items-center gap-2">
@@ -164,33 +165,33 @@
 		<form onsubmit={handleCreate}>
 			<div class="px-5 pt-5 pb-4 space-y-4">
 				<div>
-					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">Create webhook</h2>
-					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">Receive HTTP POST notifications when events occur.</p>
+					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.webhooks.create_title')}</h2>
+					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.webhooks.create_desc')}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Payload URL</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('settings.webhooks.payload_url')}</Label>
 					<Input
 						bind:value={newUrl}
-						placeholder="https://example.com/webhooks"
+						placeholder={i18n.t('settings.webhooks.payload_placeholder')}
 						required
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Secret</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('settings.webhooks.secret')}</Label>
 					<Password
 						bind:value={newSecret}
-						placeholder="Used to sign webhook payloads"
+						placeholder={i18n.t('settings.webhooks.secret_placeholder')}
 						required
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
-					<p class="text-[10px] text-[var(--color-text-tertiary)]">Payloads are signed with HMAC-SHA256 using this secret</p>
+					<p class="text-[10px] text-[var(--color-text-tertiary)]">{i18n.t('settings.webhooks.secret_desc')}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Events</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('settings.webhooks.events')}</Label>
 					<div class="grid grid-cols-2 gap-2">
 						{#each ALL_EVENTS as event}
 							<button
@@ -207,8 +208,8 @@
 			</div>
 
 			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
-				<Button variant="outline" size="sm" type="button" onclick={() => (showCreate = false)}>Cancel</Button>
-				<Button size="sm" type="submit" disabled={!newUrl.trim() || !newSecret.trim() || newEvents.length === 0}>Create webhook</Button>
+				<Button variant="outline" size="sm" type="button" onclick={() => (showCreate = false)}>{i18n.t('settings.webhooks.cancel')}</Button>
+				<Button size="sm" type="submit" disabled={!newUrl.trim() || !newSecret.trim() || newEvents.length === 0}>{i18n.t('settings.webhooks.create_button')}</Button>
 			</div>
 		</form>
 	</Dialog.Content>

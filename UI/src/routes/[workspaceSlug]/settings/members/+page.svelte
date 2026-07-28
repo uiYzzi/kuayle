@@ -7,6 +7,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import { UserPlus, Trash2 } from 'lucide-svelte';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
@@ -31,9 +32,9 @@
 		try {
 			await updateMemberRole(slug, userId, role);
 			members = members.map((m) => (m.user_id === userId ? { ...m, role } : m));
-			appToast.success('Role updated');
+			appToast.success(i18n.t('settings.members.role_updated'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update role');
+			appToast.apiError(err, i18n.t('settings.members.failed_update_role'));
 		}
 	}
 
@@ -41,9 +42,9 @@
 		try {
 			await removeMember(slug, userId);
 			members = members.filter((m) => m.user_id !== userId);
-			appToast.success('Member removed');
+			appToast.success(i18n.t('settings.members.removed'));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to remove member');
+			appToast.apiError(err, i18n.t('settings.members.failed_remove'));
 		}
 	}
 
@@ -51,26 +52,26 @@
 		if (!inviteEmail.trim()) return;
 		try {
 			await inviteMember(slug, inviteEmail.trim(), inviteRole);
-			appToast.success('Member invited');
+			appToast.success(i18n.t('settings.members.invited'));
 			showInvite = false;
 			inviteEmail = '';
 			inviteRole = 'member';
 			members = await listMembers(slug);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to invite member');
+			appToast.apiError(err, i18n.t('settings.members.failed_invite'));
 		}
 	}
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">Members</h1>
+		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.members.title')}</h1>
 		<button
 			onclick={() => (showInvite = true)}
 			class="flex items-center gap-1.5 rounded-md bg-[var(--app-accent)] px-3 py-1.5 text-sm text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)]"
 		>
 			<UserPlus size={14} />
-			Invite member
+			{i18n.t('settings.members.invite')}
 		</button>
 	</div>
 
@@ -78,7 +79,7 @@
 		{#if loading}
 			<p class="text-sm text-[var(--color-text-tertiary)]"></p>
 		{:else if members.length === 0}
-			<p class="text-sm text-[var(--color-text-secondary)]">No members found.</p>
+			<p class="text-sm text-[var(--color-text-secondary)]">{i18n.t('settings.members.no_members')}</p>
 		{:else}
 			<div class="overflow-hidden rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 				{#each members as member, i}
@@ -88,7 +89,7 @@
 								{(member.name || member.email).charAt(0).toUpperCase()}
 							</div>
 							<div>
-								<p class="text-sm font-medium text-[var(--color-text-primary)]">{member.name || 'Unnamed'}</p>
+								<p class="text-sm font-medium text-[var(--color-text-primary)]">{member.name || i18n.t('settings.members.unnamed')}</p>
 								<p class="text-xs text-[var(--color-text-tertiary)]">{member.email}</p>
 							</div>
 						</div>
@@ -113,7 +114,7 @@
 							<button
 								onclick={() => handleRemove(member.user_id)}
 								class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-red-500"
-								title="Remove member"
+								title={i18n.t('settings.members.remove')}
 							>
 								<Trash2 size={14} />
 							</button>
@@ -129,36 +130,36 @@
 <Dialog.Root bind:open={showInvite}>
 	<Dialog.Content class="sm:max-w-md">
 		<Dialog.Header>
-			<Dialog.Title>Invite member</Dialog.Title>
-			<Dialog.Description>Invite a new member to this workspace by email.</Dialog.Description>
+			<Dialog.Title>{i18n.t('settings.members.invite_title')}</Dialog.Title>
+			<Dialog.Description>{i18n.t('settings.members.invite_desc')}</Dialog.Description>
 		</Dialog.Header>
 		<div class="space-y-4 py-4">
 			<div>
-				<label for="invite-email" class="mb-1 block text-sm text-[var(--color-text-secondary)]">Email</label>
+				<label for="invite-email" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{i18n.t('settings.members.email')}</label>
 				<input
 					id="invite-email"
 					type="email"
 					bind:value={inviteEmail}
-					placeholder="user@example.com"
+					placeholder={i18n.t('settings.members.email_placeholder')}
 					class="w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
 			<div>
-				<label for="invite-role" class="mb-1 block text-sm text-[var(--color-text-secondary)]">Role</label>
+				<label for="invite-role" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{i18n.t('settings.members.role')}</label>
 				<select
 					id="invite-role"
 					bind:value={inviteRole}
 					class="w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none"
 				>
-					<option value="admin">Admin</option>
-					<option value="member">Member</option>
+					<option value="admin">{i18n.t('settings.role_admin')}</option>
+					<option value="member">{i18n.t('settings.role_member')}</option>
 					<option value="guest">Guest</option>
 				</select>
 			</div>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (showInvite = false)}>Cancel</Button>
-			<Button onclick={handleInvite} disabled={!inviteEmail.trim()}>Send invite</Button>
+			<Button variant="outline" onclick={() => (showInvite = false)}>{i18n.t('settings.cancel')}</Button>
+			<Button onclick={handleInvite} disabled={!inviteEmail.trim()}>{i18n.t('settings.members.send_invite')}</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

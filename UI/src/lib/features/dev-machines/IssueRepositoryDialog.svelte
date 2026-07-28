@@ -12,6 +12,7 @@
 	import type { DevMachineEnvironment } from '$lib/types/dev-machine';
 	import type { Issue } from '$lib/types/issue';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let { open = $bindable(false), slug, issue }: { open: boolean; slug: string; issue: Issue } = $props();
 	let repositories = $state<GitHubRepo[]>([]);
@@ -72,14 +73,14 @@
 
 <Dialog.Root bind:open>
 	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header><Dialog.Title>Issue development defaults</Dialog.Title><Dialog.Description>Override the project, team, or workspace repository and environment for {issue.identifier}.</Dialog.Description></Dialog.Header>
+		<Dialog.Header><Dialog.Title>{i18n.t('machines.issue_defaults_title')}</Dialog.Title><Dialog.Description>{i18n.t('machines.issue_defaults_desc', { identifier: issue.identifier })}</Dialog.Description></Dialog.Header>
 		<div class="space-y-4">
 			<div class="space-y-1.5">
-				<Label>Repository</Label>
-				<ComboboxPopover bind:open={repositoryOpen} placeholder="Search repositories..." emptyMessage="No repositories found." width="w-[min(28rem,calc(100vw-2rem))]">
+				<Label>{i18n.t('machines.repository')}</Label>
+				<ComboboxPopover bind:open={repositoryOpen} placeholder={i18n.t('machines.search_repositories')} emptyMessage={i18n.t('machines.no_repositories')} width="w-[min(28rem,calc(100vw-2rem))]">
 					{#snippet trigger()}
-						<Button type="button" variant="outline" class="w-full justify-between gap-2 font-normal" disabled={loading} aria-label="Repository">
-							<span class="flex min-w-0 items-center gap-2"><GitBranch class="size-3.5 shrink-0 text-[var(--color-text-tertiary)]" /><span class="truncate">{selectedRepository?.full_name ?? 'Use project, team, or workspace default'}</span></span>
+						<Button type="button" variant="outline" class="w-full justify-between gap-2 font-normal" disabled={loading} aria-label={i18n.t('machines.repository')}>
+							<span class="flex min-w-0 items-center gap-2"><GitBranch class="size-3.5 shrink-0 text-[var(--color-text-tertiary)]" /><span class="truncate">{selectedRepository?.full_name ?? i18n.t('machines.use_workspace_default')}</span></span>
 							<ChevronsUpDown class="size-3.5 shrink-0 text-[var(--color-text-tertiary)]" />
 						</Button>
 					{/snippet}
@@ -89,8 +90,8 @@
 					{/each}
 				</ComboboxPopover>
 			</div>
-			<div class="space-y-1.5"><Label>Environment</Label><Select.Root type="single" value={environmentId} disabled={loading} onValueChange={(value) => value && (environmentId = value)}><Select.Trigger class="w-full">{selectedEnvironment?.name ?? 'Use project, team, or workspace default'}</Select.Trigger><Select.Content><Select.Item value="inherit" label="Use inherited default">Use inherited default</Select.Item>{#each environments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+			<div class="space-y-1.5"><Label>{i18n.t('machines.environment')}</Label><Select.Root type="single" value={environmentId} disabled={loading} onValueChange={(value) => value && (environmentId = value)}><Select.Trigger class="w-full">{selectedEnvironment?.name ?? i18n.t('machines.use_workspace_default')}</Select.Trigger><Select.Content><Select.Item value="inherit" label={i18n.t('machines.use_inherited_default')}>{i18n.t('machines.use_inherited_default')}</Select.Item>{#each environments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
 		</div>
-		<Dialog.Footer><Button variant="outline" onclick={() => (open = false)}>Cancel</Button><Button onclick={save} disabled={loading || saving}>{saving ? 'Saving...' : 'Save defaults'}</Button></Dialog.Footer>
+		<Dialog.Footer><Button variant="outline" onclick={() => (open = false)}>{i18n.t('common.cancel')}</Button><Button onclick={save} disabled={loading || saving}>{saving ? i18n.t('common.saving') : i18n.t('machines.save_defaults')}</Button></Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
