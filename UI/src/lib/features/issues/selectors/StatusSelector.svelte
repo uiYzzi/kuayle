@@ -4,6 +4,7 @@
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
 	import type { TeamStatus } from '$lib/types/team-status';
 	import type { Snippet } from 'svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		open = $bindable(false),
@@ -26,7 +27,7 @@
 	} = $props();
 </script>
 
-<ComboboxPopover bind:open placeholder="Search statuses..." {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={i18n.t('sharedComponents.selectors.search_statuses')} {width} {align} {shortcutKey} {trigger}>
 	{#each statuses as ts (ts.id)}
 		<Command.Item
 			value={ts.name}
