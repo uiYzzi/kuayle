@@ -59,6 +59,7 @@ export const issueDetail = {
 	'issue.history.cycle': '周期',
 	'issue.history.status': '状态',
 	'issue.history.none': '无',
+	'issue.history.former_user': '前成员',
 	'issue.history.unassigned': '未指派',
 	'issue.history.unknown_issue': '未知任务',
 	'issue.toast.failed_title': '更新标题失败',

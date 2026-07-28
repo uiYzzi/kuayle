@@ -57,6 +57,7 @@ export const issueDetail = {
 	'issue.history.cycle': 'cycle',
 	'issue.history.status': 'status',
 	'issue.history.none': 'None',
+	'issue.history.former_user': 'Former user',
 	'issue.history.unassigned': 'Unassigned',
 	'issue.history.unknown_issue': 'Unknown issue',
 	'issue.toast.failed_title': 'Failed to update title',
