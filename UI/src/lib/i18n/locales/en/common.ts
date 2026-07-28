@@ -122,4 +122,13 @@ export const common = {
 	'common.context_menu.failed_duplicate': 'Failed to duplicate issue',
 	'common.context_menu.failed_convert': 'Failed to convert issue',
 	'common.context_menu.failed_update': 'Failed to update {field}',
+
+	// Group
+	'common.group': 'Group',
+	'common.group_by': 'Group by',
+	'common.group_by.status': 'Status',
+	'common.group_by.priority': 'Priority',
+	'common.group_by.assignee': 'Assignee',
+	'common.group_by.project': 'Project',
+	'common.group_by.no_grouping': 'No grouping',
 } as const;

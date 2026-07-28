@@ -122,5 +122,14 @@ export const common: Record<string, string> = {
 	'common.context_menu.failed_delete': '刪除事項失敗',
 	'common.context_menu.failed_duplicate': '複製事項失敗',
 	'common.context_menu.failed_convert': '轉換事項失敗',
-	'common.context_menu.failed_update': '更新 {field} 失敗'
+	'common.context_menu.failed_update': '更新 {field} 失敗',
+
+	// Group
+	'common.group': '分組',
+	'common.group_by': '分組依據',
+	'common.group_by.status': '狀態',
+	'common.group_by.priority': '優先級',
+	'common.group_by.assignee': '負責人',
+	'common.group_by.project': '專案',
+	'common.group_by.no_grouping': '不分组',
 } as Record<string, string>;
