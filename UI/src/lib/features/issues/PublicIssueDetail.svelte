@@ -9,6 +9,7 @@
 	import { X, CalendarDays, ChevronUp, ChevronDown } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { onMount, onDestroy } from 'svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		issue = $bindable(),
@@ -90,7 +91,7 @@
 		<div class="sticky top-0 z-10 flex items-center justify-between bg-[var(--color-bg)] rounded-tl-2xl px-6 py-3">
 			<span class="text-sm font-medium text-[var(--color-text-tertiary)]">{issue.identifier}</span>
 			<div class="flex items-center gap-1">
-				<span class="text-xs text-[var(--color-text-tertiary)] mr-1">{formatRelativeTime(issue.created_at)}</span>
+				<span class="text-xs text-[var(--color-text-tertiary)] mr-1">{formatRelativeTime(issue.created_at, i18n.dateLocale)}</span>
 				{#if issues.length > 1}
 					<button
 						onclick={goUp}
@@ -174,7 +175,7 @@
 						<Tooltip.Trigger>
 							<span class="flex items-center gap-1 rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-2 py-1 text-xs text-[var(--color-text-secondary)]">
 								<CalendarDays size={11} class={diffDays < 0 ? 'text-red-500' : diffDays === 0 ? 'text-orange-500' : 'text-[var(--color-text-tertiary)]'} />
-								{due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+								{due.toLocaleDateString(i18n.dateLocale, { month: 'short', day: 'numeric' })}
 							</span>
 						</Tooltip.Trigger>
 						<Tooltip.Content>Due date</Tooltip.Content>

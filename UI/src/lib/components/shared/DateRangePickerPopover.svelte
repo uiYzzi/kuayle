@@ -4,6 +4,7 @@
 	import { CalendarDate } from '@internationalized/date';
 	import type { DateValue } from '@internationalized/date';
 	import { CalendarIcon, X } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		startDate = null,
@@ -41,7 +42,7 @@
 
 	function formatDate(value: string): string {
 		try {
-			return new Date(value).toLocaleDateString('en-US', {
+			return new Date(value).toLocaleDateString(i18n.dateLocale, {
 				month: 'short',
 				day: 'numeric',
 				year: 'numeric'

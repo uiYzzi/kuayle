@@ -136,7 +136,7 @@
 								{/each}
 							</div>
 							<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">
-								{i18n.t('settings.webhooks.created')} {formatRelativeTime(webhook.created_at)}
+								{i18n.t('settings.webhooks.created')} {formatRelativeTime(webhook.created_at, i18n.dateLocale)}
 							</p>
 						</div>
 						<div class="flex items-center gap-2">

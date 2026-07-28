@@ -264,7 +264,7 @@
 				{/if}
 				{#if cycle.completed_at}
 					<div class="text-xs text-[var(--color-text-tertiary)]">
-						Completed {formatRelativeTime(cycle.completed_at)}
+						Completed {formatRelativeTime(cycle.completed_at, i18n.dateLocale)}
 					</div>
 				{/if}
 			</div>

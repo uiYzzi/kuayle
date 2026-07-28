@@ -3,6 +3,7 @@
 	import { getIssueGitHubActivity } from '$lib/api/github';
 	import type { GitHubIssueActivity } from '$lib/types/github';
 	import { formatRelativeTime } from '$lib/utils/format';
+import { i18n } from '$lib/i18n/index.svelte';
 	import { GitBranch, GitPullRequest, GitCommitHorizontal, ExternalLink, Copy, Check, ChevronRight } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
 
@@ -98,7 +99,7 @@
 								<span>{pr.repo_full_name}#{pr.number}</span>
 								<span class="text-green-600">+{pr.additions}</span>
 								<span class="text-red-500">-{pr.deletions}</span>
-								<span>{formatRelativeTime(pr.created_at)}</span>
+								<span>{formatRelativeTime(pr.created_at, i18n.dateLocale)}</span>
 							</div>
 						</div>
 						<ExternalLink size={12} class="mt-1 shrink-0 text-[var(--color-text-tertiary)] opacity-0 group-hover:opacity-100" />
@@ -149,7 +150,7 @@
 								{#if commit.author_login}
 									<span>{commit.author_login}</span>
 								{/if}
-								<span>{formatRelativeTime(commit.committed_at)}</span>
+								<span>{formatRelativeTime(commit.committed_at, i18n.dateLocale)}</span>
 							</div>
 						</div>
 					</a>

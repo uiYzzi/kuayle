@@ -309,7 +309,7 @@
 	}
 
 	function formatDisplayDate(value: string) {
-		return new Date(`${value}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		return new Date(`${value}T00:00:00`).toLocaleDateString(i18n.dateLocale, { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 
 	async function bulkSetAssignees(assigneeIds = selectedAssigneeIds) {
