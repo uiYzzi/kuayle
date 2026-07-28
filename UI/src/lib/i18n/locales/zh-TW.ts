@@ -13,6 +13,7 @@ import { teamSettings } from './zh-TW/team-settings';
 import { insights } from './zh-TW/insights';
 import { machines } from './zh-TW/machines';
 import { cycles } from './zh-TW/cycles';
+import { projects } from './zh-TW/projects';
 
 export const zhTW: Record<string, string> = {
 	...settingsNav,
@@ -28,5 +29,6 @@ export const zhTW: Record<string, string> = {
 	...teamSettings,
 	...insights,
 	...machines,
-	...cycles
+	...cycles,
+	...projects
 };

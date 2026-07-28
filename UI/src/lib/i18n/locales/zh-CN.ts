@@ -13,6 +13,7 @@ import { teamSettings } from './zh-CN/team-settings';
 import { insights } from './zh-CN/insights';
 import { machines } from './zh-CN/machines';
 import { cycles } from './zh-CN/cycles';
+import { projects } from './zh-CN/projects';
 
 export const zhCN: Record<string, string> = {
 	...settingsNav,
@@ -28,5 +29,6 @@ export const zhCN: Record<string, string> = {
 	...teamSettings,
 	...insights,
 	...machines,
-	...cycles
+	...cycles,
+	...projects
 };
