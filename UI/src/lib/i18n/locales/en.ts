@@ -13,6 +13,7 @@ import { insights } from './en/insights';
 import { machines } from './en/machines';
 import { cycles } from './en/cycles';
 import { projects } from './en/projects';
+import { views } from './en/views';
 
 export const en = {
 	...settingsNav,
@@ -29,7 +30,8 @@ export const en = {
 	...insights,
 	...machines,
 	...cycles,
-	...projects
+	...projects,
+	...views
 } as const;
 
 export type TranslationKey = keyof typeof en;

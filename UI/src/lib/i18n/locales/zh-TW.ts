@@ -14,6 +14,7 @@ import { insights } from './zh-TW/insights';
 import { machines } from './zh-TW/machines';
 import { cycles } from './zh-TW/cycles';
 import { projects } from './zh-TW/projects';
+import { views } from './zh-TW/views';
 
 export const zhTW: Record<string, string> = {
 	...settingsNav,
@@ -30,5 +31,6 @@ export const zhTW: Record<string, string> = {
 	...insights,
 	...machines,
 	...cycles,
-	...projects
+	...projects,
+	...views
 };
