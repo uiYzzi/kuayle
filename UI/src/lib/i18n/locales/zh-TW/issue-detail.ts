@@ -59,6 +59,7 @@ export const issueDetail = {
 	'issue.history.cycle': '週期',
 	'issue.history.status': '狀態',
 	'issue.history.none': '無',
+	'issue.history.former_user': '前成員',
 	'issue.history.unassigned': '未指派',
 	'issue.history.unknown_issue': '未知任務',
 	'issue.toast.failed_title': '更新標題失敗',

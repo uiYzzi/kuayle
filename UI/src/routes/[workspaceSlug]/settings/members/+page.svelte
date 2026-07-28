@@ -97,7 +97,7 @@
 							<Popover.Root>
 								<Popover.Trigger>
 									<button class="rounded-md border border-[var(--app-border)] px-2.5 py-1 text-xs capitalize text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
-										{member.role}
+										{i18n.t('common.role.' + member.role)}
 									</button>
 								</Popover.Trigger>
 								<Popover.Content class="w-36 p-1" align="end">
@@ -106,7 +106,7 @@
 											onclick={() => handleRoleChange(member.user_id, role)}
 											class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm capitalize text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] {member.role === role ? 'bg-[var(--color-bg-hover)]' : ''}"
 										>
-											{role}
+											{i18n.t('common.role.' + role)}
 										</button>
 									{/each}
 								</Popover.Content>
@@ -153,7 +153,7 @@
 				>
 					<option value="admin">{i18n.t('settings.role_admin')}</option>
 					<option value="member">{i18n.t('settings.role_member')}</option>
-					<option value="guest">Guest</option>
+					<option value="guest">{i18n.t('common.role.guest')}</option>
 				</select>
 			</div>
 		</div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import UserHoverCard from '$lib/components/shared/UserHoverCard.svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		value,
@@ -18,7 +19,7 @@
 
 <span class="inline-flex min-w-0 flex-wrap items-center gap-1">
 	{#if ids.length === 0}
-		<code class="rounded bg-[var(--color-bg-tertiary)] px-1 py-0.5 text-[11px] text-[var(--color-text-secondary)]">None</code>
+		<code class="rounded bg-[var(--color-bg-tertiary)] px-1 py-0.5 text-[11px] text-[var(--color-text-secondary)]">{i18n.t('issue.history.none')}</code>
 	{:else}
 		{#each ids as id, index (`${id}-${index}`)}
 			{@const member = members.find((candidate) => candidate.user_id === id)}
@@ -28,7 +29,7 @@
 					class="inline-flex cursor-pointer rounded bg-[var(--color-bg-tertiary)] px-1 py-0.5 font-mono text-[11px] text-[var(--color-text-secondary)] outline-none transition-colors hover:text-[var(--color-text-primary)] focus-visible:ring-1 focus-visible:ring-[var(--app-accent)]"
 				/>
 			{:else}
-				<code class="rounded bg-[var(--color-bg-tertiary)] px-1 py-0.5 text-[11px] text-[var(--color-text-secondary)]">{fallbackLabels[index] || 'Former user'}</code>
+				<code class="rounded bg-[var(--color-bg-tertiary)] px-1 py-0.5 text-[11px] text-[var(--color-text-secondary)]">{fallbackLabels[index] || i18n.t('issue.history.former_user')}</code>
 			{/if}
 		{/each}
 	{/if}
