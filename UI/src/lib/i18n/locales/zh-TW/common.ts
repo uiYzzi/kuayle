@@ -22,6 +22,7 @@ export const common: Record<string, string> = {
 	'common.queuing': '排隊中...',
 	'common.starting': '啟動中...',
 	'common.working': '工作中...',
+	'common.clear_all': '清除全部',
 	'common.dismiss': '忽略',
 	'common.refresh': '重新整理',
 	'common.open': '開啟',

@@ -20,6 +20,7 @@ export const common = {
 	'common.queuing': 'Queuing...',
 	'common.starting': 'Starting...',
 	'common.working': 'Working...',
+	'common.clear_all': 'Clear all',
 	'common.dismiss': 'Dismiss',
 	'common.refresh': 'Refresh',
 	'common.open': 'Open',

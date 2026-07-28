@@ -19,6 +19,7 @@
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import { Ban, CalendarDays, CircleUser, Copy, Link, OctagonAlert, RefreshCw } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		issue,
@@ -353,7 +354,7 @@
 						onclick={() => { updateField('assignee_ids', []); assigneeOpen = false; }}
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 					>
-						Clear all
+						{i18n.t('common.clear_all')}
 					</button>
 					{#each members as member}
 						{@const isAssigned = (issue.assignees ?? []).some(a => a.id === member.user_id)}
