@@ -15,7 +15,7 @@ export function formatRelativeTime(date: string, locale: string = 'en-US'): stri
 	const hours = Math.floor(minutes / 60);
 	const days = Math.floor(hours / 24);
 
-	if (days > 7) return new Date(date).toLocaleDateString(locale, { month: 'numeric', day: 'numeric', year: 'numeric' });
+	if (days > 7) return new Date(date).toLocaleDateString(locale, { month: '2-digit', day: '2-digit', year: 'numeric' });
 	if (days > 0) return `${days}d ago`;
 	if (hours > 0) return `${hours}h ago`;
 	if (minutes > 0) return `${minutes}m ago`;
