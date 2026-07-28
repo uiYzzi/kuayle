@@ -876,7 +876,7 @@ test('cancels Issue Machine Picker work when the dialog is dismissed', async ({ 
 	checkoutDelay = createRequestDelay();
 	const delayedCheckout = checkoutDelay;
 	const agentPicker = await openPicker('Run Agent');
-	await agentPicker.getByRole('button', { name: 'Continue to Agent' }).click();
+	await agentPicker.getByRole('button', { name: 'Run Agent' }).click();
 	await delayedCheckout.started;
 	await page.keyboard.press('Escape');
 	delayedCheckout.release();
@@ -1126,7 +1126,7 @@ test('opens agent-run trace sheet from card click, activity click, deep link, an
 	await page.getByText('Trace test machine').click();
 	await page.waitForURL(`**/machines/${machineId}`);
 	const runList = page.locator('#agent-runs');
-	await expect(runList.getByRole('link', { name: 'Pull request' })).toHaveAttribute('href', pullRequestUrl);
+	await expect(runList.getByRole('link', { name: 'Pull Request' })).toHaveAttribute('href', pullRequestUrl);
 	await expect(runList.locator(`a[href="${untrustedPullRequestUrl}"]`)).toHaveCount(0);
 
 	// Click the first agent-run card

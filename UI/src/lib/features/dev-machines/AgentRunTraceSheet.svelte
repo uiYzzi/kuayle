@@ -374,7 +374,7 @@
 					<!-- Logs -->
 					{#if logs.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.logs', { count: logs.length })}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.logs')} ({logs.length})</h3>
 							{#if logsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="trace-logs-retention">{i18n.t('machines.logs_retention', { count: DEV_MACHINE_LOG_RETENTION })}</p>{/if}
 							<pre class="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-black/30 p-3 text-[11px] leading-relaxed text-zinc-300 font-mono">{logs.map((chunk) => `[${chunk.stream}] ${chunk.content}`).join('')}</pre>
 						</section>
