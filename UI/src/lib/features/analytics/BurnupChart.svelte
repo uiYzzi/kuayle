@@ -17,7 +17,7 @@
 		const theme = getAnalyticsChartTheme();
 		const dates = burnup.points.map((p) => {
 			const date = new Date(`${p.date}T00:00:00`);
-			return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+			return date.toLocaleDateString(i18n.dateLocale, { month: 'short', day: 'numeric' });
 		});
 		const totalCreated = burnup.points.map((p) => p.total_created ?? 0);
 		const totalCompleted = burnup.points.map((p) => p.total_completed ?? 0);

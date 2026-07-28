@@ -34,7 +34,7 @@
 	function formatDate(value: string): string {
 		const parsed = parseDate(value);
 		if (!parsed) return value;
-		return new Date(parsed.year, parsed.month - 1, parsed.day).toLocaleDateString(undefined, {
+		return new Date(parsed.year, parsed.month - 1, parsed.day).toLocaleDateString(i18n.dateLocale, {
 			month: 'short',
 			day: 'numeric',
 			year: 'numeric'
