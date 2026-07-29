@@ -7,12 +7,22 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/kuayle/kuayle-backend/internal/domain"
 )
 
+var ErrWorkspaceSlugTaken = errors.New("workspace slug already taken")
 var ErrWorkspaceHasDevMachineRuntimes = errors.New("workspace has non-destroyed dev machine runtimes")
 var ErrWorkspaceEnvironmentCleanupPending = errors.New("workspace environment cleanup is pending")
+
+func workspaceCreateError(err error) error {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" && pgErr.ConstraintName == "workspaces_slug_key" {
+		return ErrWorkspaceSlugTaken
+	}
+	return err
+}
 
 type WorkspaceRepository struct {
 	db *sqlx.DB
@@ -24,7 +34,7 @@ func NewWorkspaceRepository(db *sqlx.DB) *WorkspaceRepository {
 
 func (r *WorkspaceRepository) Create(ctx context.Context, ws *domain.Workspace) error {
 	query := `INSERT INTO workspaces (id, name, slug, owner_id) VALUES ($1, $2, $3, $4) RETURNING created_at, updated_at`
-	return r.db.QueryRowContext(ctx, query, ws.ID, ws.Name, ws.Slug, ws.OwnerID).Scan(&ws.CreatedAt, &ws.UpdatedAt)
+	return workspaceCreateError(r.db.QueryRowContext(ctx, query, ws.ID, ws.Name, ws.Slug, ws.OwnerID).Scan(&ws.CreatedAt, &ws.UpdatedAt))
 }
 
 func (r *WorkspaceRepository) CreateWithMemberAndLabels(ctx context.Context, ws *domain.Workspace, member *domain.WorkspaceMember, labels []domain.Label) error {
@@ -41,7 +51,7 @@ func (r *WorkspaceRepository) CreateWithMemberAndLabels(ctx context.Context, ws 
 
 	workspaceQuery := `INSERT INTO workspaces (id, name, slug, owner_id) VALUES ($1, $2, $3, $4) RETURNING created_at, updated_at`
 	if err := tx.QueryRowContext(ctx, workspaceQuery, ws.ID, ws.Name, ws.Slug, ws.OwnerID).Scan(&ws.CreatedAt, &ws.UpdatedAt); err != nil {
-		return err
+		return workspaceCreateError(err)
 	}
 
 	memberQuery := `INSERT INTO workspace_members (workspace_id, user_id, role) VALUES ($1, $2, $3) RETURNING created_at`

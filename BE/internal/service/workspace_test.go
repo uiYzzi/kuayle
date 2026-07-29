@@ -178,9 +178,40 @@ func TestWorkspaceService_Create_SlugTaken(t *testing.T) {
 
 	ws, err := svc.Create(ctx, userID, dto.CreateWorkspaceRequest{Name: "Test", Slug: "taken"})
 
-	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrWorkspaceSlugTaken)
 	assert.Nil(t, ws)
-	assert.Contains(t, err.Error(), "slug already taken")
+	wsRepo.AssertNotCalled(t, "CreateWithMemberAndLabels", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestWorkspaceService_Create_SlugLookupFails(t *testing.T) {
+	wsRepo := new(mockWorkspaceRepo)
+	userRepo := new(mockUserRepo)
+	svc := NewWorkspaceService(wsRepo, userRepo)
+
+	ctx := context.Background()
+	lookupErr := errors.New("database unavailable")
+	wsRepo.On("GetBySlug", ctx, "test").Return(nil, lookupErr)
+
+	ws, err := svc.Create(ctx, uuid.New(), dto.CreateWorkspaceRequest{Name: "Test", Slug: "test"})
+
+	assert.ErrorIs(t, err, lookupErr)
+	assert.Nil(t, ws)
+	wsRepo.AssertNotCalled(t, "CreateWithMemberAndLabels", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
+}
+
+func TestWorkspaceService_Create_InsertSlugConflict(t *testing.T) {
+	wsRepo := new(mockWorkspaceRepo)
+	userRepo := new(mockUserRepo)
+	svc := NewWorkspaceService(wsRepo, userRepo)
+
+	ctx := context.Background()
+	wsRepo.On("GetBySlug", ctx, "test").Return(nil, nil)
+	wsRepo.On("CreateWithMemberAndLabels", ctx, mock.AnythingOfType("*domain.Workspace"), mock.AnythingOfType("*domain.WorkspaceMember"), mock.AnythingOfType("[]domain.Label")).Return(repository.ErrWorkspaceSlugTaken)
+
+	ws, err := svc.Create(ctx, uuid.New(), dto.CreateWorkspaceRequest{Name: "Test", Slug: "test"})
+
+	assert.ErrorIs(t, err, ErrWorkspaceSlugTaken)
+	assert.Nil(t, ws)
 }
 
 func TestWorkspaceService_ListByUser(t *testing.T) {

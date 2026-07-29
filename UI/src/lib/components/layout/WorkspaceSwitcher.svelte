@@ -8,6 +8,7 @@
 	import { Plus, ChevronsUpDown, Check, Loader2 } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { toSlug } from '$lib/utils/slug';
 
 	let {
 		currentWorkspace,
@@ -35,15 +36,6 @@
 			localStorage.setItem('kuayle_last_workspace', ws.slug);
 			goto(`/${ws.slug}/my-issues`);
 		}
-	}
-
-	function toSlug(value: string) {
-		return value
-			.toLowerCase()
-			.replace(/[^a-z0-9]/g, '-')
-			.replace(/-+/g, '-')
-			.replace(/^-|-$/g, '')
-			.slice(0, 50);
 	}
 
 	function handleNameInput() {

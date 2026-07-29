@@ -14,6 +14,7 @@ import (
 )
 
 var (
+	ErrWorkspaceSlugTaken                 = errors.New("workspace slug already taken")
 	ErrWorkspaceNotFound                  = errors.New("workspace not found")
 	ErrNotWorkspaceOwner                  = errors.New("only the workspace owner can perform this action")
 	ErrWorkspaceHasDevMachineRuntimes     = errors.New("workspace has non-destroyed dev machine runtimes")
@@ -46,9 +47,12 @@ func defaultWorkspaceLabelSpecs() []defaultWorkspaceLabel {
 }
 
 func (s *WorkspaceService) Create(ctx context.Context, userID uuid.UUID, req dto.CreateWorkspaceRequest) (*domain.Workspace, error) {
-	existing, _ := s.workspaceRepo.GetBySlug(ctx, req.Slug)
+	existing, err := s.workspaceRepo.GetBySlug(ctx, req.Slug)
+	if err != nil {
+		return nil, err
+	}
 	if existing != nil {
-		return nil, fmt.Errorf("workspace slug already taken")
+		return nil, ErrWorkspaceSlugTaken
 	}
 
 	ws := &domain.Workspace{
@@ -67,6 +71,9 @@ func (s *WorkspaceService) Create(ctx context.Context, userID uuid.UUID, req dto
 	labels := defaultWorkspaceLabels(ws.ID)
 
 	if err := s.workspaceRepo.CreateWithMemberAndLabels(ctx, ws, member, labels); err != nil {
+		if errors.Is(err, repository.ErrWorkspaceSlugTaken) {
+			return nil, ErrWorkspaceSlugTaken
+		}
 		return nil, err
 	}
 
