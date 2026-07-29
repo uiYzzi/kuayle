@@ -16,6 +16,7 @@ import { cycles } from './zh-CN/cycles';
 import { projects } from './zh-CN/projects';
 import { views } from './zh-CN/views';
 import { bulkActions } from './zh-CN/bulk-actions';
+import { invite } from './zh-CN/invite';
 
 export const zhCN: Record<string, string> = {
 	...settingsNav,
@@ -34,5 +35,6 @@ export const zhCN: Record<string, string> = {
 	...cycles,
 	...projects,
 	...views,
-	...bulkActions
+	...bulkActions,
+	...invite
 };

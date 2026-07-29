@@ -19,5 +19,6 @@ export const login = {
 	'login.demo.aria_close': '關閉示範登入抽屜',
 	'login.demo.close': '關閉',
 	'login.demo.use': '使用',
-	'login.demo.users_button': '示範使用者'
+	'login.demo.users_button': '示範使用者',
+	'login.invite_notice': '你受邀加入一個工作區,請登入或建立帳號以繼續。'
 } as Record<string, string>;

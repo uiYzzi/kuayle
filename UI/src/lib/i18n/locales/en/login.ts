@@ -17,5 +17,6 @@ export const login = {
 	'login.demo.aria_close': 'Close demo login drawer',
 	'login.demo.close': 'Close',
 	'login.demo.use': 'Use',
-	'login.demo.users_button': 'Demo users'
+	'login.demo.users_button': 'Demo users',
+	'login.invite_notice': 'You were invited to join a workspace. Sign in or create an account to continue.'
 } as const;

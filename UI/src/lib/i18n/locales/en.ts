@@ -15,6 +15,7 @@ import { cycles } from './en/cycles';
 import { projects } from './en/projects';
 import { views } from './en/views';
 import { bulkActions } from './en/bulk-actions';
+import { invite } from './en/invite';
 
 export const en = {
 	...settingsNav,
@@ -33,7 +34,8 @@ export const en = {
 	...cycles,
 	...projects,
 	...views,
-	...bulkActions
+	...bulkActions,
+	...invite
 } as const;
 
 export type TranslationKey = keyof typeof en;

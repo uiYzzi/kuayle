@@ -16,6 +16,7 @@ import { cycles } from './zh-TW/cycles';
 import { projects } from './zh-TW/projects';
 import { views } from './zh-TW/views';
 import { bulkActions } from './zh-TW/bulk-actions';
+import { invite } from './zh-TW/invite';
 
 export const zhTW: Record<string, string> = {
 	...settingsNav,
@@ -34,5 +35,6 @@ export const zhTW: Record<string, string> = {
 	...cycles,
 	...projects,
 	...views,
-	...bulkActions
+	...bulkActions,
+	...invite
 };
