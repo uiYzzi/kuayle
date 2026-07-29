@@ -216,7 +216,7 @@ func main() {
 	e.GET("/api/public/assets/:token", uploadH.PublicAsset, mw.RateLimit(10, 20))
 
 	// Authenticated routes
-	api := e.Group("/api", mw.Auth(cfg.JWTSecret))
+	api := e.Group("/api", mw.Auth(cfg.JWTSecret, patRepo))
 
 	// User
 	api.GET("/auth/me", authH.Me)
