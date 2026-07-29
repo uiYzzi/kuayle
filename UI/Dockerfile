@@ -13,7 +13,11 @@ RUN npm run build
 FROM golang:1.26.5-alpine AS caddy-builder
 RUN apk add --no-cache git
 RUN go install github.com/caddyserver/xcaddy/cmd/xcaddy@v0.4.6
-RUN xcaddy build v2.11.4 --with google.golang.org/grpc@v1.82.1
+# Pin x/text past CVE-2026-56852 (fixed in v0.39.0; v0.40.0 matches caddy master).
+# Drop the override once a Caddy release bundles x/text >= v0.39.0.
+RUN xcaddy build v2.11.4 \
+    --with google.golang.org/grpc@v1.82.1 \
+    --with golang.org/x/text@v0.40.0
 
 FROM alpine:3.23
 RUN apk update && apk upgrade --no-cache
