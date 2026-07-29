@@ -10,7 +10,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
 
 permissions:
   contents: write
@@ -49,6 +48,7 @@ jobs:
 
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "number=$number" >> "$GITHUB_OUTPUT"
+          echo "image_prefix=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Bump UI version
         if: github.event_name == 'release'
@@ -112,8 +112,8 @@ jobs:
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.IMAGE_PREFIX }}/kuayle:latest
-            ${{ env.IMAGE_PREFIX }}/kuayle:${{ steps.version.outputs.version }}
+            ${{ steps.version.outputs.image_prefix }}/kuayle:latest
+            ${{ steps.version.outputs.image_prefix }}/kuayle:${{ steps.version.outputs.version }}
           cache-from: type=gha,scope=all-in-one
           cache-to: type=gha,mode=max,scope=all-in-one
 
@@ -126,8 +126,8 @@ jobs:
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.IMAGE_PREFIX }}/kuayle-api:latest
-            ${{ env.IMAGE_PREFIX }}/kuayle-api:${{ steps.version.outputs.version }}
+            ${{ steps.version.outputs.image_prefix }}/kuayle-api:latest
+            ${{ steps.version.outputs.image_prefix }}/kuayle-api:${{ steps.version.outputs.version }}
           cache-from: type=gha,scope=api
           cache-to: type=gha,mode=max,scope=api
 
@@ -140,8 +140,8 @@ jobs:
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
-            ${{ env.IMAGE_PREFIX }}/kuayle-web:latest
-            ${{ env.IMAGE_PREFIX }}/kuayle-web:${{ steps.version.outputs.version }}
+            ${{ steps.version.outputs.image_prefix }}/kuayle-web:latest
+            ${{ steps.version.outputs.image_prefix }}/kuayle-web:${{ steps.version.outputs.version }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
 
