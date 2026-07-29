@@ -307,7 +307,7 @@
 					/>
 				</div>
 				{#if addSearchOpen && availableIssues.length > 0}
-					<div class="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-md border border-[var(--app-border)] bg-[var(--color-bg-primary)] shadow-lg">
+					<div class="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] shadow-lg">
 						{#each availableIssues as issue}
 							<button
 								onmousedown={() => handleAddIssueToCycle(issue)}
