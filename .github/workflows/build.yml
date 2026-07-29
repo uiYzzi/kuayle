@@ -5,10 +5,12 @@ on:
     types: [published]
   pull_request:
     branches: [main]
+  push:
+    branches: [deploy]
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/carbogninalberto
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
 
 permissions:
   contents: write
@@ -27,8 +29,8 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Checkout pull request
-        if: github.event_name == 'pull_request'
+      - name: Checkout
+        if: github.event_name != 'release'
         uses: actions/checkout@v7.0.0
 
       - name: Extract version
@@ -37,6 +39,9 @@ jobs:
           if [ "${{ github.event_name }}" = "release" ]; then
             version="${{ github.event.release.tag_name }}"
             number="${version#v}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            version="${GITHUB_REF_NAME}.$(git rev-parse --short HEAD)"
+            number="0.0.0"
           else
             version="pr"
             number="0.0.0"
@@ -91,7 +96,7 @@ jobs:
         uses: docker/setup-buildx-action@v4.1.0
 
       - name: Log in to GitHub Container Registry
-        if: github.event_name == 'release'
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v4.2.0
         with:
           registry: ${{ env.REGISTRY }}
@@ -105,7 +110,7 @@ jobs:
           context: .
           file: ./Dockerfile
           pull: true
-          push: ${{ github.event_name == 'release' }}
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.IMAGE_PREFIX }}/kuayle:latest
             ${{ env.IMAGE_PREFIX }}/kuayle:${{ steps.version.outputs.version }}
@@ -119,7 +124,7 @@ jobs:
           context: ./BE
           file: ./BE/Dockerfile
           pull: true
-          push: ${{ github.event_name == 'release' }}
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.IMAGE_PREFIX }}/kuayle-api:latest
             ${{ env.IMAGE_PREFIX }}/kuayle-api:${{ steps.version.outputs.version }}
@@ -133,7 +138,7 @@ jobs:
           context: ./UI
           file: ./UI/Dockerfile
           pull: true
-          push: ${{ github.event_name == 'release' }}
+          push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.IMAGE_PREFIX }}/kuayle-web:latest
             ${{ env.IMAGE_PREFIX }}/kuayle-web:${{ steps.version.outputs.version }}
@@ -143,6 +148,8 @@ jobs:
   dev-machine-images:
     name: Dev Machine Image (${{ matrix.name }})
     runs-on: ubuntu-latest
+    # Fork deploy pushes don't need dev machine images; skip to save CI time.
+    if: github.event_name != 'push'
     strategy:
       fail-fast: false
       matrix:
