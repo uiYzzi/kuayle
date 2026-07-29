@@ -54,6 +54,7 @@ func main() {
 	// Repositories
 	userRepo := repository.NewUserRepository(db)
 	refreshRepo := repository.NewRefreshTokenRepository(db)
+	patRepo := repository.NewPersonalAccessTokenRepository(db)
 	workspaceRepo := repository.NewWorkspaceRepository(db)
 	teamRepo := repository.NewTeamRepository(db)
 	issueRepo := repository.NewIssueRepository(db)
@@ -92,6 +93,7 @@ func main() {
 	teamStatusSvc := service.NewTeamStatusService(teamStatusRepo, visibilityRepo)
 	favSvc := service.NewFavoriteService(favRepo)
 	prefsSvc := service.NewPreferencesService(prefsRepo)
+	tokenSvc := service.NewTokenService(patRepo, workspaceRepo)
 	aiSettingsSvc := service.NewAISettingsService(aiSettingsRepo, workspaceRepo, issueRepo, crypto.DeriveKey(cfg.JWTSecret+":ai"))
 
 	// Dev Machine agent registry
@@ -134,6 +136,7 @@ func main() {
 	teamStatusH := handler.NewTeamStatusHandler(teamStatusSvc)
 	favH := handler.NewFavoriteHandler(favSvc)
 	prefsH := handler.NewPreferencesHandler(prefsSvc)
+	tokenH := handler.NewTokenHandler(tokenSvc)
 	aiSettingsH := handler.NewAISettingsHandler(aiSettingsSvc)
 	devMachineH := handler.NewDevMachineHandler(devMachineSvc)
 	analyticsRepo := repository.NewAnalyticsRepository(db)
@@ -220,6 +223,11 @@ func main() {
 	api.PATCH("/auth/me", authH.UpdateProfile)
 	api.GET("/preferences", prefsH.Get)
 	api.PATCH("/preferences", prefsH.Update)
+
+	// Personal access tokens (PAT callers are rejected by the handler)
+	api.GET("/tokens", tokenH.List)
+	api.POST("/tokens", tokenH.Create)
+	api.DELETE("/tokens/:id", tokenH.Revoke)
 	api.GET("/system/update-status", systemH.UpdateStatus)
 	api.POST("/system/update", systemH.StartUpdate)
 
