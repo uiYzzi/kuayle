@@ -7,6 +7,7 @@ export const settingsNav = {
 	'settings.nav.system': 'System',
 	'settings.nav.profile': 'Profile',
 	'settings.nav.preferences': 'Preferences',
+	'settings.nav.api_tokens': 'API Tokens',
 	'settings.nav.general': 'General',
 	'settings.nav.members': 'Members',
 	'settings.nav.labels': 'Labels',
