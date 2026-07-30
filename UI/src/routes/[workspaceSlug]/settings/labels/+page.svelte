@@ -7,7 +7,8 @@
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { appToast } from '$lib/features/toast/toast';
 	import { Plus, Trash2, Pencil, MoreHorizontal } from 'lucide-svelte';
 
@@ -31,9 +32,9 @@
 		try {
 			const label = await createLabel(slug, data);
 			labels = [...labels, label];
-			appToast.success(i18n.t('settings.labels.created'));
+			appToast.success(m['settings.labels.created']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.labels.failed_create'));
+			appToast.apiError(err, m['settings.labels.failed_create']());
 		}
 	}
 
@@ -43,9 +44,9 @@
 			const updated = await updateLabel(slug, editingLabel.id, data);
 			labels = labels.map((l) => (l.id === editingLabel!.id ? updated : l));
 			editingLabel = null;
-			appToast.success(i18n.t('settings.labels.updated'));
+			appToast.success(m['settings.labels.updated']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.labels.failed_update'));
+			appToast.apiError(err, m['settings.labels.failed_update']());
 		}
 	}
 
@@ -53,9 +54,9 @@
 		try {
 			await deleteLabel(slug, id);
 			labels = labels.filter((l) => l.id !== id);
-			appToast.success(i18n.t('settings.labels.deleted'));
+			appToast.success(m['settings.labels.deleted']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.labels.failed_delete'));
+			appToast.apiError(err, m['settings.labels.failed_delete']());
 		}
 	}
 
@@ -68,13 +69,13 @@
 
 <div class="mx-auto max-w-2xl px-8 py-10">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.labels.title')}</h1>
+		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['settings.labels.title']()}</h1>
 		<button
 			onclick={() => (showCreate = true)}
 			class="flex items-center gap-1 rounded-md bg-[var(--app-accent)] px-3 py-1.5 text-sm text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)]"
 		>
 			<Plus size={14} />
-			{i18n.t('settings.labels.new_label')}
+			{m['settings.labels.new_label']()}
 		</button>
 	</div>
 
@@ -84,9 +85,9 @@
 			</div>
 		{:else if labels.length === 0}
 			<EmptyState
-				title={i18n.t('settings.labels.no_labels')}
-				description={i18n.t('settings.labels.no_labels_desc')}
-				action={{ label: i18n.t('settings.labels.new_label'), onclick: () => (showCreate = true) }}
+				title={m['settings.labels.no_labels']()}
+				description={m['settings.labels.no_labels_desc']()}
+				action={{ label: m['settings.labels.new_label'](), onclick: () => (showCreate = true) }}
 			/>
 		{:else}
 			<div class="rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
@@ -114,14 +115,14 @@
 										class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 									>
 										<Pencil size={13} />
-										{i18n.t('settings.edit')}
+										{m['settings.edit']()}
 									</button>
 									<button
 										onclick={() => { menuOpenId = null; handleDelete(label.id); }}
 										class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-hover)]"
 									>
 										<Trash2 size={13} />
-										{i18n.t('settings.delete')}
+										{m['settings.delete']()}
 									</button>
 								</Popover.Content>
 							</Popover.Root>

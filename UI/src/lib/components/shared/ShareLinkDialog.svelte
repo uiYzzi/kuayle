@@ -8,7 +8,8 @@
 	import { createSharedLink, listSharedLinks, updateSharedLink, deleteSharedLink } from '$lib/api/shared-links';
 	import { Copy, ExternalLink, Trash2, Link, Info } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -61,9 +62,9 @@
 			};
 			const link = await createSharedLink(slug, req);
 			links = [link, ...links];
-			appToast.success(i18n.t('sharedComponents.share_link.toast.created'));
+			appToast.success(m['sharedComponents.share_link.toast.created']());
 		} catch {
-			appToast.error(i18n.t('sharedComponents.share_link.toast.create_failed'));
+			appToast.error(m['sharedComponents.share_link.toast.create_failed']());
 		} finally {
 			loading = false;
 		}
@@ -73,9 +74,9 @@
 		try {
 			const updated = await updateSharedLink(slug, link.id, { is_active: !link.is_active });
 			links = links.map((l) => (l.id === updated.id ? updated : l));
-			appToast.success(updated.is_active ? i18n.t('sharedComponents.share_link.toast.activated') : i18n.t('sharedComponents.share_link.toast.deactivated'));
+			appToast.success(updated.is_active ? m['sharedComponents.share_link.toast.activated']() : m['sharedComponents.share_link.toast.deactivated']());
 		} catch {
-			appToast.error(i18n.t('sharedComponents.share_link.toast.update_failed'));
+			appToast.error(m['sharedComponents.share_link.toast.update_failed']());
 		}
 	}
 
@@ -83,24 +84,24 @@
 		try {
 			await deleteSharedLink(slug, link.id);
 			links = links.filter((l) => l.id !== link.id);
-			appToast.success(i18n.t('sharedComponents.share_link.toast.deleted'));
+			appToast.success(m['sharedComponents.share_link.toast.deleted']());
 		} catch {
-			appToast.error(i18n.t('sharedComponents.share_link.toast.delete_failed'));
+			appToast.error(m['sharedComponents.share_link.toast.delete_failed']());
 		}
 	}
 
 	function copyUrl(url: string) {
 		navigator.clipboard.writeText(url);
-		appToast.success(i18n.t('sharedComponents.share_link.toast.copied'));
+		appToast.success(m['sharedComponents.share_link.toast.copied']());
 	}
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>{i18n.t('sharedComponents.share_link.title')}</Dialog.Title>
+			<Dialog.Title>{m['sharedComponents.share_link.title']()}</Dialog.Title>
 			<Dialog.Description>
-				{i18n.t('sharedComponents.share_link.description')}
+				{m['sharedComponents.share_link.description']()}
 			</Dialog.Description>
 		</Dialog.Header>
 
@@ -109,7 +110,7 @@
 			<div class="space-y-3">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-1.5">
-						<span class="text-sm text-[var(--color-text-secondary)]">{i18n.t('sharedComponents.share_link.include_descriptions')}</span>
+						<span class="text-sm text-[var(--color-text-secondary)]">{m['sharedComponents.share_link.include_descriptions']()}</span>
 						<button
 							class="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
 							onclick={() => (showDescriptionHint = !showDescriptionHint)}
@@ -121,12 +122,12 @@
 				</div>
 				{#if showDescriptionHint}
 					<p class="text-xs text-[var(--color-text-tertiary)] -mt-1">
-						{i18n.t('sharedComponents.share_link.description_hint')}
+						{m['sharedComponents.share_link.description_hint']()}
 					</p>
 				{/if}
 				<Button onclick={handleCreate} disabled={loading} size="sm" class="w-full">
 					<Link size={14} class="mr-2" />
-					{i18n.t('sharedComponents.share_link.create_new_link')}
+					{m['sharedComponents.share_link.create_new_link']()}
 				</Button>
 			</div>
 
@@ -134,25 +135,25 @@
 				<Separator />
 
 				<div class="space-y-2 min-w-0">
-					<p class="text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">{i18n.t('sharedComponents.share_link.existing_links')}</p>
+					<p class="text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider">{m['sharedComponents.share_link.existing_links']()}</p>
 					{#each links as link (link.id)}
 						<div class="rounded-md border border-[var(--app-border)] p-2 min-w-0 {link.is_active ? '' : 'opacity-50'}">
 							<p class="truncate text-xs text-[var(--color-text-primary)] font-mono min-w-0">{link.url}</p>
 							<div class="flex items-center gap-1.5 mt-1.5">
 								<p class="text-[10px] text-[var(--color-text-tertiary)]">
-									{link.is_active ? i18n.t('sharedComponents.share_link.active') : i18n.t('sharedComponents.share_link.inactive')}
+									{link.is_active ? m['sharedComponents.share_link.active']() : m['sharedComponents.share_link.inactive']()}
 									{#if link.expires_at}
-										 &middot; {i18n.t('sharedComponents.share_link.expires')} {new Date(link.expires_at).toLocaleDateString(i18n.dateLocale)}
+										 &middot; {m['sharedComponents.share_link.expires']()} {new Date(link.expires_at).toLocaleDateString(getLocale())}
 									{/if}
 									{#if link.include_description}
-										 &middot; {i18n.t('sharedComponents.share_link.with_descriptions')}
+										 &middot; {m['sharedComponents.share_link.with_descriptions']()}
 									{/if}
 								</p>
 								<div class="flex-1"></div>
 								<button
 									onclick={() => copyUrl(link.url)}
 									class="shrink-0 rounded p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
-									title={i18n.t('sharedComponents.share_link.copy_link')}
+									title={m['sharedComponents.share_link.copy_link']()}
 								>
 									<Copy size={14} />
 								</button>
@@ -161,7 +162,7 @@
 									target="_blank"
 									rel="noopener noreferrer"
 									class="shrink-0 rounded p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
-									title={i18n.t('sharedComponents.share_link.open_in_new_tab')}
+									title={m['sharedComponents.share_link.open_in_new_tab']()}
 								>
 									<ExternalLink size={14} />
 								</a>
@@ -169,12 +170,12 @@
 									onclick={() => handleToggle(link)}
 									class="shrink-0 rounded px-1.5 py-0.5 text-[10px] border border-[var(--app-border)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 								>
-									{link.is_active ? i18n.t('sharedComponents.share_link.disable') : i18n.t('sharedComponents.share_link.enable')}
+									{link.is_active ? m['sharedComponents.share_link.disable']() : m['sharedComponents.share_link.enable']()}
 								</button>
 								<button
 									onclick={() => handleDelete(link)}
 									class="shrink-0 rounded p-1 text-[var(--color-text-tertiary)] hover:text-red-500 hover:bg-[var(--color-bg-hover)]"
-									title={i18n.t('sharedComponents.share_link.delete_link')}
+									title={m['sharedComponents.share_link.delete_link']()}
 								>
 									<Trash2 size={14} />
 								</button>

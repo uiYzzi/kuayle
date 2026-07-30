@@ -16,7 +16,8 @@
 	import type { GitHubRepo } from '$lib/types/github';
 	import type { DevMachineEnvironment } from '$lib/types/dev-machine';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Check, Search, X } from 'lucide-svelte';
 	import * as LucideIcons from 'lucide-svelte';
 	import type { Component } from 'svelte';
@@ -203,7 +204,7 @@
 			developmentReady = true;
 		} catch (error) {
 			if (!isCurrentDevelopmentScope(s, t, version)) return;
-			appToast.apiError(error, i18n.t('team_settings.toast.dev_settings_load_failed'));
+			appToast.apiError(error, m['team_settings.toast.dev_settings_load_failed']());
 		} finally {
 			if (isCurrentDevelopmentScope(s, t, version)) developmentLoading = false;
 		}
@@ -262,7 +263,7 @@
 				issueCopyPrompt = team?.issue_copy_prompt ?? '';
 			})
 			.catch(() => {
-				appToast.error(i18n.t('team_settings.toast.load_team_error'));
+				appToast.error(m['team_settings.toast.load_team_error']());
 			})
 			.finally(() => {
 				loading = false;
@@ -286,10 +287,10 @@
 				description: editDescription.trim() || null
 			});
 			editingDetails = false;
-			appToast.success(i18n.t('team_settings.toast.details_updated'));
+			appToast.success(m['team_settings.toast.details_updated']());
 		} catch (err: any) {
 			team = previous;
-			appToast.apiError(err, i18n.t('team_settings.toast.details_update_failed'));
+			appToast.apiError(err, m['team_settings.toast.details_update_failed']());
 		}
 	}
 
@@ -299,10 +300,10 @@
 		team = { ...team, ...data };
 		try {
 			team = await updateTeam(slug, teamId, data);
-			appToast.success(i18n.t('team_settings.toast.appearance_updated'));
+			appToast.success(m['team_settings.toast.appearance_updated']());
 		} catch (err: any) {
 			team = previous;
-			appToast.apiError(err, i18n.t('team_settings.toast.appearance_update_failed'));
+			appToast.apiError(err, m['team_settings.toast.appearance_update_failed']());
 		}
 	}
 
@@ -315,10 +316,10 @@
 		team = { ...team, [field]: value };
 		try {
 			team = await updateTeam(slug, teamId, { [field]: value });
-			appToast.success(i18n.t('team_settings.toast.automation_updated'));
+			appToast.success(m['team_settings.toast.automation_updated']());
 		} catch (err: any) {
 			team = previous;
-			appToast.apiError(err, i18n.t('team_settings.toast.automation_update_failed'));
+			appToast.apiError(err, m['team_settings.toast.automation_update_failed']());
 		}
 	}
 
@@ -331,10 +332,10 @@
 		try {
 			team = await updateTeam(slug, teamId, { issue_copy_prompt: prompt });
 			issueCopyPrompt = team.issue_copy_prompt ?? '';
-			appToast.success(i18n.t('team_settings.toast.copy_prompt_updated'));
+			appToast.success(m['team_settings.toast.copy_prompt_updated']());
 		} catch (err: any) {
 			team = previous;
-			appToast.apiError(err, i18n.t('team_settings.toast.copy_prompt_update_failed'));
+			appToast.apiError(err, m['team_settings.toast.copy_prompt_update_failed']());
 		} finally {
 			savingIssueCopyPrompt = false;
 		}
@@ -361,10 +362,10 @@
 				});
 			}
 			if (!isCurrentDevelopmentScope(s, t, requestVersion) || developmentSaveVersion !== saveVersion) return;
-			appToast.success(i18n.t('team_settings.toast.dev_settings_saved'));
+			appToast.success(m['team_settings.toast.dev_settings_saved']());
 		} catch (error) {
 			if (!isCurrentDevelopmentScope(s, t, requestVersion) || developmentSaveVersion !== saveVersion) return;
-			appToast.apiError(error, i18n.t('team_settings.toast.dev_settings_save_failed'));
+			appToast.apiError(error, m['team_settings.toast.dev_settings_save_failed']());
 		} finally {
 			if (isCurrentDevelopmentScope(s, t, requestVersion) && developmentSaveVersion === saveVersion) savingDevelopment = false;
 		}
@@ -372,9 +373,9 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('team_settings.title')}</h1>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['team_settings.title']()}</h1>
 	<p class="mt-2 text-sm text-[var(--color-text-tertiary)]">
-		{i18n.t('team_settings.description')}
+		{m['team_settings.description']()}
 	</p>
 
 	{#if loading}
@@ -391,48 +392,48 @@
 						<TeamIcon {team} size={18} />
 					</div>
 					<div>
-						<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('team_settings.general')}</p>
-						<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('team_settings.general_desc')}</p>
+						<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['team_settings.general']()}</p>
+						<p class="text-xs text-[var(--color-text-tertiary)]">{m['team_settings.general_desc']()}</p>
 					</div>
 				</div>
 				{#if !editingDetails}
-					<Button variant="ghost" size="sm" onclick={startEditDetails}>{i18n.t('team_settings.edit')}</Button>
+					<Button variant="ghost" size="sm" onclick={startEditDetails}>{m['team_settings.edit']()}</Button>
 				{/if}
 			</div>
 			<div class="space-y-4 px-5 py-4">
 				{#if editingDetails}
 					<div class="space-y-1.5">
-						<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('team_settings.name')}</Label>
+						<Label class="text-xs text-[var(--color-text-secondary)]">{m['team_settings.name']()}</Label>
 						<Input
 							bind:value={editName}
 							class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 						/>
 					</div>
 					<div class="space-y-1.5">
-						<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('team_settings.description_label')}</Label>
+						<Label class="text-xs text-[var(--color-text-secondary)]">{m['team_settings.description_label']()}</Label>
 						<Input
 							bind:value={editDescription}
-							placeholder={i18n.t('team_settings.description_placeholder')}
+							placeholder={m['team_settings.description_placeholder']()}
 							class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 						/>
 					</div>
 					<div class="flex justify-end gap-2">
-						<Button variant="outline" size="sm" onclick={() => (editingDetails = false)}><X size={14} />{i18n.t('team_settings.cancel')}</Button>
-						<Button size="sm" onclick={saveDetails} disabled={!editName.trim()}><Check size={14} />{i18n.t('team_settings.save')}</Button>
+						<Button variant="outline" size="sm" onclick={() => (editingDetails = false)}><X size={14} />{m['team_settings.cancel']()}</Button>
+						<Button size="sm" onclick={saveDetails} disabled={!editName.trim()}><Check size={14} />{m['team_settings.save']()}</Button>
 					</div>
 				{:else}
 					<div class="grid gap-3 text-sm">
 						<div>
-							<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('team_settings.name')}</p>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['team_settings.name']()}</p>
 							<p class="text-[var(--color-text-primary)]">{team.name}</p>
 						</div>
 						<div>
-							<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('team_settings.identifier')}</p>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['team_settings.identifier']()}</p>
 							<p class="font-mono text-[var(--color-text-primary)]">{team.key}</p>
 						</div>
 						<div>
-							<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('team_settings.description_label')}</p>
-							<p class="text-[var(--color-text-primary)]">{team.description || i18n.t('team_settings.no_description')}</p>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['team_settings.description_label']()}</p>
+							<p class="text-[var(--color-text-primary)]">{team.description || m['team_settings.no_description']()}</p>
 						</div>
 					</div>
 				{/if}
@@ -440,23 +441,23 @@
 		</div>
 
 		<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
-			<div class="border-b border-[var(--app-border)] px-5 py-4"><p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('team_settings.development_defaults')}</p><p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('team_settings.development_defaults_desc')}</p></div>
+			<div class="border-b border-[var(--app-border)] px-5 py-4"><p class="text-sm font-medium text-[var(--color-text-primary)]">{m['team_settings.development_defaults']()}</p><p class="text-xs text-[var(--color-text-tertiary)]">{m['team_settings.development_defaults_desc']()}</p></div>
 			<div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
-				{#if !canManageDevelopment}<p class="rounded-md border border-[var(--app-border)] p-3 text-xs text-[var(--color-text-tertiary)] sm:col-span-2">{i18n.t('team_settings.development_admin_only')}</p>{/if}
-				<div class="space-y-1"><Label>{i18n.t('team_settings.repository')}</Label><Select.Root type="single" value={developmentRepositoryId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentRepositoryId = value)}><Select.Trigger class="w-full">{developmentLoading ? i18n.t('team_settings.loading') : developmentRepositories.find((item) => item.id === developmentRepositoryId)?.full_name ?? i18n.t('team_settings.use_workspace_default')}</Select.Trigger><Select.Content><Select.Item value="inherit" label={i18n.t('team_settings.use_workspace_default')}>{i18n.t('team_settings.use_workspace_default')}</Select.Item>{#each developmentRepositories as repository}<Select.Item value={repository.id} label={repository.full_name}>{repository.full_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
-				<div class="space-y-1"><Label>{i18n.t('team_settings.environment')}</Label><Select.Root type="single" value={developmentEnvironmentId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentEnvironmentId = value)}><Select.Trigger class="w-full">{developmentLoading ? i18n.t('team_settings.loading') : developmentEnvironments.find((item) => item.id === developmentEnvironmentId)?.name ?? i18n.t('team_settings.use_workspace_default')}</Select.Trigger><Select.Content><Select.Item value="inherit" label={i18n.t('team_settings.use_workspace_default')}>{i18n.t('team_settings.use_workspace_default')}</Select.Item>{#each developmentEnvironments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
-				<div class="flex justify-end sm:col-span-2"><Button size="sm" onclick={saveDevelopmentSettings} disabled={developmentLoading || !developmentReady || savingDevelopment || !canManageDevelopment}>{savingDevelopment ? i18n.t('team_settings.saving') : i18n.t('team_settings.save_development_defaults')}</Button></div>
+				{#if !canManageDevelopment}<p class="rounded-md border border-[var(--app-border)] p-3 text-xs text-[var(--color-text-tertiary)] sm:col-span-2">{m['team_settings.development_admin_only']()}</p>{/if}
+				<div class="space-y-1"><Label>{m['team_settings.repository']()}</Label><Select.Root type="single" value={developmentRepositoryId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentRepositoryId = value)}><Select.Trigger class="w-full">{developmentLoading ? m['team_settings.loading']() : developmentRepositories.find((item) => item.id === developmentRepositoryId)?.full_name ?? m['team_settings.use_workspace_default']()}</Select.Trigger><Select.Content><Select.Item value="inherit" label={m['team_settings.use_workspace_default']()}>{m['team_settings.use_workspace_default']()}</Select.Item>{#each developmentRepositories as repository}<Select.Item value={repository.id} label={repository.full_name}>{repository.full_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+				<div class="space-y-1"><Label>{m['team_settings.environment']()}</Label><Select.Root type="single" value={developmentEnvironmentId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentEnvironmentId = value)}><Select.Trigger class="w-full">{developmentLoading ? m['team_settings.loading']() : developmentEnvironments.find((item) => item.id === developmentEnvironmentId)?.name ?? m['team_settings.use_workspace_default']()}</Select.Trigger><Select.Content><Select.Item value="inherit" label={m['team_settings.use_workspace_default']()}>{m['team_settings.use_workspace_default']()}</Select.Item>{#each developmentEnvironments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+				<div class="flex justify-end sm:col-span-2"><Button size="sm" onclick={saveDevelopmentSettings} disabled={developmentLoading || !developmentReady || savingDevelopment || !canManageDevelopment}>{savingDevelopment ? m['team_settings.saving']() : m['team_settings.save_development_defaults']()}</Button></div>
 			</div>
 		</div>
 
 		<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<div class="border-b border-[var(--app-border)] px-5 py-4">
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('team_settings.appearance')}</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('team_settings.appearance_desc')}</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['team_settings.appearance']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['team_settings.appearance_desc']()}</p>
 			</div>
 			<div class="space-y-4 px-5 py-4">
 				<div>
-					<p class="mb-2 text-xs font-medium text-[var(--color-text-secondary)]">{i18n.t('team_settings.icon')}</p>
+					<p class="mb-2 text-xs font-medium text-[var(--color-text-secondary)]">{m['team_settings.icon']()}</p>
 					<Popover.Root bind:open={pickerOpen}>
 						<Popover.Trigger>
 							<button
@@ -467,9 +468,9 @@
 									<TeamIcon {team} size={20} />
 								</span>
 								<span>
-									<span class="block text-sm text-[var(--color-text-primary)]">{i18n.t('team_settings.choose_icon_or_emoji')}</span>
+									<span class="block text-sm text-[var(--color-text-primary)]">{m['team_settings.choose_icon_or_emoji']()}</span>
 									<span class="block text-xs text-[var(--color-text-tertiary)]"
-										>{i18n.t('team_settings.icons_preview_desc')}</span
+										>{m['team_settings.icons_preview_desc']()}</span
 									>
 								</span>
 							</button>
@@ -483,7 +484,7 @@
 									/>
 									<input
 										bind:value={pickerQuery}
-										placeholder={pickerTab === 'icons' ? i18n.t('team_settings.search_lucide_icons') : i18n.t('team_settings.search_emoji')}
+										placeholder={pickerTab === 'icons' ? m['team_settings.search_lucide_icons']() : m['team_settings.search_emoji']()}
 										class="h-8 w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] pl-7 pr-2 text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--app-accent)]"
 									/>
 								</div>
@@ -495,7 +496,7 @@
 											? 'bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]'
 											: 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]'}"
 									>
-										{i18n.t('team_settings.icons_tab')}
+										{m['team_settings.icons_tab']()}
 									</button>
 									<button
 										type="button"
@@ -504,7 +505,7 @@
 											? 'bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)]'
 											: 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]'}"
 									>
-										{i18n.t('team_settings.emoji_tab')}
+										{m['team_settings.emoji_tab']()}
 									</button>
 								</div>
 							</div>
@@ -513,7 +514,7 @@
 									<p
 										class="px-1 pb-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]"
 									>
-										{i18n.t('team_settings.icons_tab')} · {filteredIcons.length}
+										{m['team_settings.icons_tab']()} · {filteredIcons.length}
 									</p>
 									<div class="grid grid-cols-8 gap-1">
 										{#each visibleIcons as option}
@@ -525,14 +526,14 @@
 												option.value
 													? 'border-[var(--app-accent)] bg-[var(--app-accent)]/10'
 													: 'border-transparent hover:border-[var(--app-border)] hover:bg-[var(--color-bg-hover)]'}"
-												aria-label={i18n.t('team_settings.use_icon_aria', { label: option.label })}
+												aria-label={m['team_settings.use_icon_aria']({ label: option.label })}
 											>
 												<Icon size={15} style="color: {selectedColor}" />
 											</button>
 										{/each}
 									</div>
 									{#if visibleIcons.length < filteredIcons.length}
-										<p class="py-2 text-center text-[10px] text-[var(--color-text-tertiary)]">{i18n.t('team_settings.scroll_for_more_icons')}</p>
+										<p class="py-2 text-center text-[10px] text-[var(--color-text-tertiary)]">{m['team_settings.scroll_for_more_icons']()}</p>
 									{/if}
 								{/if}
 								{#if pickerTab === 'emoji'}
@@ -549,7 +550,7 @@
 														? 'bg-[var(--app-accent)]/10 text-[var(--app-accent-light)]'
 														: 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 												>
-													{i18n.t(group.labelKey)}
+													{m[group.labelKey]()}
 												</button>
 											{/each}
 										</div>
@@ -558,8 +559,8 @@
 										class="px-1 pb-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]"
 									>
 										{pickerQuery.trim()
-											? i18n.t('team_settings.emoji_search_label')
-											: i18n.t(EMOJI_GROUPS.find((group) => group.id === emojiGroup)?.labelKey ?? 'team_settings.emoji_default_label')} · {emojiResults.length}
+											? m['team_settings.emoji_search_label']()
+											: m[EMOJI_GROUPS.find((group) => group.id === emojiGroup)?.labelKey ?? 'team_settings.emoji_default_label']()} · {emojiResults.length}
 									</p>
 									{#if emojiLoading}
 										<div class="flex justify-center py-6">
@@ -578,7 +579,7 @@
 													unicode
 														? 'border-[var(--app-accent)] bg-[var(--app-accent)]/10'
 														: 'border-transparent hover:border-[var(--app-border)] hover:bg-[var(--color-bg-hover)]'}"
-													aria-label={i18n.t('team_settings.use_emoji_aria', { label: emojiLabel(emoji) })}
+													aria-label={m['team_settings.use_emoji_aria']({ label: emojiLabel(emoji) })}
 												>
 													{unicode}
 												</button>
@@ -586,7 +587,7 @@
 										</div>
 										{#if visibleEmojis.length < emojiResults.length}
 											<p class="py-2 text-center text-[10px] text-[var(--color-text-tertiary)]">
-												{i18n.t('team_settings.scroll_for_more_emoji')}
+												{m['team_settings.scroll_for_more_emoji']()}
 											</p>
 										{/if}
 									{/if}
@@ -596,7 +597,7 @@
 					</Popover.Root>
 				</div>
 				<div>
-					<p class="mb-2 text-xs font-medium text-[var(--color-text-secondary)]">{i18n.t('team_settings.color')}</p>
+					<p class="mb-2 text-xs font-medium text-[var(--color-text-secondary)]">{m['team_settings.color']()}</p>
 					<div class="flex flex-wrap gap-1.5">
 						{#each PRESET_COLORS as c}
 							<button
@@ -606,7 +607,7 @@
 									? 'ring-2 ring-[var(--app-accent)] ring-offset-2 ring-offset-[var(--color-bg-secondary)]'
 									: ''}"
 								style="background-color: {c}"
-								aria-label={i18n.t('team_settings.use_color_aria', { color: c })}
+								aria-label={m['team_settings.use_color_aria']({ color: c })}
 							></button>
 						{/each}
 					</div>
@@ -616,16 +617,16 @@
 
 		<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<div class="border-b border-[var(--app-border)] px-5 py-4">
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('team_settings.sub_issue_automation')}</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['team_settings.sub_issue_automation']()}</p>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
-					{i18n.t('team_settings.sub_issue_automation_desc')}
+					{m['team_settings.sub_issue_automation_desc']()}
 				</p>
 			</div>
 			<label class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm text-[var(--color-text-primary)]">{i18n.t('team_settings.parent_auto_close')}</p>
+					<p class="text-sm text-[var(--color-text-primary)]">{m['team_settings.parent_auto_close']()}</p>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						{i18n.t('team_settings.parent_auto_close_desc')}
+						{m['team_settings.parent_auto_close_desc']()}
 					</p>
 				</div>
 				<Switch
@@ -635,9 +636,9 @@
 			</label>
 			<label class="flex items-center justify-between gap-4 border-t border-[var(--app-border)] px-5 py-4">
 				<div>
-					<p class="text-sm text-[var(--color-text-primary)]">{i18n.t('team_settings.sub_issue_auto_close')}</p>
+					<p class="text-sm text-[var(--color-text-primary)]">{m['team_settings.sub_issue_auto_close']()}</p>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						{i18n.t('team_settings.sub_issue_auto_close_desc')}
+						{m['team_settings.sub_issue_auto_close_desc']()}
 					</p>
 				</div>
 				<Switch
@@ -649,25 +650,25 @@
 
 		<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<div class="border-b border-[var(--app-border)] px-5 py-4">
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('team_settings.issue_copy_prompt')}</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['team_settings.issue_copy_prompt']()}</p>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
-					{i18n.t('team_settings.issue_copy_prompt_desc')}
+					{m['team_settings.issue_copy_prompt_desc']()}
 				</p>
 			</div>
 			<div class="space-y-3 px-5 py-4">
 				<textarea
 					bind:value={issueCopyPrompt}
 					rows="8"
-					placeholder={i18n.t('team_settings.issue_copy_prompt_placeholder')}
+					placeholder={m['team_settings.issue_copy_prompt_placeholder']()}
 					class="w-full rounded-lg border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 font-mono text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--app-accent)]"
 				></textarea>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
-					{i18n.t('team_settings.available_placeholders')} {'{{issue_identifier}}'}, {'{{issue_title}}'}, {'{{team_key}}'}, {'{{team_name}}'}, {'{{issue_xml}}'}.
+					{m['team_settings.available_placeholders']()} {'{{issue_identifier}}'}, {'{{issue_title}}'}, {'{{team_key}}'}, {'{{team_name}}'}, {'{{issue_xml}}'}.
 				</p>
 				<div class="flex justify-end gap-2">
-					<Button variant="outline" size="sm" onclick={() => (issueCopyPrompt = '')}>{i18n.t('team_settings.use_workspace_default')}</Button>
+					<Button variant="outline" size="sm" onclick={() => (issueCopyPrompt = '')}>{m['team_settings.use_workspace_default']()}</Button>
 					<Button size="sm" onclick={saveIssueCopyPrompt} disabled={savingIssueCopyPrompt}>
-						{savingIssueCopyPrompt ? i18n.t('team_settings.saving') : i18n.t('team_settings.save_prompt')}
+						{savingIssueCopyPrompt ? m['team_settings.saving']() : m['team_settings.save_prompt']()}
 					</Button>
 				</div>
 			</div>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { VelocityPoint } from '$lib/types/cycle';
 	import * as echarts from 'echarts';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		data
@@ -75,19 +76,19 @@
 				textStyle: { color: colorText, fontSize: 11 },
 				formatter: (params: any) => {
 					const name = params[0]?.axisValue ?? '';
-					const completed = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.completed'))?.value ?? 0;
-					const cancelled = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.cancelled'))?.value ?? 0;
-					const remaining = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.remaining'))?.value ?? 0;
+					const completed = params.find((p: any) => p.seriesName === m['cycles.chart.completed']())?.value ?? 0;
+					const cancelled = params.find((p: any) => p.seriesName === m['cycles.chart.cancelled']())?.value ?? 0;
+					const remaining = params.find((p: any) => p.seriesName === m['cycles.chart.remaining']())?.value ?? 0;
 					const total = completed + cancelled + remaining;
 					return `<div><strong>${name}</strong></div>`
-						+ `<div style="margin-top:4px">${i18n.t('cycles.chart.velocity_completed')}${completed}/${total}</div>`
-						+ `<div>${i18n.t('cycles.chart.velocity_cancelled')}${cancelled}</div>`
-						+ `<div>${i18n.t('cycles.chart.velocity_remaining')}${remaining}</div>`;
+						+ `<div style="margin-top:4px">${m['cycles.chart.velocity_completed']()}${completed}/${total}</div>`
+						+ `<div>${m['cycles.chart.velocity_cancelled']()}${cancelled}</div>`
+						+ `<div>${m['cycles.chart.velocity_remaining']()}${remaining}</div>`;
 				}
 			},
 			series: [
 				{
-					name: i18n.t('cycles.chart.completed'),
+					name: m['cycles.chart.completed'](),
 					type: 'bar',
 					stack: 'total',
 					data: completedData,
@@ -95,14 +96,14 @@
 					barMaxWidth: 32
 				},
 				{
-					name: i18n.t('cycles.chart.cancelled'),
+					name: m['cycles.chart.cancelled'](),
 					type: 'bar',
 					stack: 'total',
 					data: cancelledData,
 					itemStyle: { color: colorCancelled }
 				},
 				{
-					name: i18n.t('cycles.chart.remaining'),
+					name: m['cycles.chart.remaining'](),
 					type: 'bar',
 					stack: 'total',
 					data: remainingData,

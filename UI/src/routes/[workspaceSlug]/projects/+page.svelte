@@ -12,7 +12,8 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { Plus } from 'lucide-svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	let projects = $state<Project[]>([]);
@@ -21,7 +22,7 @@
 	let showCreateProject = $state(false);
 
 	function statusLabel(status: ProjectStatus): string {
-		return i18n.t(`projects.status.${status}`);
+		return m[`projects.status.${status}`]();
 	}
 
 	onMount(async () => {
@@ -37,9 +38,9 @@
 			const project = await createProject(slug, data);
 			projects = [...projects, project];
 			sidebarState.addProject(project);
-			appToast.success(i18n.t('projects.toast.created'));
+			appToast.success(m['projects.toast.created']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('projects.toast.failed_create'));
+			appToast.apiError(err, m['projects.toast.failed_create']());
 		}
 	}
 
@@ -64,12 +65,12 @@
 	>
 		<div class="flex items-center gap-2">
 			<SidebarToggle />
-			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('projects.title')}</h1>
+			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">{m['projects.title']()}</h1>
 		</div>
 		<button
 			onclick={() => (showCreateProject = true)}
 			class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			title={i18n.t('projects.new_project')}
+			title={m['projects.new_project']()}
 		>
 			<Plus size={16} />
 		</button>
@@ -77,9 +78,9 @@
 
 	{#if !loading && projects.length === 0}
 		<EmptyState
-			title={i18n.t('projects.no_projects')}
-			description={i18n.t('projects.no_projects_desc')}
-			action={{ label: i18n.t('projects.new_project'), onclick: () => (showCreateProject = true) }}
+			title={m['projects.no_projects']()}
+			description={m['projects.no_projects_desc']()}
+			action={{ label: m['projects.new_project'](), onclick: () => (showCreateProject = true) }}
 		/>
 	{:else}
 		<div class="divide-y divide-[var(--app-border)]">

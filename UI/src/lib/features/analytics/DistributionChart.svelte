@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import * as echarts from 'echarts';
 	import type { AnalyticsDistribution } from '$lib/api/analytics';
 	import { getPriorityLabel, type IssuePriority } from '$lib/types/issue';
@@ -189,7 +190,7 @@
 				? 'bg-[var(--app-accent)]/10 text-[var(--color-text-primary)]'
 				: 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'}"
 		>
-			{teamScoped ? i18n.t('insights.by_status') : i18n.t('insights.by_status_type')}
+			{teamScoped ? m['insights.by_status']() : m['insights.by_status_type']()}
 		</button>
 		<button
 			onclick={() => (activeTab = 'priority')}
@@ -197,7 +198,7 @@
 				? 'bg-[var(--app-accent)]/10 text-[var(--color-text-primary)]'
 				: 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'}"
 		>
-			{i18n.t('insights.by_priority')}
+			{m['insights.by_priority']()}
 		</button>
 	</div>
 	<div bind:this={container} class="h-60 w-full"></div>

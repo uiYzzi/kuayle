@@ -34,7 +34,8 @@
 	import { createShortcutEngine, type ShortcutDef } from '$lib/utils/keyboard';
 	import { Menu, Search, SquarePen } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import TerminalDock from '$lib/features/dev-machines/TerminalDock.svelte';
 	import { setTerminalDock } from '$lib/features/dev-machines/terminal-dock-context.svelte';
 
@@ -180,11 +181,11 @@
 	// Full shortcut definitions
 	const shortcutDefs = $derived<ShortcutDef[]>([
 		// Navigation sequences (G + key)
-		{ keys: ['g', 'i'], handler: () => goto(`/${slug}/inbox`), label: i18n.t('sidebar.go_inbox'), category: i18n.t('sidebar.navigation') },
-		{ keys: ['g', 'm'], handler: () => goto(`/${slug}/my-issues`), label: i18n.t('sidebar.go_my_issues'), category: i18n.t('sidebar.navigation') },
-		{ keys: ['g', 'a'], handler: () => goto(`/${slug}/insights`), label: i18n.t('sidebar.go_insights'), category: i18n.t('sidebar.navigation') },
-		{ keys: ['g', 'p'], handler: () => goto(`/${slug}/projects`), label: i18n.t('sidebar.go_projects'), category: i18n.t('sidebar.navigation') },
-		{ keys: ['g', 's'], handler: () => goto(`/${slug}/settings`), label: i18n.t('sidebar.go_settings'), category: i18n.t('sidebar.navigation') },
+		{ keys: ['g', 'i'], handler: () => goto(`/${slug}/inbox`), label: m['sidebar.go_inbox'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 'm'], handler: () => goto(`/${slug}/my-issues`), label: m['sidebar.go_my_issues'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 'a'], handler: () => goto(`/${slug}/insights`), label: m['sidebar.go_insights'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 'p'], handler: () => goto(`/${slug}/projects`), label: m['sidebar.go_projects'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 's'], handler: () => goto(`/${slug}/settings`), label: m['sidebar.go_settings'](), category: m['sidebar.navigation']() },
 		// Actions
 		{
 			key: 'c',
@@ -200,12 +201,12 @@
 					showCreateIssue = true;
 				}
 			},
-			label: i18n.t('sidebar.create_issue'),
-			category: i18n.t('sidebar.actions')
+			label: m['sidebar.create_issue'](),
+			category: m['sidebar.actions']()
 		},
-		{ key: 'k', meta: true, handler: () => (showCommandPalette = !showCommandPalette), label: i18n.t('sidebar.command_palette'), category: i18n.t('sidebar.actions') },
-		{ key: '/', handler: () => (showCommandPalette = true), label: i18n.t('sidebar.search'), category: i18n.t('sidebar.actions') },
-		{ key: '?', shift: true, handler: () => (showShortcutHelp = !showShortcutHelp), label: i18n.t('sidebar.keyboard_shortcuts'), category: i18n.t('sidebar.help') },
+		{ key: 'k', meta: true, handler: () => (showCommandPalette = !showCommandPalette), label: m['sidebar.command_palette'](), category: m['sidebar.actions']() },
+		{ key: '/', handler: () => (showCommandPalette = true), label: m['sidebar.search'](), category: m['sidebar.actions']() },
+		{ key: '?', shift: true, handler: () => (showShortcutHelp = !showShortcutHelp), label: m['sidebar.keyboard_shortcuts'](), category: m['sidebar.help']() },
 	]);
 
 	const shortcutEngine = createShortcutEngine(shortcutDefs);
@@ -224,9 +225,9 @@
 			const team = await createTeam(slug, data);
 			teams = [...teams, team];
 			sidebarState.teams = teams;
-			appToast.success(i18n.t('sidebar.team_created'));
+			appToast.success(m['sidebar.team_created']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('sidebar.failed_create_team'));
+			appToast.apiError(err, m['sidebar.failed_create_team']());
 		}
 	}
 
@@ -262,17 +263,17 @@
 			if (confirmAction === 'leave') {
 				const result = await leaveTeam(slug, confirmTeam.id);
 				removeTeamFromState(confirmTeam.id);
-				appToast.success(result.status === 'deleted' ? i18n.t('sidebar.team_deleted') : i18n.t('sidebar.left_team'));
+				appToast.success(result.status === 'deleted' ? m['sidebar.team_deleted']() : m['sidebar.left_team']());
 			} else {
 				await deleteTeam(slug, confirmTeam.id);
 				removeTeamFromState(confirmTeam.id);
-				appToast.success(i18n.t('sidebar.team_deleted'));
+				appToast.success(m['sidebar.team_deleted']());
 			}
 			confirmOpen = false;
 			confirmTeam = null;
 			confirmAction = null;
 		} catch (err: any) {
-			appToast.apiError(err, confirmAction === 'leave' ? i18n.t('sidebar.failed_leave_team') : i18n.t('sidebar.failed_delete_team'));
+			appToast.apiError(err, confirmAction === 'leave' ? m['sidebar.failed_leave_team']() : m['sidebar.failed_delete_team']());
 		} finally {
 			confirmSubmitting = false;
 		}
@@ -499,8 +500,8 @@
 			<Sheet.Root bind:open={showMobileSidebar}>
 				<Sheet.Content side="left" class="w-[min(88vw,320px)] p-0 [&>button]:hidden" showCloseButton={false}>
 					<Sheet.Header class="sr-only">
-						<Sheet.Title>{i18n.t('sidebar.workspace_navigation')}</Sheet.Title>
-						<Sheet.Description>{i18n.t('sidebar.navigate_sections')}</Sheet.Description>
+						<Sheet.Title>{m['sidebar.workspace_navigation']()}</Sheet.Title>
+						<Sheet.Description>{m['sidebar.navigate_sections']()}</Sheet.Description>
 					</Sheet.Header>
 					<Sidebar
 						{workspace}
@@ -525,16 +526,16 @@
 			{#if !isSettings}
 				<div class="flex h-12 shrink-0 items-center justify-between border-b border-[var(--app-border)] bg-[var(--color-bg)] px-3 md:hidden">
 					<div class="flex min-w-0 items-center gap-2">
-						<Button variant="ghost" size="icon-lg" onclick={() => (showMobileSidebar = true)} aria-label={i18n.t('sidebar.open_navigation')}>
+						<Button variant="ghost" size="icon-lg" onclick={() => (showMobileSidebar = true)} aria-label={m['sidebar.open_navigation']()}>
 							<Menu size={18} />
 						</Button>
 						<span class="truncate text-sm font-medium text-[var(--color-text-primary)]">{workspace.name}</span>
 					</div>
 					<div class="flex shrink-0 items-center gap-1">
-						<Button variant="ghost" size="icon-lg" onclick={() => (showCommandPalette = true)} aria-label={i18n.t('sidebar.search')}>
+						<Button variant="ghost" size="icon-lg" onclick={() => (showCommandPalette = true)} aria-label={m['sidebar.search']()}>
 							<Search size={18} />
 						</Button>
-						<Button variant="ghost" size="icon-lg" onclick={openCreateIssue} aria-label={i18n.t('sidebar.create_issue')}>
+						<Button variant="ghost" size="icon-lg" onclick={openCreateIssue} aria-label={m['sidebar.create_issue']()}>
 							<SquarePen size={18} />
 						</Button>
 					</div>
@@ -570,7 +571,7 @@
 				const created = await issuesState.create(slug, req);
 				showIssueCreatedToast(slug, created);
 			} catch (err: any) {
-				appToast.apiError(err, i18n.t('sidebar.failed_create_issue'));
+				appToast.apiError(err, m['sidebar.failed_create_issue']());
 			}
 		}}
 	/>
@@ -584,20 +585,20 @@
 		<Dialog.Content class="sm:max-w-[420px] border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<Dialog.Header>
 				<Dialog.Title>
-					{confirmAction === 'delete' ? i18n.t('sidebar.delete_team_title') : i18n.t('sidebar.leave_team_title')}
+					{confirmAction === 'delete' ? m['sidebar.delete_team_title']() : m['sidebar.leave_team_title']()}
 				</Dialog.Title>
 				<Dialog.Description>
 					{#if confirmAction === 'delete'}
-						{i18n.t('sidebar.delete_team_desc', { name: confirmTeam?.name ?? i18n.t('sidebar.this_team') })}
+						{m['sidebar.delete_team_desc']({ name: confirmTeam?.name ?? m['sidebar.this_team']() })}
 					{:else}
-						{i18n.t('sidebar.leave_team_desc', { name: confirmTeam?.name ?? i18n.t('sidebar.this_team') })}
+						{m['sidebar.leave_team_desc']({ name: confirmTeam?.name ?? m['sidebar.this_team']() })}
 					{/if}
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer>
-				<Button variant="outline" onclick={() => (confirmOpen = false)} disabled={confirmSubmitting}>{i18n.t('sidebar.cancel')}</Button>
+				<Button variant="outline" onclick={() => (confirmOpen = false)} disabled={confirmSubmitting}>{m['sidebar.cancel']()}</Button>
 				<Button variant="destructive" onclick={confirmTeamAction} disabled={confirmSubmitting}>
-					{confirmSubmitting ? i18n.t('sidebar.working') : confirmAction === 'delete' ? i18n.t('sidebar.delete_team_title') : i18n.t('sidebar.leave_team_title')}
+					{confirmSubmitting ? m['sidebar.working']() : confirmAction === 'delete' ? m['sidebar.delete_team_title']() : m['sidebar.leave_team_title']()}
 				</Button>
 			</Dialog.Footer>
 		</Dialog.Content>

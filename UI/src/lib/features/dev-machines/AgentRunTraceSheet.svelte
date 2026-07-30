@@ -7,7 +7,8 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { safeGitHubPullRequestUrl } from '$lib/security/github-url';
 	import { appendRecentTelemetry, DEV_MACHINE_EVENT_RETENTION, DEV_MACHINE_LOG_RETENTION } from './telemetry-retention';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Bot, ExternalLink, X, RotateCw, Loader } from 'lucide-svelte';
 
 	let { open = $bindable(false), slug, runId, machine, checkouts, onclose }: {
@@ -206,13 +207,13 @@
 				<div class="flex items-center justify-between">
 					<div class="flex items-center gap-2">
 						<Bot size={16} />
-						<Sheet.Title class="text-sm font-semibold">{i18n.t('machines.agent_run_trace')}</Sheet.Title>
+						<Sheet.Title class="text-sm font-semibold">{m['machines.agent_run_trace']()}</Sheet.Title>
 					</div>
 					<div class="flex items-center gap-1">
 						{#if run && !isTerminal}
-							<Button variant="ghost" size="icon-sm" onclick={() => void poll()} title={i18n.t('machines.refresh')}><RotateCw size={14} /></Button>
+							<Button variant="ghost" size="icon-sm" onclick={() => void poll()} title={m['machines.refresh']()}><RotateCw size={14} /></Button>
 						{/if}
-						<Button variant="ghost" size="icon-sm" onclick={handleClose} title={i18n.t('common.close')}><X size={16} /></Button>
+						<Button variant="ghost" size="icon-sm" onclick={handleClose} title={m['common.close']()}><X size={16} /></Button>
 					</div>
 				</div>
 			</Sheet.Header>
@@ -224,8 +225,8 @@
 					</div>
 				{:else if failed && !run}
 					<div class="text-center text-sm text-red-400 py-12">
-						{i18n.t('machines.failed_load_trace')}
-						<Button variant="outline" size="xs" class="mt-2" onclick={() => void loadTrace()}>{i18n.t('machines.refresh')}</Button>
+						{m['machines.failed_load_trace']()}
+						<Button variant="outline" size="xs" class="mt-2" onclick={() => void loadTrace()}>{m['machines.refresh']()}</Button>
 					</div>
 				{:else if run}
 					<!-- Status overview -->
@@ -240,16 +241,16 @@
 							</span>
 						{/if}
 						<p class="text-[10px] text-[var(--color-text-tertiary)]">
-							{i18n.t('machines.created_at', { time: formatTimestamp(run.created_at) })}<br />
-							{#if run.started_at}{i18n.t('machines.started_at', { time: formatTimestamp(run.started_at) })}<br />{/if}
-							{#if run.completed_at}{i18n.t('machines.completed_at', { time: formatTimestamp(run.completed_at) })}{/if}
+							{m['machines.created_at']({ time: formatTimestamp(run.created_at) })}<br />
+							{#if run.started_at}{m['machines.started_at']({ time: formatTimestamp(run.started_at) })}<br />{/if}
+							{#if run.completed_at}{m['machines.completed_at']({ time: formatTimestamp(run.completed_at) })}{/if}
 						</p>
 					</section>
 
 					<!-- Prompt -->
 					{#if run.prompt}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.prompt')}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.prompt']()}</h3>
 							<pre class="mt-1 whitespace-pre-wrap rounded-md bg-black/20 p-3 text-[11px] leading-relaxed text-zinc-300 max-h-40 overflow-y-auto">{run.prompt}</pre>
 						</section>
 					{/if}
@@ -257,7 +258,7 @@
 					<!-- Result / Summary -->
 					{#if run.summary}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.summary')}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.summary']()}</h3>
 							<p class="mt-1 text-xs text-[var(--color-text-secondary)]">{run.summary}</p>
 						</section>
 					{/if}
@@ -265,7 +266,7 @@
 					<!-- Error -->
 					{#if run.error_message}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-red-400">{i18n.t('machines.error')}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-red-400">{m['machines.error']()}</h3>
 							<pre class="mt-1 whitespace-pre-wrap rounded-md bg-red-500/10 p-3 text-[11px] leading-relaxed text-red-300 max-h-32 overflow-y-auto">{run.error_message}</pre>
 						</section>
 					{/if}
@@ -273,7 +274,7 @@
 					<!-- Changed files -->
 					{#if run.changed_files?.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.changed_files', { count: run.changed_files.length })}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.changed_files']({ count: run.changed_files.length })}</h3>
 							<ul class="mt-1 space-y-0.5">
 								{#each run.changed_files as file}
 									<li class="text-[11px] text-[var(--color-text-secondary)] font-mono">{file}</li>
@@ -285,7 +286,7 @@
 					<!-- Commits -->
 					{#if run.commits?.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.commits_section', { count: run.commits.length })}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.commits_section']({ count: run.commits.length })}</h3>
 							<ul class="mt-1 space-y-0.5">
 								{#each run.commits as commit}
 									<li class="text-[11px] text-[var(--color-text-secondary)] font-mono">{commit}</li>
@@ -297,7 +298,7 @@
 					<!-- Tests -->
 					{#if run.tests_run?.length || run.test_status !== 'not_run'}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.tests')} · <span class={run.test_status === 'passed' ? 'text-green-400' : run.test_status === 'failed' ? 'text-red-400' : ''}>{run.test_status}</span></h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.tests']()} · <span class={run.test_status === 'passed' ? 'text-green-400' : run.test_status === 'failed' ? 'text-red-400' : ''}>{run.test_status}</span></h3>
 							{#if run.tests_run?.length}
 								<ul class="mt-1 space-y-0.5">
 									{#each run.tests_run as test}
@@ -320,7 +321,7 @@
 					<!-- Risk notes -->
 					{#if run.risk_notes?.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-amber-400">{i18n.t('machines.risk_notes')}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-amber-400">{m['machines.risk_notes']()}</h3>
 							<ul class="mt-1 space-y-0.5">
 								{#each run.risk_notes as note}
 									<li class="text-[11px] text-amber-400/80">{note}</li>
@@ -332,7 +333,7 @@
 					<!-- Steps -->
 					{#if steps.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.steps', { count: steps.length })}</h3>
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.steps']({ count: steps.length })}</h3>
 							<div class="mt-1 space-y-1">
 								{#each steps as step}
 									<div class="flex items-start gap-2 rounded border border-[var(--app-border)] p-2">
@@ -352,8 +353,8 @@
 					<!-- Events -->
 					{#if events.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.events', { count: events.length })}</h3>
-							{#if eventsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="trace-events-retention">{i18n.t('machines.events_retention', { count: DEV_MACHINE_EVENT_RETENTION })}</p>{/if}
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.events']({ count: events.length })}</h3>
+							{#if eventsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="trace-events-retention">{m['machines.events_retention']({ count: DEV_MACHINE_EVENT_RETENTION })}</p>{/if}
 							<div class="mt-1 space-y-1 max-h-64 overflow-y-auto">
 								{#each events.toReversed() as event}
 									<div class="rounded border border-[var(--app-border)] p-2">
@@ -374,8 +375,8 @@
 					<!-- Logs -->
 					{#if logs.length}
 						<section>
-							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{i18n.t('machines.logs')} ({logs.length})</h3>
-							{#if logsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="trace-logs-retention">{i18n.t('machines.logs_retention', { count: DEV_MACHINE_LOG_RETENTION })}</p>{/if}
+							<h3 class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">{m['machines.logs']()} ({logs.length})</h3>
+							{#if logsLimited}<p class="mt-1 text-[10px] text-[var(--color-text-tertiary)]" data-testid="trace-logs-retention">{m['machines.logs_retention']({ count: DEV_MACHINE_LOG_RETENTION })}</p>{/if}
 							<pre class="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded-md bg-black/30 p-3 text-[11px] leading-relaxed text-zinc-300 font-mono">{logs.map((chunk) => `[${chunk.stream}] ${chunk.content}`).join('')}</pre>
 						</section>
 					{/if}
@@ -384,7 +385,7 @@
 					{#if !isTerminal}
 						<div class="pt-2">
 							<Button variant="destructive" size="sm" disabled={cancelBusy} onclick={doCancel} class="w-full">
-								{cancelBusy ? i18n.t('machines.cancelling') : i18n.t('machines.cancel_run')}
+								{cancelBusy ? m['machines.cancelling']() : m['machines.cancel_run']()}
 							</Button>
 						</div>
 					{/if}

@@ -5,7 +5,8 @@
 	import type { ButtonVariant } from "../button/button.svelte";
 	import { isEqualMonth, type DateValue } from "@internationalized/date";
 	import type { Snippet } from "svelte";
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		ref = $bindable(null),
@@ -15,7 +16,7 @@
 		weekdayFormat = "short",
 		buttonVariant = "ghost",
 		captionLayout = "label",
-		locale = i18n.dateLocale,
+		locale = getLocale(),
 		months: monthsProp,
 		years,
 		monthFormat: monthFormatProp,
