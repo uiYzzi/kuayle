@@ -137,7 +137,7 @@
 								{/each}
 							</div>
 							<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">
-								{m['settings.webhooks.created']()} {formatRelativeTime(webhook.created_at, getLocale())}
+								{m['settings.webhooks.created']({ time: formatRelativeTime(webhook.created_at, getLocale()) })}
 							</p>
 						</div>
 						<div class="flex items-center gap-2">

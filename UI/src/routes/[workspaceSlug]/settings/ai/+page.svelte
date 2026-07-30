@@ -155,7 +155,7 @@
 				<div>
 					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.copy_prompt']()}</h2>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						{m['settings.ai.copy_prompt_desc']()}
+						{m['settings.ai.copy_prompt_desc']({ title: '{title}', description: '{description}', identifier: '{identifier}' })}
 					</p>
 				</div>
 				<Button variant="outline" size="sm" onclick={resetIssueCopyPrompt}>{m['settings.ai.reset']()}</Button>

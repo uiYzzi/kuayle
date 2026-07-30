@@ -25,6 +25,7 @@
 	let left = $state(0);
 	let top = $state(0);
 	const displayName = $derived(member?.name || member?.email || label);
+	const dynamicMessage = m as unknown as Record<string, () => string>;
 
 	onMount(() => {
 		left = anchor.left;
@@ -59,7 +60,7 @@
 				<div class="truncate font-medium">{displayName}</div>
 				{#if member}
 					<div class="truncate text-xs text-[var(--color-text-tertiary)]">{member.email}</div>
-					<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{m['common.role.' + member.role]()}</div>
+					<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{dynamicMessage['common.role.' + member.role]()}</div>
 				{/if}
 			</div>
 		</div>

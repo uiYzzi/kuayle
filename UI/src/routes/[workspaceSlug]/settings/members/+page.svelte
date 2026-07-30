@@ -98,7 +98,7 @@
 							<Popover.Root>
 								<Popover.Trigger>
 									<button class="rounded-md border border-[var(--app-border)] px-2.5 py-1 text-xs capitalize text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
-										{m['common.role.' + member.role]()}
+										{(m as unknown as Record<string, () => string>)['common.role.' + member.role]()}
 									</button>
 								</Popover.Trigger>
 								<Popover.Content class="w-36 p-1" align="end">
@@ -107,7 +107,7 @@
 											onclick={() => handleRoleChange(member.user_id, role)}
 											class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm capitalize text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] {member.role === role ? 'bg-[var(--color-bg-hover)]' : ''}"
 										>
-											{m['common.role.' + role]()}
+											{(m as unknown as Record<string, () => string>)['common.role.' + role]()}
 										</button>
 									{/each}
 								</Popover.Content>

@@ -97,7 +97,7 @@
 
 	async function handleDelete() {
 		if (deleteConfirm !== workspace?.slug) {
-			appToast.error(m['settings.general.type_slug_confirm']());
+			appToast.error(m['settings.general.type_slug_confirm']({ slug: workspace?.slug ?? '' }));
 			return;
 		}
 		deleting = true;
@@ -250,7 +250,7 @@
 		</Dialog.Header>
 		<div class="space-y-2 py-4">
 			<label for="delete-confirm" class="block text-sm text-[var(--color-text-secondary)]">
-				{m['settings.general.type_slug_confirm']()}
+				{m['settings.general.type_slug_confirm']({ slug: workspace?.slug ?? '' })}
 			</label>
 			<input
 				id="delete-confirm"

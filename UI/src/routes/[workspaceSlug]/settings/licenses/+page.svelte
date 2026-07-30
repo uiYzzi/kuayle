@@ -80,7 +80,7 @@
 				class="h-8 w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] pl-7 pr-2 text-sm text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--app-accent)]"
 			/>
 		</div>
-		<p class="shrink-0 text-xs text-[var(--color-text-tertiary)]">{m['settings.licenses.n_packages']({ count: filteredEntries.length })}</p>
+		<p class="shrink-0 text-xs text-[var(--color-text-tertiary)]">{m['settings.licenses.n_packages']({ n: filteredEntries.length })}</p>
 	</div>
 
 	<div class="mt-4 overflow-hidden rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">

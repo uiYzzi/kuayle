@@ -159,7 +159,7 @@
 			<div>
 				<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.version.changelog']()}</h2>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
-					{m['settings.version.changelog_desc']()}
+					{m['settings.version.changelog_desc']({ version: currentVersionLabel })}
 				</p>
 			</div>
 			<button

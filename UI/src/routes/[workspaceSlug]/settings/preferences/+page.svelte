@@ -13,6 +13,7 @@
 
 	const LOCALE_LABELS: Record<string, string> = {
 		en: 'English',
+		it: 'Italiano',
 		'zh-CN': '简体中文',
 		'zh-TW': '繁體中文'
 	};
@@ -215,7 +216,7 @@
 				type="single"
 				value={getLocale()}
 				onValueChange={(v) => {
-					if (v) setLocale(v);
+					if (v) setLocale(v as (typeof locales)[number]);
 				}}
 			>
 				<Select.Trigger size="sm" class="w-[130px]">

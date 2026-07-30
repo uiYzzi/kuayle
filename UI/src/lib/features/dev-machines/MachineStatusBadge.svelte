@@ -5,8 +5,9 @@
 	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let { status }: { status: DevMachineStatus } = $props();
+	const dynamicMessage = m as unknown as Record<string, () => string>;
 
-	const label = $derived(m['machines.status_' + status]() || status.replaceAll('_', ' '));
+	const label = $derived(dynamicMessage['machines.status_' + status]() || status.replaceAll('_', ' '));
 	const style = $derived(
 		status === 'running'
 			? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'

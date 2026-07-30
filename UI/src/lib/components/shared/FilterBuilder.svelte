@@ -207,8 +207,8 @@
 	function getAssigneeChipLabel(): string {
 		if (!filters.assignee) return m['sharedComponents.filter_builder.assignee']();
 		if (filters.assignee === 'none') return m['sharedComponents.filter_builder.unassigned']();
-		const m = members.find((m) => m.user_id === filters.assignee);
-		return m?.name || m?.email || m['sharedComponents.filter_builder.assignee']();
+		const member = members.find((member) => member.user_id === filters.assignee);
+		return member?.name || member?.email || m['sharedComponents.filter_builder.assignee']();
 	}
 
 	function getProjectChipLabel(): string {

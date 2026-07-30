@@ -501,7 +501,8 @@
 
 	function copyToClipboard(text: string, toastKey: string) {
 		navigator.clipboard.writeText(text);
-		appToast.success(m[toastKey]());
+		const dynamicMessage = m as unknown as Record<string, () => string>;
+		appToast.success(dynamicMessage[toastKey]());
 	}
 
 	async function toggleSubscription() {

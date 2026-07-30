@@ -72,6 +72,7 @@
 		{ id: 8, labelKey: 'team_settings.emoji_group.symbols' },
 		{ id: 9, labelKey: 'team_settings.emoji_group.flags' }
 	];
+	const dynamicMessage = m as unknown as Record<string, () => string>;
 
 	function formatIconLabel(name: string): string {
 		return name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/([A-Z])([A-Z][a-z])/g, '$1 $2');
@@ -549,8 +550,8 @@
 													class="shrink-0 rounded-full px-2 py-0.5 text-[10px] {emojiGroup === group.id
 														? 'bg-[var(--app-accent)]/10 text-[var(--app-accent-light)]'
 														: 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
-												>
-													{m[group.labelKey]()}
+													>
+														{dynamicMessage[group.labelKey]()}
 												</button>
 											{/each}
 										</div>
@@ -560,7 +561,7 @@
 									>
 										{pickerQuery.trim()
 											? m['team_settings.emoji_search_label']()
-											: m[EMOJI_GROUPS.find((group) => group.id === emojiGroup)?.labelKey ?? 'team_settings.emoji_default_label']()} · {emojiResults.length}
+											: dynamicMessage[EMOJI_GROUPS.find((group) => group.id === emojiGroup)?.labelKey ?? 'team_settings.emoji_default_label']()} · {emojiResults.length}
 									</p>
 									{#if emojiLoading}
 										<div class="flex justify-center py-6">

@@ -349,7 +349,7 @@
 									indeterminate={someFilteredSelected}
 									class="pointer-events-none"
 								/>
-								<span class="text-xs">{m[repoSearch ? 'settings.github.select_all_filtered' : 'settings.github.select_all']()} ({filteredRepos.length})</span>
+								<span class="text-xs">{repoSearch ? m['settings.github.select_all_filtered']({ n: filteredRepos.length }) : m['settings.github.select_all']()} ({filteredRepos.length})</span>
 							</button>
 
 							<!-- Repo list -->
