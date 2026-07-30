@@ -8,7 +8,6 @@
 	import { Plus, ChevronsUpDown, Check, Loader2 } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { appToast } from '$lib/features/toast/toast';
-<<<<<<< HEAD
 	import { m } from '$lib/paraglide/messages.js';
 	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { toSlug } from '$lib/utils/slug';
