@@ -1,3 +1,5 @@
+import { i18n } from '$lib/i18n/index.svelte';
+import type { TranslationKey } from '$lib/i18n/locales/en';
 import type { Label } from './label';
 import type { User } from './auth';
 
@@ -167,19 +169,39 @@ export interface Comment {
 
 export const STATUS_ORDER: IssueStatus[] = ['in_progress', 'in_review', 'todo', 'backlog', 'done', 'cancelled'];
 
-export const STATUS_LABELS: Record<IssueStatus, string> = {
-	backlog: 'Backlog',
-	todo: 'Todo',
-	in_progress: 'In Progress',
-	in_review: 'In Review',
-	done: 'Done',
-	cancelled: 'Cancelled'
-};
+export function getStatusLabel(status: IssueStatus): string {
+	const key = `common.status.${status}` as TranslationKey;
+	return i18n.t(key);
+}
 
-export const PRIORITY_LABELS: Record<IssuePriority, string> = {
-	0: 'No priority',
-	1: 'Urgent',
-	2: 'High',
-	3: 'Medium',
-	4: 'Low'
-};
+export function getStatusLabels(): Record<IssueStatus, string> {
+	return {
+		backlog: i18n.t('common.status.backlog'),
+		todo: i18n.t('common.status.todo'),
+		in_progress: i18n.t('common.status.in_progress'),
+		in_review: i18n.t('common.status.in_review'),
+		done: i18n.t('common.status.done'),
+		cancelled: i18n.t('common.status.cancelled')
+	};
+}
+
+export function getPriorityLabel(priority: IssuePriority): string {
+	const keys: Record<IssuePriority, TranslationKey> = {
+		0: 'common.priority.no_priority',
+		1: 'common.priority.urgent',
+		2: 'common.priority.high',
+		3: 'common.priority.medium',
+		4: 'common.priority.low'
+	};
+	return i18n.t(keys[priority]);
+}
+
+export function getPriorityLabels(): Record<IssuePriority, string> {
+	return {
+		0: i18n.t('common.priority.no_priority'),
+		1: i18n.t('common.priority.urgent'),
+		2: i18n.t('common.priority.high'),
+		3: i18n.t('common.priority.medium'),
+		4: i18n.t('common.priority.low')
+	};
+}

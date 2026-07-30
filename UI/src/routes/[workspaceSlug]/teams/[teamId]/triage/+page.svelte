@@ -12,6 +12,7 @@
 	import { Kbd } from '$lib/components/ui/kbd';
 	import { appToast } from '$lib/features/toast/toast';
 	import { formatRelativeTime } from '$lib/utils/format';
+import { i18n } from '$lib/i18n/index.svelte';
 	import { CheckCircle2, XCircle, SquareUser, ShieldCheck, ChevronRight } from 'lucide-svelte';
 	import { sidebarState } from '$lib/features/layout/sidebar.state.svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
@@ -132,7 +133,7 @@
 						<div class="flex items-center gap-2">
 							<IssuePriorityIcon priority={issue.priority} size={13} />
 							<span class="text-xs text-[var(--color-text-tertiary)]">{issue.identifier}</span>
-							<span class="ml-auto text-xs text-[var(--color-text-tertiary)]">{formatRelativeTime(issue.created_at)}</span>
+							<span class="ml-auto text-xs text-[var(--color-text-tertiary)]">{formatRelativeTime(issue.created_at, i18n.dateLocale)}</span>
 						</div>
 						<p class="line-clamp-2 text-sm text-[var(--color-text-primary)]">{issue.title}</p>
 					</button>

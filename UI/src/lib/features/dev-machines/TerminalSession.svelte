@@ -20,6 +20,7 @@
 	import type { Terminal as XTerminal, IDisposable } from '@xterm/xterm';
 	import type { FitAddon as XFitAddon } from '@xterm/addon-fit';
 	import { useTerminalDock } from './terminal-dock-context.svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 	type SocketConnection = { socket: WebSocket; timer?: ReturnType<typeof setTimeout>; expectedClose: boolean };
 
 	let {
@@ -320,10 +321,10 @@
 			{#if status === 'creating' || status === 'resuming' || status === 'pending' || status === 'connecting'}
 				<LoaderCircle class="size-3.5 animate-spin" />
 			{/if}
-			<span class="truncate">{statusMessage || 'Terminal idle'}</span>
+			<span class="truncate">{statusMessage || i18n.t('machines.terminal_idle')}</span>
 		</span>
 		{#if canRetry}
-			<Button size="xs" variant="outline" onclick={() => start()}><RefreshCw class="size-3" />Reconnect</Button>
+			<Button size="xs" variant="outline" onclick={() => start()}><RefreshCw class="size-3" />{i18n.t('machines.reconnect')}</Button>
 		{/if}
 	</div>
 	{#if status === 'error'}

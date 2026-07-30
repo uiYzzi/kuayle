@@ -9,6 +9,7 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { appToast } from '$lib/features/toast/toast';
 	import { Bookmark, Trash2, SquareUser, Layers, ChevronRight } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
 	import { sidebarState } from '$lib/features/layout/sidebar.state.svelte';
 
@@ -59,9 +60,9 @@
 		try {
 			await deleteView(slug, view.id);
 			views = views.filter((v) => v.id !== view.id);
-			appToast.success('View deleted');
+			appToast.success(i18n.t('views.toast.deleted'));
 		} catch {
-			appToast.error('Failed to delete view');
+			appToast.error(i18n.t('views.toast.failed_delete'));
 		} finally {
 			deleteOpen = false;
 			pendingDeleteView = null;
@@ -86,7 +87,7 @@
 				{/if}
 				<span class="flex items-center gap-1.5 font-medium text-[var(--color-text-primary)]">
 					<Layers size={14} class="shrink-0" />
-					Views
+					{i18n.t("views.title")}
 				</span>
 			</nav>
 		</div>
@@ -94,8 +95,8 @@
 
 	{#if !loading && views.length === 0}
 		<EmptyState
-			title="No views for this team"
-			description="Save filters from the team issues page and choose Team visibility to share views here."
+			title={i18n.t("views.no_team_views")}
+			description={i18n.t("views.no_team_views_desc")}
 		/>
 	{:else}
 		<div class="divide-y divide-[var(--app-border)]">
@@ -107,7 +108,7 @@
 							<div class="flex items-center gap-2">
 								<span class="text-sm font-medium text-[var(--color-text-primary)]">{view.name}</span>
 								{#if view.is_shared}
-									<Badge variant="outline" class="text-[10px]">Shared</Badge>
+									<Badge variant="outline" class="text-[10px]">{i18n.t("views.shared")}</Badge>
 								{/if}
 							</div>
 							{#if view.description}
@@ -118,7 +119,7 @@
 					<button
 						onclick={() => requestDelete(view)}
 						class="shrink-0 rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-tertiary)] hover:text-red-500"
-						title="Delete view"
+						title={i18n.t("views.delete_view")}
 					>
 						<Trash2 size={14} />
 					</button>
@@ -131,14 +132,14 @@
 <AlertDialog.Root bind:open={deleteOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Delete view?</AlertDialog.Title>
+			<AlertDialog.Title>{i18n.t("views.delete_title")}</AlertDialog.Title>
 			<AlertDialog.Description>
-				This will permanently delete {pendingDeleteView?.name ?? 'this view'}.
+				{i18n.t("views.delete_desc", { name: pendingDeleteView?.name ?? "this view" })}
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={handleDelete}>Delete view</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>{i18n.t("common.cancel")}</AlertDialog.Cancel>
+			<AlertDialog.Action variant="destructive" onclick={handleDelete}>{i18n.t("views.delete_view")}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

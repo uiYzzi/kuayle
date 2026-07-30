@@ -9,6 +9,7 @@
 	import { onMount } from 'svelte';
 	import { appToast } from '$lib/features/toast/toast';
 	import { toSlug } from '$lib/utils/slug';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		currentWorkspace,
@@ -60,14 +61,14 @@
 			const workspace = await createWorkspace(workspaceName, workspaceSlug);
 			workspaces = [...workspaces, workspace].sort((a, b) => a.name.localeCompare(b.name));
 			localStorage.setItem('kuayle_last_workspace', workspace.slug);
-			appToast.success('Workspace created');
+			appToast.success(i18n.t('sidebar.workspace_created'));
 			showCreateWorkspace = false;
 			newWorkspaceName = '';
 			newWorkspaceSlug = '';
 			slugEdited = false;
 			goto(`/${workspace.slug}/inbox`);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create workspace');
+			appToast.apiError(err, i18n.t('sidebar.failed_create_workspace'));
 		} finally {
 			creating = false;
 		}
@@ -90,7 +91,7 @@
 	</Popover.Trigger>
 	<Popover.Content class="w-56 p-1" align="start">
 		<div class="px-2 py-1">
-			<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">Workspaces</span>
+			<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('sidebar.workspaces')}</span>
 		</div>
 		{#each workspaces as ws}
 			<button
@@ -114,7 +115,7 @@
 				class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]"
 			>
 				<Plus size={14} />
-				Create workspace
+				{i18n.t('sidebar.create_workspace')}
 			</button>
 		</div>
 	</Popover.Content>
@@ -123,13 +124,13 @@
 <Dialog.Root bind:open={showCreateWorkspace}>
 	<Dialog.Content class="sm:max-w-md border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<Dialog.Header>
-			<Dialog.Title>Create workspace</Dialog.Title>
-			<Dialog.Description>Set up a new workspace for your team, projects, and issues.</Dialog.Description>
+			<Dialog.Title>{i18n.t('sidebar.create_workspace')}</Dialog.Title>
+			<Dialog.Description>{i18n.t('sidebar.create_workspace_desc')}</Dialog.Description>
 		</Dialog.Header>
 
 		<form onsubmit={handleCreateWorkspace} class="space-y-4 py-2">
 			<div>
-				<label for="workspace-name" class="mb-1 block text-sm text-[var(--color-text-secondary)]">Workspace name</label>
+				<label for="workspace-name" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{i18n.t('sidebar.workspace_name')}</label>
 				<input
 					id="workspace-name"
 					type="text"
@@ -137,13 +138,13 @@
 					oninput={handleNameInput}
 					required
 					maxlength="100"
-					placeholder="Acme Engineering"
+					placeholder={i18n.t('sidebar.workspace_name_placeholder')}
 					class="w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
 
 			<div>
-				<label for="workspace-slug" class="mb-1 block text-sm text-[var(--color-text-secondary)]">Workspace URL</label>
+				<label for="workspace-slug" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{i18n.t('sidebar.workspace_url')}</label>
 				<input
 					id="workspace-slug"
 					type="text"
@@ -154,20 +155,20 @@
 					}}
 					required
 					maxlength="50"
-					placeholder="acme-engineering"
+					placeholder={i18n.t('sidebar.workspace_url_placeholder')}
 					class="w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
-				<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">This becomes the workspace URL path.</p>
+				<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">{i18n.t('sidebar.workspace_url_desc')}</p>
 			</div>
 
 			<Dialog.Footer>
-				<Button type="button" variant="outline" onclick={() => (showCreateWorkspace = false)} disabled={creating}>Cancel</Button>
+				<Button type="button" variant="outline" onclick={() => (showCreateWorkspace = false)} disabled={creating}>{i18n.t('sidebar.cancel')}</Button>
 				<Button type="submit" disabled={creating || !newWorkspaceName.trim() || !newWorkspaceSlug.trim()}>
 					{#if creating}
 						<Loader2 size={14} class="animate-spin" />
-						Creating...
+						{i18n.t('sidebar.creating')}
 					{:else}
-						Create workspace
+						{i18n.t('sidebar.create_workspace')}
 					{/if}
 				</Button>
 			</Dialog.Footer>

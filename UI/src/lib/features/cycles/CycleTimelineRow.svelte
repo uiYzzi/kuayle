@@ -2,6 +2,7 @@
 	import type { Cycle } from '$lib/types/cycle';
 	import { Badge } from '$lib/components/ui/badge';
 	import * as Popover from '$lib/components/ui/popover';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import {
 		CirclePlay,
 		CircleDotDashed,
@@ -52,7 +53,7 @@
 	);
 
 	const badgeLabel = $derived(
-		cycle.status === 'active' ? 'Current' : cycle.status === 'completed' ? 'Completed' : 'Upcoming'
+		cycle.status === 'active' ? i18n.t('cycles.status.current') : cycle.status === 'completed' ? i18n.t('cycles.status.completed') : i18n.t('cycles.status.upcoming')
 	);
 
 	const successPct = $derived(
@@ -97,20 +98,20 @@
 						stroke-linecap="round"
 					/>
 				</svg>
-				<span><span class="font-semibold text-[var(--color-text-secondary)]">{ringPct}%</span> complete</span>
+				<span><span class="font-semibold text-[var(--color-text-secondary)]">{ringPct}%</span>{i18n.t('cycles.timeline.complete')}</span>
 			</div>
-			<span><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.total}</span> scope</span>
+			<span><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.total}</span>{i18n.t('cycles.timeline.scope')}</span>
 		{:else if cycle.status === 'completed' && cycle.progress}
-			<span><span class="font-semibold text-[var(--color-text-secondary)]">{successPct}%</span> success</span>
+			<span><span class="font-semibold text-[var(--color-text-secondary)]">{successPct}%</span>{i18n.t('cycles.timeline.success')}</span>
 			<span
-				><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.completed}</span> completed</span
+				><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.completed}</span>{i18n.t('cycles.timeline.completed')}</span
 			>
-			<span><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.total}</span> scope</span>
+			<span><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.total}</span>{i18n.t('cycles.timeline.scope')}</span>
 		{:else if cycle.progress}
-			<span><span class="font-semibold text-[var(--color-text-secondary)]">{successPct}%</span> of capacity</span>
-			<span><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.total}</span> scope</span>
+			<span><span class="font-semibold text-[var(--color-text-secondary)]">{successPct}%</span>{i18n.t('cycles.timeline.of_capacity')}</span>
+			<span><span class="font-semibold text-[var(--color-text-secondary)]">{cycle.progress.total}</span>{i18n.t('cycles.timeline.scope')}</span>
 		{:else}
-			<span><span class="font-semibold text-[var(--color-text-secondary)]">0</span> scope</span>
+			<span><span class="font-semibold text-[var(--color-text-secondary)]">0</span>{i18n.t('cycles.timeline.scope')}</span>
 		{/if}
 	</div>
 
@@ -142,7 +143,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 					>
 						<Pencil size={14} />
-						Edit cycle
+						{i18n.t('cycles.edit_cycle')}
 					</button>
 				{/if}
 				{#if cycle.status === 'upcoming' && onactivate}
@@ -155,7 +156,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 					>
 						<Play size={14} />
-						Start cycle
+						{i18n.t('cycles.start_cycle')}
 					</button>
 				{/if}
 				{#if cycle.status === 'active' && oncomplete}
@@ -168,7 +169,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 					>
 						<CheckCircle2 size={14} />
-						Complete cycle
+						{i18n.t('cycles.complete_cycle')}
 					</button>
 				{/if}
 				{#if ondelete}
@@ -182,7 +183,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<Trash2 size={14} />
-						Delete cycle
+						{i18n.t('cycles.delete_cycle')}
 					</button>
 				{/if}
 			</Popover.Content>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { IssueStatus, IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Project } from '$lib/types/project';
@@ -40,7 +40,7 @@
 				return groupLabel ?? groupKey;
 			}
 			case 'priority':
-				return PRIORITY_LABELS[Number(groupKey) as IssuePriority] ?? groupKey;
+				return getPriorityLabel(Number(groupKey) as IssuePriority) ?? groupKey;
 			case 'assignee': {
 				if (groupKey === 'unassigned') return 'Unassigned';
 				const member = members.find(m => m.user_id === groupKey);

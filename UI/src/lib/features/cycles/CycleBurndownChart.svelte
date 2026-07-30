@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Cycle, CycleBurndownPoint } from '$lib/types/cycle';
 	import * as echarts from 'echarts';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	let {
 		cycle,
@@ -34,7 +35,7 @@
 
 	function formatDate(dateStr: string): string {
 		const d = new Date(dateStr + 'T00:00:00');
-		return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+		return d.toLocaleDateString(i18n.dateLocale, { month: 'short', day: 'numeric' });
 	}
 
 	$effect(() => {
@@ -184,9 +185,9 @@
 				formatter: (params: any) => {
 					const date = params[0]?.axisValue ?? '';
 					const todayLabel = formatDate(new Date().toISOString().slice(0, 10));
-					const label = date === todayLabel ? 'Today' : date;
-					const started = params.find((p: any) => p.seriesName === 'Started');
-					const completed = params.find((p: any) => p.seriesName === 'Completed');
+					const label = date === todayLabel ? i18n.t('cycles.chart.today') : date;
+					const started = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.started'));
+					const completed = params.find((p: any) => p.seriesName === i18n.t('cycles.chart.completed'));
 					const sv = started?.value ?? started?.value?.value ?? '';
 					const cv = completed?.value ?? completed?.value?.value ?? '';
 					if (sv === '' && cv === '') return `<span style="font-weight:500">${label}</span>`;
@@ -197,7 +198,7 @@
 			},
 			series: [
 				{
-					name: 'Scope',
+					name: i18n.t('cycles.chart.scope'),
 					type: 'line',
 					data: finishData,
 					smooth: false,
@@ -219,7 +220,7 @@
 					}
 				},
 				{
-					name: 'Buffer',
+					name: i18n.t('cycles.chart.buffer'),
 					type: 'line',
 					data: bufferData,
 					smooth: false,
@@ -234,7 +235,7 @@
 					silent: true
 				},
 				{
-					name: 'Started',
+					name: i18n.t('cycles.chart.started'),
 					type: 'line',
 					data: startedData.map((v, i) =>
 						i === lastActualIndex
@@ -253,7 +254,7 @@
 					}
 				},
 				{
-					name: 'Completed',
+					name: i18n.t('cycles.chart.completed'),
 					type: 'line',
 					data: completedData.map((v, i) =>
 						i === lastActualIndex
@@ -272,7 +273,7 @@
 					}
 				},
 				{
-					name: 'Projection',
+					name: i18n.t('cycles.chart.projection'),
 					type: 'line',
 					data: projectionData,
 					smooth: false,
@@ -324,14 +325,14 @@
 			<div class="flex items-center justify-between gap-3">
 				<span class="flex items-center gap-2">
 					<span class="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--color-text-tertiary)]" style="border: 1px dotted var(--color-text-tertiary);"></span>
-					<span class="text-[var(--color-text-secondary)]">Scope</span>
+					<span class="text-[var(--color-text-secondary)]">{i18n.t('cycles.chart.scope')}</span>
 				</span>
 				<span class="font-medium text-[var(--color-text-secondary)]">{displayPoint?.scope ?? lastPoint?.scope}</span>
 			</div>
 			<div class="flex items-center justify-between gap-3">
 				<span class="flex items-center gap-2">
 					<span class="inline-block h-2.5 w-2.5 rounded-sm bg-amber-500"></span>
-					<span class="text-[var(--color-text-secondary)]">Started</span>
+					<span class="text-[var(--color-text-secondary)]">{i18n.t('cycles.chart.started')}</span>
 				</span>
 				{#if hoveredNoData}
 					<span class="text-[var(--color-text-tertiary)]">-</span>
@@ -342,7 +343,7 @@
 			<div class="flex items-center justify-between gap-3">
 				<span class="flex items-center gap-2">
 					<span class="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--app-accent)]"></span>
-					<span class="text-[var(--color-text-secondary)]">Completed</span>
+					<span class="text-[var(--color-text-secondary)]">{i18n.t('cycles.chart.completed')}</span>
 				</span>
 				{#if hoveredNoData}
 					<span class="text-[var(--color-text-tertiary)]">-</span>
@@ -353,9 +354,9 @@
 			<div class="flex items-center justify-between gap-3">
 				<span class="flex items-center gap-2">
 					<span class="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--app-accent)]"></span>
-					<span class="text-[var(--color-text-secondary)]">Projection</span>
+					<span class="text-[var(--color-text-secondary)]">{i18n.t('cycles.chart.projection')}</span>
 				</span>
-				<span class="text-[var(--color-text-tertiary)]">avg/day</span>
+				<span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.chart.avg_per_day')}</span>
 			</div>
 		</div>
 	{/if}

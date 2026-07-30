@@ -33,6 +33,7 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { Layers, SquareUser, SquaresSubtract, ChevronRight, Share2 } from 'lucide-svelte';
 	import ShareLinkDialog from '$lib/components/shared/ShareLinkDialog.svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 	import { sidebarState } from '$lib/features/layout/sidebar.state.svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
@@ -76,13 +77,13 @@
 		relationDialogOpen = true;
 	}
 
-	const groupByOptions: { value: GroupByField; label: string }[] = [
-		{ value: 'status', label: 'Status' },
-		{ value: 'priority', label: 'Priority' },
-		{ value: 'assignee', label: 'Assignee' },
-		{ value: 'project', label: 'Project' },
-		{ value: null, label: 'No grouping' }
-	];
+	const groupByOptions = $derived<{ value: GroupByField; label: string }[]>([
+		{ value: 'status', label: i18n.t('common.group_by.status') },
+		{ value: 'priority', label: i18n.t('common.group_by.priority') },
+		{ value: 'assignee', label: i18n.t('common.group_by.assignee') },
+		{ value: 'project', label: i18n.t('common.group_by.project') },
+		{ value: null, label: i18n.t('common.group_by.no_grouping') }
+	]);
 
 	$effect(() => {
 		if (isMobile.current && layout === 'board') {
@@ -278,7 +279,7 @@
 				applyLocalGroupOrder(reorderedGroup.map((issue) => (issue.id === updatedIssue.id ? updatedIssue : issue)));
 			}
 		} catch {
-			appToast.error('Failed to move issue');
+			appToast.error(i18n.t('common.toast.failed_move_issue'));
 		}
 	}
 
@@ -418,13 +419,13 @@
 				{/if}
 				<span class="flex items-center gap-1.5 font-medium text-[var(--color-text-primary)]">
 					<SquaresSubtract size={14} class="shrink-0" />
-					Issues
+					{i18n.t('common.issues')}
 				</span>
 			</nav>
 			<button
 				onclick={() => (showShareLink = true)}
 				class="rounded-md p-1 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] transition-colors"
-				title="Share public link"
+				title={i18n.t('sharedComponents.share_link.title')}
 			>
 				<Share2 size={14} />
 			</button>
@@ -436,10 +437,10 @@
 					<Popover.Trigger>
 						<button
 							class="flex items-center gap-1 rounded-md border border-[var(--app-border)] px-2 py-1 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)]"
-							title="Group by"
+							title={i18n.t('common.group_by')}
 						>
 							<Layers size={12} />
-							Group
+							{i18n.t('common.group')}
 						</button>
 					</Popover.Trigger>
 					<Popover.Content class="w-40 p-1" align="end">

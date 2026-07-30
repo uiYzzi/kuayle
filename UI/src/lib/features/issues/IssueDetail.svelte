@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import BellIcon from '@lucide/svelte/icons/bell';
-	import type { Issue, Comment, IssueHistory } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import type { Issue, Comment, IssueHistory, IssuePriority } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 	import { listComments, createComment, getIssueHistory, subscribeToIssue, unsubscribeFromIssue } from '$lib/api/issues';
 	import { issuesState } from './issues.state.svelte';
 	import IssueStatusIcon from './IssueStatusIcon.svelte';
 	import IssuePriorityIcon from './IssuePriorityIcon.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
+import { i18n } from '$lib/i18n/index.svelte';
 	import { appToast } from '$lib/features/toast/toast';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { StatusSelector, PrioritySelector } from './selectors';
@@ -114,7 +115,7 @@
 	function formatHistoryValue(field: string, value: string | null, displayValue?: string | null): string {
 		if (displayValue?.trim()) return displayValue;
 		if (!value) return 'None';
-		if (field === 'priority') return PRIORITY_LABELS[Number(value) as keyof typeof PRIORITY_LABELS] ?? value;
+		if (field === 'priority') return getPriorityLabel(Number(value) as IssuePriority) ?? value;
 		return value;
 	}
 
@@ -191,7 +192,7 @@
 						{#snippet trigger()}
 							<button class="flex items-center gap-1.5 rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
 								<IssuePriorityIcon priority={issue.priority} size={12} />
-								{PRIORITY_LABELS[issue.priority]}
+								{getPriorityLabel(issue.priority)}
 							</button>
 						{/snippet}
 					</PrioritySelector>
@@ -227,7 +228,7 @@
 									>{comment.user?.name ?? 'User'}</span
 								>
 								<span class="text-[var(--color-text-tertiary)]"
-									>{formatRelativeTime(comment.created_at)}</span
+									>{formatRelativeTime(comment.created_at, i18n.dateLocale)}</span
 								>
 							</div>
 							<div class="mt-1 prose prose-invert prose-sm max-w-none text-[var(--color-text-secondary)]" use:mentionInteractivity={{ slug, members, issues: issuesState.issues }}>
@@ -294,7 +295,7 @@
 										{/if}
 									{/if}
 									<span class="text-[var(--color-text-tertiary)]">&middot;</span>
-									<span>{formatRelativeTime(entry.created_at)}</span>
+									<span>{formatRelativeTime(entry.created_at, i18n.dateLocale)}</span>
 								</div>
 							</div>
 						{/each}

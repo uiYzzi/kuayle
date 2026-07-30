@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { AlertTriangle, Check, Info, X, XCircle } from 'lucide-svelte';
+	import { i18n } from '$lib/i18n/index.svelte';
 
 	export type AppToastVariant = 'success' | 'error' | 'info' | 'warning';
 
@@ -38,7 +39,7 @@
 	<div class="content">
 		<div class="header">
 			<div class="title">{title}</div>
-			<button class="close" type="button" aria-label="Close toast" onclick={dismiss}>
+			<button class="close" type="button" aria-label={i18n.t('sharedComponents.app_toast.close')} onclick={dismiss}>
 				<X size={16} />
 			</button>
 		</div>
