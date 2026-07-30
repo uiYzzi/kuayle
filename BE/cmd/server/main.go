@@ -73,12 +73,17 @@ func main() {
 	prefsRepo := repository.NewUserPreferencesRepository(db)
 	assetRepo := repository.NewAssetRepository(db)
 	aiSettingsRepo := repository.NewAISettingsRepository(db)
+	inviteLinkRepo := repository.NewWorkspaceInviteLinkRepository(db)
 
 	// Dev Machine control-plane store
 	devMachineRepo := repository.NewDevMachineRepository(db)
 
 	// Services
-	authSvc := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret)
+	inviteLinkSvc := service.NewInviteLinkService(inviteLinkRepo, workspaceRepo)
+	authSvc := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret,
+		service.WithRegistrationDisabled(cfg.DisableRegistration),
+		service.WithInviteRedeemer(inviteLinkSvc),
+	)
 	workspaceSvc := service.NewWorkspaceService(workspaceRepo, userRepo)
 	teamSvc := service.NewTeamService(teamRepo, teamStatusRepo)
 	notifSvc := service.NewNotificationService(notifRepo)
@@ -123,6 +128,8 @@ func main() {
 	loginThrottle := mw.NewLoginThrottle(5, 15*time.Minute)
 	authH := handler.NewAuthHandler(authSvc, cfg.Environment != "development", loginThrottle, cfg.IsSysAdmin)
 	workspaceH := handler.NewWorkspaceHandler(workspaceSvc)
+	inviteLinkH := handler.NewInviteLinkHandler(inviteLinkSvc, cfg.FrontendURL)
+	configH := handler.NewConfigHandler(!cfg.DisableRegistration)
 	teamH := handler.NewTeamHandler(teamSvc)
 	issueH := handler.NewIssueHandler(issueSvc, commentSvc, userRepo, teamStatusRepo, projectRepo, cycleRepo, relationSvc)
 	labelH := handler.NewLabelHandler(labelSvc)
@@ -224,11 +231,15 @@ func main() {
 		sharedLink: sharedLinkH,
 		upload:     uploadH,
 		github:     githubH,
+		config:     configH,
+		inviteLink: inviteLinkH,
 	}, &appMiddleware{
 		auth:                   mw.Auth(cfg.JWTSecret, patRepo),
 		authRateLimit:          mw.RateLimit(5, 10),
 		publicRateLimit:        mw.RateLimit(2, 5),
 		publicAssetRateLimit:   mw.RateLimit(10, 20),
+		publicConfigRateLimit:  mw.RateLimit(10, 20),
+		publicInviteRateLimit:  mw.RateLimit(5, 10),
 		workspaceMembership:    mw.WorkspaceMembership(workspaceRepo),
 		devMachineDemoGuard:    mw.DevMachineDemoGuard(cfg.DemoDevMachineAllowed),
 		machineEventsRateLimit: mw.MachineTokenRateLimit(20, 40),

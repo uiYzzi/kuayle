@@ -56,6 +56,8 @@ type appHandlers struct {
 	sharedLink *handler.SharedLinkHandler
 	upload     *handler.UploadHandler
 	github     *handler.GitHubHandler
+	config     *handler.ConfigHandler
+	inviteLink *handler.InviteLinkHandler
 }
 
 // appMiddleware carries the pre-built route middleware whose construction
@@ -65,6 +67,8 @@ type appMiddleware struct {
 	authRateLimit          echo.MiddlewareFunc
 	publicRateLimit        echo.MiddlewareFunc
 	publicAssetRateLimit   echo.MiddlewareFunc
+	publicConfigRateLimit  echo.MiddlewareFunc
+	publicInviteRateLimit  echo.MiddlewareFunc
 	workspaceMembership    echo.MiddlewareFunc
 	devMachineDemoGuard    echo.MiddlewareFunc
 	machineEventsRateLimit echo.MiddlewareFunc
@@ -89,6 +93,10 @@ func registerRoutes(e *echo.Echo, h *appHandlers, m *appMiddleware) {
 	pub.GET("/share/:token/issues", h.sharedLink.ListPublicIssues).Name = "public"
 	e.GET("/api/public/assets/:token", h.upload.PublicAsset, m.publicAssetRateLimit).Name = "public"
 
+	// Public instance config + invite preview (no auth, rate limited)
+	e.GET("/api/config", h.config.Get, m.publicConfigRateLimit).Name = "public"
+	e.GET("/api/invite/:token", h.inviteLink.Preview, m.publicInviteRateLimit).Name = "public"
+
 	// Authenticated routes
 	api := e.Group("/api", m.auth)
 
@@ -109,12 +117,18 @@ func registerRoutes(e *echo.Echo, h *appHandlers, m *appMiddleware) {
 	scoped(api, http.MethodGet, "/workspaces", h.workspace.List, "workspaces:read")
 	sessionOnly(api, http.MethodPost, "/workspaces", h.workspace.Create)
 
+	// Invite link acceptance (authenticated, no workspace context yet)
+	sessionOnly(api, http.MethodPost, "/invite/:token/accept", h.inviteLink.Accept)
+
 	// Workspace-scoped routes
 	ws := api.Group("/workspaces/:slug", m.workspaceMembership)
 	scoped(ws, http.MethodGet, "", h.workspace.Get, "workspaces:read")
 	ownerOnly(ws, http.MethodPatch, "", h.workspace.Update)
 	ownerOnly(ws, http.MethodDelete, "", h.workspace.Delete)
 	scoped(ws, http.MethodPost, "/invite", h.workspace.Invite, "member:invite")
+	scoped(ws, http.MethodPost, "/invite-links", h.inviteLink.Create, "member:invite")
+	scoped(ws, http.MethodGet, "/invite-links", h.inviteLink.List, "member:invite")
+	scoped(ws, http.MethodDelete, "/invite-links/:id", h.inviteLink.Revoke, "member:invite")
 	scoped(ws, http.MethodGet, "/members", h.workspace.ListMembers, "members:read")
 	scoped(ws, http.MethodPatch, "/members/:userId", h.workspace.UpdateMemberRole, "member:invite")
 	scoped(ws, http.MethodDelete, "/members/:userId", h.workspace.RemoveMember, "member:invite")
