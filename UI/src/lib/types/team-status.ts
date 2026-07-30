@@ -19,8 +19,8 @@ export interface TeamStatus {
 export const CATEGORY_ORDER: StatusCategory[] = ['backlog', 'unstarted', 'started', 'completed', 'cancelled'];
 
 export function getCategoryLabel(category: StatusCategory): string {
-	const key = `common.category.${category}`;
-	return m[key]();
+	const dynamicMessage = m as unknown as Record<string, () => string>;
+	return dynamicMessage[`common.category.${category}`]();
 }
 
 export function getCategoryLabels(): Record<StatusCategory, string> {
