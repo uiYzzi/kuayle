@@ -30,7 +30,8 @@
 	import type { DevMachineEnvironment } from '$lib/types/dev-machine';
 	import { appToast } from '$lib/features/toast/toast';
 	import { createKeyboardHandler } from '$lib/utils/keyboard';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import {
 		Trash2,
 		MoreHorizontal,
@@ -74,10 +75,10 @@
 	const projectTeam = $derived(project?.team_id ? teams.find(t => t.id === project!.team_id) : null);
 
 	const STATUS_OPTIONS: { value: ProjectStatus; label: string; icon: typeof Circle }[] = [
-		{ value: 'planned', label: i18n.t('projects.status.planned'), icon: Circle },
-		{ value: 'in_progress', label: i18n.t('projects.status.in_progress'), icon: Play },
-		{ value: 'completed', label: i18n.t('projects.status.completed'), icon: CheckCircle2 },
-		{ value: 'cancelled', label: i18n.t('projects.status.cancelled'), icon: XCircle }
+		{ value: 'planned', label: m['projects.status.planned'](), icon: Circle },
+		{ value: 'in_progress', label: m['projects.status.in_progress'](), icon: Play },
+		{ value: 'completed', label: m['projects.status.completed'](), icon: CheckCircle2 },
+		{ value: 'cancelled', label: m['projects.status.cancelled'](), icon: XCircle }
 	];
 
 	function isCurrentDevelopmentScope(s: string, pid: string, version: number) {
@@ -100,7 +101,7 @@
 			developmentReady = true;
 		} catch (error) {
 			if (!isCurrentDevelopmentScope(s, pid, version)) return;
-			appToast.apiError(error, i18n.t('projects.toast.failed_load_development'));
+			appToast.apiError(error, m['projects.toast.failed_load_development']());
 		} finally {
 			if (isCurrentDevelopmentScope(s, pid, version)) developmentLoading = false;
 		}
@@ -123,7 +124,7 @@
 			}
 			cycles = allCycles;
 		} catch {
-			appToast.error(i18n.t('projects.toast.not_found'));
+			appToast.error(m['projects.toast.not_found']());
 			goto(`/${slug}/projects`);
 		} finally {
 			loading = false;
@@ -161,9 +162,9 @@
 		try {
 			project = await updateProject(slug, project.id, { status });
 			statusOpen = false;
-			appToast.success(i18n.t('projects.toast.status_updated'));
+			appToast.success(m['projects.toast.status_updated']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('projects.toast.failed_update_status'));
+			appToast.apiError(err, m['projects.toast.failed_update_status']());
 		}
 	}
 
@@ -171,9 +172,9 @@
 		if (!project) return;
 		try {
 			project = await updateProject(slug, project.id, { [field]: value });
-			appToast.success(i18n.t('projects.toast.date_updated'));
+			appToast.success(m['projects.toast.date_updated']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('projects.toast.failed_update_date'));
+			appToast.apiError(err, m['projects.toast.failed_update_date']());
 		}
 	}
 
@@ -181,10 +182,10 @@
 		if (!project) return;
 		try {
 			await deleteProject(slug, project.id);
-			appToast.success(i18n.t('projects.toast.deleted'));
+			appToast.success(m['projects.toast.deleted']());
 			goto(`/${slug}/projects`);
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('projects.toast.failed_delete'));
+			appToast.apiError(err, m['projects.toast.failed_delete']());
 		}
 	}
 
@@ -210,10 +211,10 @@
 			}
 			if (!isCurrentDevelopmentScope(s, pid, requestVersion) || developmentSaveVersion !== saveVersion) return;
 			developmentOpen = false;
-			appToast.success(i18n.t('projects.toast.development_saved'));
+			appToast.success(m['projects.toast.development_saved']());
 		} catch (error) {
 			if (!isCurrentDevelopmentScope(s, pid, requestVersion) || developmentSaveVersion !== saveVersion) return;
-			appToast.apiError(error, i18n.t('projects.toast.failed_save_development'));
+			appToast.apiError(error, m['projects.toast.failed_save_development']());
 		} finally {
 			if (isCurrentDevelopmentScope(s, pid, requestVersion) && developmentSaveVersion === saveVersion) savingDevelopment = false;
 		}
@@ -254,7 +255,7 @@
 						<ChevronRight size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
 						<a href="/{slug}/teams/{projectTeam.id}/projects" class="flex items-center gap-1.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
 							<Box size={14} class="shrink-0" />
-							{i18n.t('projects.title')}
+							{m['projects.title']()}
 						</a>
 						<ChevronRight size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
 					{/if}
@@ -263,7 +264,7 @@
 				<Popover.Root bind:open={statusOpen}>
 					<Popover.Trigger>
 						<Badge variant={statusVariant(project.status)} class="cursor-pointer text-[10px]">
-							{i18n.t(`projects.status.${project.status}`)}
+							{m[`projects.status.${project.status}`]()}
 						</Badge>
 					</Popover.Trigger>
 					<Popover.Content class="w-40 p-1" align="start">
@@ -281,20 +282,20 @@
 				</Popover.Root>
 			</div>
 			<div class="flex items-center gap-2">
-				<Button variant="ghost" size="icon-sm" disabled={developmentLoading || !developmentReady} onclick={() => (developmentOpen = true)} title={developmentLoading ? i18n.t('projects.development.loading') : developmentReady ? canManageDevelopment ? i18n.t('projects.development.settings') : i18n.t('projects.development.view_settings') : i18n.t('projects.development.unavailable')}><Settings2 size={15} /></Button>
+				<Button variant="ghost" size="icon-sm" disabled={developmentLoading || !developmentReady} onclick={() => (developmentOpen = true)} title={developmentLoading ? m['projects.development.loading']() : developmentReady ? canManageDevelopment ? m['projects.development.settings']() : m['projects.development.view_settings']() : m['projects.development.unavailable']()}><Settings2 size={15} /></Button>
 				<!-- View switcher -->
 				<div class="flex rounded-md border border-[var(--app-border)]">
 					<button
 						onclick={() => (viewMode = 'list')}
 						class="rounded-l-md px-2 py-1 {viewMode === 'list' ? 'bg-[var(--color-bg-hover)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]'}"
-						title={i18n.t('projects.list_view')}
+						title={m['projects.list_view']()}
 					>
 						<List size={14} />
 					</button>
 					<button
 						onclick={() => (viewMode = 'gantt')}
 						class="rounded-r-md px-2 py-1 {viewMode === 'gantt' ? 'bg-[var(--color-bg-hover)] text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]'}"
-						title={i18n.t('projects.gantt_view')}
+						title={m['projects.gantt_view']()}
 					>
 						<BarChart3 size={14} />
 					</button>
@@ -312,7 +313,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-hover)]"
 						>
 								<Trash2 size={14} />
-								{i18n.t('projects.delete')}
+								{m['projects.delete']()}
 						</button>
 					</Popover.Content>
 				</Popover.Root>
@@ -324,23 +325,23 @@
 			<div class="flex items-center gap-4 text-xs text-[var(--color-text-tertiary)]">
 				<div class="flex items-center gap-1.5">
 					<Calendar size={12} />
-					<span>{i18n.t('projects.start_date')}</span>
+					<span>{m['projects.start_date']()}</span>
 					<DatePickerPopover
 						value={project.start_date}
 						onchange={(d) => handleDateChange('start_date', d)}
-							placeholder={i18n.t('projects.set_start')}
+							placeholder={m['projects.set_start']()}
 					/>
 				</div>
 				<div class="flex items-center gap-1.5">
-					<span>{i18n.t('projects.target_date')}</span>
+					<span>{m['projects.target_date']()}</span>
 					<DatePickerPopover
 						value={project.target_date}
 						onchange={(d) => handleDateChange('target_date', d)}
-						placeholder={i18n.t('projects.set_target')}
+						placeholder={m['projects.set_target']()}
 					/>
 				</div>
 				{#if project.progress}
-					<span>{i18n.t('projects.progress', { completed: project.progress.completed, total: project.progress.total })}</span>
+					<span>{m['projects.progress']({ completed: project.progress.completed, total: project.progress.total })}</span>
 				{/if}
 			</div>
 			{#if project.description}
@@ -358,8 +359,8 @@
 			<div class="flex-1 overflow-y-auto">
 				{#if !issuesState.loading && issuesState.issues.length === 0}
 					<EmptyState
-						title={i18n.t('projects.no_issues')}
-						description={i18n.t('projects.no_issues_desc')}
+						title={m['projects.no_issues']()}
+						description={m['projects.no_issues_desc']()}
 					/>
 				{:else}
 					{#each issuesState.issues as issue (issue.id)}
@@ -384,13 +385,13 @@
 
 <Dialog.Root bind:open={developmentOpen}>
 	<Dialog.Content class="sm:max-w-md">
-		<Dialog.Header><Dialog.Title>{i18n.t('projects.development.title')}</Dialog.Title><Dialog.Description>{i18n.t('projects.development.description')}</Dialog.Description></Dialog.Header>
-		{#if !canManageDevelopment}<p class="rounded-md border border-[var(--app-border)] p-3 text-xs text-[var(--color-text-tertiary)]">{i18n.t('projects.development.permission_note')}</p>{/if}
+		<Dialog.Header><Dialog.Title>{m['projects.development.title']()}</Dialog.Title><Dialog.Description>{m['projects.development.description']()}</Dialog.Description></Dialog.Header>
+		{#if !canManageDevelopment}<p class="rounded-md border border-[var(--app-border)] p-3 text-xs text-[var(--color-text-tertiary)]">{m['projects.development.permission_note']()}</p>{/if}
 		<div class="space-y-4">
-			<div class="space-y-1"><Label>{i18n.t('projects.development.repository')}</Label><Select.Root type="single" value={developmentRepositoryId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentRepositoryId = value)}><Select.Trigger class="w-full">{developmentLoading ? i18n.t('common.loading') : developmentRepositories.find((item) => item.id === developmentRepositoryId)?.full_name ?? i18n.t('projects.development.team_or_workspace_default')}</Select.Trigger><Select.Content><Select.Item value="inherit" label={i18n.t('projects.development.inherited_default')}>{i18n.t('projects.development.inherited_default')}</Select.Item>{#each developmentRepositories as repository}<Select.Item value={repository.id} label={repository.full_name}>{repository.full_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
-			<div class="space-y-1"><Label>{i18n.t('projects.development.environment')}</Label><Select.Root type="single" value={developmentEnvironmentId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentEnvironmentId = value)}><Select.Trigger class="w-full">{developmentLoading ? i18n.t('common.loading') : developmentEnvironments.find((item) => item.id === developmentEnvironmentId)?.name ?? i18n.t('projects.development.team_or_workspace_default')}</Select.Trigger><Select.Content><Select.Item value="inherit" label={i18n.t('projects.development.inherited_default')}>{i18n.t('projects.development.inherited_default')}</Select.Item>{#each developmentEnvironments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+			<div class="space-y-1"><Label>{m['projects.development.repository']()}</Label><Select.Root type="single" value={developmentRepositoryId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentRepositoryId = value)}><Select.Trigger class="w-full">{developmentLoading ? m['common.loading']() : developmentRepositories.find((item) => item.id === developmentRepositoryId)?.full_name ?? m['projects.development.team_or_workspace_default']()}</Select.Trigger><Select.Content><Select.Item value="inherit" label={m['projects.development.inherited_default']()}>{m['projects.development.inherited_default']()}</Select.Item>{#each developmentRepositories as repository}<Select.Item value={repository.id} label={repository.full_name}>{repository.full_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+			<div class="space-y-1"><Label>{m['projects.development.environment']()}</Label><Select.Root type="single" value={developmentEnvironmentId} disabled={developmentLoading || !developmentReady || !canManageDevelopment} onValueChange={(value) => value && (developmentEnvironmentId = value)}><Select.Trigger class="w-full">{developmentLoading ? m['common.loading']() : developmentEnvironments.find((item) => item.id === developmentEnvironmentId)?.name ?? m['projects.development.team_or_workspace_default']()}</Select.Trigger><Select.Content><Select.Item value="inherit" label={m['projects.development.inherited_default']()}>{m['projects.development.inherited_default']()}</Select.Item>{#each developmentEnvironments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
 		</div>
-		<Dialog.Footer><Button variant="outline" onclick={() => (developmentOpen = false)}>{i18n.t('common.cancel')}</Button><Button onclick={saveDevelopmentSettings} disabled={developmentLoading || !developmentReady || savingDevelopment || !canManageDevelopment}>{savingDevelopment ? i18n.t('common.saving') : i18n.t('common.save')}</Button></Dialog.Footer>
+		<Dialog.Footer><Button variant="outline" onclick={() => (developmentOpen = false)}>{m['common.cancel']()}</Button><Button onclick={saveDevelopmentSettings} disabled={developmentLoading || !developmentReady || savingDevelopment || !canManageDevelopment}>{savingDevelopment ? m['common.saving']() : m['common.save']()}</Button></Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
 

@@ -16,7 +16,8 @@
 	import { convertIssueToProject, duplicateIssue } from '$lib/api/issues';
 	import { showIssueDeletedToast } from './issue-deleted-toast';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import type { Snippet } from 'svelte';
 	import {
 		ArrowUpCircle,
@@ -74,19 +75,19 @@
 	let includeSubIssues = $state(false);
 	const ANIM_DURATION = 100;
 
-	let pickerTitle = $derived(pickerMode === 'sub_issue_of' ? i18n.t('common.context_menu.set_parent_issue') : i18n.t('common.context_menu.make_parent_of'));
+	let pickerTitle = $derived(pickerMode === 'sub_issue_of' ? m['common.context_menu.set_parent_issue']() : m['common.context_menu.make_parent_of']());
 	let pickerDescription = $derived(
 		pickerMode === 'sub_issue_of'
-			? i18n.t('common.context_menu.parent_desc', { id: issue.identifier })
-			: i18n.t('common.context_menu.child_desc', { id: issue.identifier })
+			? m['common.context_menu.parent_desc']({ id: issue.identifier })
+			: m['common.context_menu.child_desc']({ id: issue.identifier })
 	);
-	let pickerActionLabel = $derived(pickerMode === 'sub_issue_of' ? i18n.t('common.context_menu.set_parent') : i18n.t('common.context_menu.make_child'));
+	let pickerActionLabel = $derived(pickerMode === 'sub_issue_of' ? m['common.context_menu.set_parent']() : m['common.context_menu.make_child']());
 
 	async function updateField(field: string, value: any) {
 		try {
 			await issuesState.update(slug, issue.identifier, { [field]: value });
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('common.context_menu.failed_update', { field }));
+			appToast.apiError(err, m['common.context_menu.failed_update']({ field }));
 		}
 	}
 
@@ -202,7 +203,7 @@
 			<ContextMenu.SubTrigger>
 				<span class={rowClass}>
 					<IssueStatusIcon status={issue.status} category={issue.status_info?.category} color={issue.status_info?.color} size={14} />
-					{i18n.t('common.context_menu.status')}
+					{m['common.context_menu.status']()}
 				</span>
 			</ContextMenu.SubTrigger>
 			<ContextMenu.SubContent class="w-44">
@@ -221,7 +222,7 @@
 			<ContextMenu.SubTrigger>
 				<span class={rowClass}>
 					<IssuePriorityIcon priority={issue.priority} size={14} />
-					{i18n.t('common.context_menu.priority')}
+					{m['common.context_menu.priority']()}
 				</span>
 			</ContextMenu.SubTrigger>
 			<ContextMenu.SubContent class="w-44">
@@ -239,11 +240,11 @@
 		{#if members.length > 0}
 			<ContextMenu.Sub>
 				<ContextMenu.SubTrigger>
-					<span class={rowClass}><CircleUser class={iconClass} />{i18n.t('common.context_menu.assignee')}</span>
+					<span class={rowClass}><CircleUser class={iconClass} />{m['common.context_menu.assignee']()}</span>
 				</ContextMenu.SubTrigger>
 				<ContextMenu.SubContent class="w-48">
 					<ContextMenu.Item onclick={() => updateField('assignee_ids', [])}>
-						<span class={rowClass}><X class={iconClass} />{i18n.t('common.context_menu.clear_all')}</span>
+						<span class={rowClass}><X class={iconClass} />{m['common.context_menu.clear_all']()}</span>
 					</ContextMenu.Item>
 					{#each members as member}
 						{@const isAssigned = (issue.assignees ?? []).some(a => a.id === member.user_id)}
@@ -265,7 +266,7 @@
 		{#if labels.length > 0}
 			<ContextMenu.Sub>
 				<ContextMenu.SubTrigger>
-					<span class={rowClass}><Tag class={iconClass} />{i18n.t('common.context_menu.labels')}</span>
+					<span class={rowClass}><Tag class={iconClass} />{m['common.context_menu.labels']()}</span>
 				</ContextMenu.SubTrigger>
 				<ContextMenu.SubContent class="w-48">
 					{#each labels as label}
@@ -289,14 +290,14 @@
 		{/if}
 
 		<ContextMenu.Item onclick={openDueDatePicker}>
-			<span class={rowClass}><CalendarDays class={iconClass} />{i18n.t('common.context_menu.due_date')}</span>
+			<span class={rowClass}><CalendarDays class={iconClass} />{m['common.context_menu.due_date']()}</span>
 		</ContextMenu.Item>
 
 		{#if projects && projects.length > 0}
 			<ContextMenu.Sub>
-				<ContextMenu.SubTrigger><span class={rowClass}><FolderKanban class={iconClass} />{i18n.t('common.context_menu.project')}</span></ContextMenu.SubTrigger>
+				<ContextMenu.SubTrigger><span class={rowClass}><FolderKanban class={iconClass} />{m['common.context_menu.project']()}</span></ContextMenu.SubTrigger>
 				<ContextMenu.SubContent class="w-48">
-					<ContextMenu.Item onclick={() => updateField('project_id', null)}><span class={rowClass}><X class={iconClass} />{i18n.t('common.context_menu.no_project')}</span></ContextMenu.Item>
+					<ContextMenu.Item onclick={() => updateField('project_id', null)}><span class={rowClass}><X class={iconClass} />{m['common.context_menu.no_project']()}</span></ContextMenu.Item>
 					{#each projects as project}
 						<ContextMenu.Item onclick={() => updateField('project_id', project.id)}><span class={rowClass}><FolderKanban class={iconClass} />{project.name}</span></ContextMenu.Item>
 					{/each}
@@ -306,9 +307,9 @@
 
 		{#if cycles && cycles.length > 0}
 			<ContextMenu.Sub>
-				<ContextMenu.SubTrigger><span class={rowClass}><RefreshCw class={iconClass} />{i18n.t('common.context_menu.cycle')}</span></ContextMenu.SubTrigger>
+				<ContextMenu.SubTrigger><span class={rowClass}><RefreshCw class={iconClass} />{m['common.context_menu.cycle']()}</span></ContextMenu.SubTrigger>
 				<ContextMenu.SubContent class="w-48">
-					<ContextMenu.Item onclick={() => updateField('cycle_id', null)}><span class={rowClass}><X class={iconClass} />{i18n.t('common.context_menu.no_cycle')}</span></ContextMenu.Item>
+					<ContextMenu.Item onclick={() => updateField('cycle_id', null)}><span class={rowClass}><X class={iconClass} />{m['common.context_menu.no_cycle']()}</span></ContextMenu.Item>
 					{#each cycles as cycle}
 						<ContextMenu.Item onclick={() => updateField('cycle_id', cycle.id)}><span class={rowClass}><RefreshCw class={iconClass} />{cycle.name}</span></ContextMenu.Item>
 					{/each}
@@ -317,34 +318,34 @@
 		{/if}
 
 		<ContextMenu.Sub>
-			<ContextMenu.SubTrigger><span class={rowClass}><CircleDot class={iconClass} />{i18n.t('common.context_menu.mark_as')}</span></ContextMenu.SubTrigger>
+			<ContextMenu.SubTrigger><span class={rowClass}><CircleDot class={iconClass} />{m['common.context_menu.mark_as']()}</span></ContextMenu.SubTrigger>
 			<ContextMenu.SubContent class="w-52">
-				<ContextMenu.Item onclick={() => onaddrelation?.('blocking')}><span class={rowClass}><GitBranch class={iconClass} />{i18n.t('common.context_menu.blocking')}</span></ContextMenu.Item>
-				<ContextMenu.Item onclick={() => onaddrelation?.('blocked_by')}><span class={rowClass}><GitBranch class={iconClass} />{i18n.t('common.context_menu.blocked_by')}</span></ContextMenu.Item>
-				<ContextMenu.Item onclick={() => onaddrelation?.('related')}><span class={rowClass}><LinkIcon class={iconClass} />{i18n.t('common.context_menu.related_issue')}</span></ContextMenu.Item>
-				<ContextMenu.Item onclick={() => onaddrelation?.('duplicate')}><span class={rowClass}><Copy class={iconClass} />{i18n.t('common.context_menu.duplicate_of')}</span></ContextMenu.Item>
+				<ContextMenu.Item onclick={() => onaddrelation?.('blocking')}><span class={rowClass}><GitBranch class={iconClass} />{m['common.context_menu.blocking']()}</span></ContextMenu.Item>
+				<ContextMenu.Item onclick={() => onaddrelation?.('blocked_by')}><span class={rowClass}><GitBranch class={iconClass} />{m['common.context_menu.blocked_by']()}</span></ContextMenu.Item>
+				<ContextMenu.Item onclick={() => onaddrelation?.('related')}><span class={rowClass}><LinkIcon class={iconClass} />{m['common.context_menu.related_issue']()}</span></ContextMenu.Item>
+				<ContextMenu.Item onclick={() => onaddrelation?.('duplicate')}><span class={rowClass}><Copy class={iconClass} />{m['common.context_menu.duplicate_of']()}</span></ContextMenu.Item>
 				<ContextMenu.Separator />
-				<ContextMenu.Item onclick={() => openPicker('sub_issue_of')}><span class={rowClass}><CornerDownRight class={iconClass} />{i18n.t('common.context_menu.sub_issue_of')}</span></ContextMenu.Item>
-				<ContextMenu.Item onclick={() => openPicker('parent_of')}><span class={rowClass}><CornerDownRight class={iconClass} />{i18n.t('common.context_menu.parent_of')}</span></ContextMenu.Item>
+				<ContextMenu.Item onclick={() => openPicker('sub_issue_of')}><span class={rowClass}><CornerDownRight class={iconClass} />{m['common.context_menu.sub_issue_of']()}</span></ContextMenu.Item>
+				<ContextMenu.Item onclick={() => openPicker('parent_of')}><span class={rowClass}><CornerDownRight class={iconClass} />{m['common.context_menu.parent_of']()}</span></ContextMenu.Item>
 				{#if issue.parent_id}
-					<ContextMenu.Item onclick={() => (removeParentOpen = true)}><span class={rowClass}><X class={iconClass} />{i18n.t('common.context_menu.remove_parent')}</span></ContextMenu.Item>
+					<ContextMenu.Item onclick={() => (removeParentOpen = true)}><span class={rowClass}><X class={iconClass} />{m['common.context_menu.remove_parent']()}</span></ContextMenu.Item>
 				{/if}
 			</ContextMenu.SubContent>
 		</ContextMenu.Sub>
 
 		<ContextMenu.Separator />
 
-		<ContextMenu.Item onclick={() => copyToClipboard(issue.identifier)}><span class={rowClass}><Copy class={iconClass} />{i18n.t('common.context_menu.copy_identifier')}</span></ContextMenu.Item>
-		<ContextMenu.Item onclick={() => copyToClipboard(`${window.location.origin}/${slug}/issue/${issue.identifier}`)}><span class={rowClass}><LinkIcon class={iconClass} />{i18n.t('common.context_menu.copy_link')}</span></ContextMenu.Item>
-		<ContextMenu.Item onclick={() => window.open(`/${slug}/issue/${issue.identifier}`, '_blank')}><span class={rowClass}><ExternalLink class={iconClass} />{i18n.t('common.context_menu.open_in_new_tab')}</span></ContextMenu.Item>
-		<ContextMenu.Item onclick={() => { includeSubIssues = false; duplicateOpen = true; }}><span class={rowClass}><CopyPlus class={iconClass} />{i18n.t('common.context_menu.duplicate_issue')}</span></ContextMenu.Item>
-		<ContextMenu.Item onclick={() => (convertOpen = true)}><span class={rowClass}><FolderKanban class={iconClass} />{i18n.t('common.context_menu.convert_to_project')}</span></ContextMenu.Item>
+		<ContextMenu.Item onclick={() => copyToClipboard(issue.identifier)}><span class={rowClass}><Copy class={iconClass} />{m['common.context_menu.copy_identifier']()}</span></ContextMenu.Item>
+		<ContextMenu.Item onclick={() => copyToClipboard(`${window.location.origin}/${slug}/issue/${issue.identifier}`)}><span class={rowClass}><LinkIcon class={iconClass} />{m['common.context_menu.copy_link']()}</span></ContextMenu.Item>
+		<ContextMenu.Item onclick={() => window.open(`/${slug}/issue/${issue.identifier}`, '_blank')}><span class={rowClass}><ExternalLink class={iconClass} />{m['common.context_menu.open_in_new_tab']()}</span></ContextMenu.Item>
+		<ContextMenu.Item onclick={() => { includeSubIssues = false; duplicateOpen = true; }}><span class={rowClass}><CopyPlus class={iconClass} />{m['common.context_menu.duplicate_issue']()}</span></ContextMenu.Item>
+		<ContextMenu.Item onclick={() => (convertOpen = true)}><span class={rowClass}><FolderKanban class={iconClass} />{m['common.context_menu.convert_to_project']()}</span></ContextMenu.Item>
 
 		<ContextMenu.Separator />
 
 		<ContextMenu.Item class="text-red-500 focus:text-red-500" onclick={() => (deleteOpen = true)}>
 			<span class="flex w-full items-center justify-between gap-2">
-				<span>{i18n.t("common.delete")}</span>
+				<span>{m['common.delete']()}</span>
 				<Trash2 class="h-4 w-4 shrink-0" />
 			</span>
 		</ContextMenu.Item>
@@ -359,7 +360,7 @@
 			style="background: rgba(0,0,0,{dueDateVisible ? 0.5 : 0}); transition: background {ANIM_DURATION}ms ease;"
 			onclick={closeDueDatePicker}
 			tabindex={-1}
-			aria-label={i18n.t('common.context_menu.close_due_date_picker')}
+			aria-label={m['common.context_menu.close_due_date_picker']()}
 		></button>
 
 		<div
@@ -368,13 +369,13 @@
 		>
 			<div class="flex items-center justify-between gap-3 border-b border-[var(--app-border)] px-4 py-3">
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('common.context_menu.choose_due_date')}</h2>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['common.context_menu.choose_due_date']()}</h2>
 					<p class="text-xs text-[var(--color-text-tertiary)]">{issue.identifier}</p>
 				</div>
 				<button
 					onclick={closeDueDatePicker}
 					class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-					title={i18n.t('common.close')}
+					title={m['common.close']()}
 				>
 					<X size={16} />
 				</button>
@@ -402,12 +403,12 @@
 <AlertDialog.Root bind:open={deleteOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>{i18n.t('common.context_menu.delete_issue_confirm', { id: issue.identifier })}</AlertDialog.Title>
+			<AlertDialog.Title>{m['common.context_menu.delete_issue_confirm']({ id: issue.identifier })}</AlertDialog.Title>
 			<AlertDialog.Description>This action cannot be undone.</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline">{i18n.t('common.cancel')}</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={handleDelete}>{i18n.t('common.delete')}</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline">{m['common.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action variant="destructive" onclick={handleDelete}>{m['common.delete']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
@@ -415,12 +416,12 @@
 <AlertDialog.Root bind:open={removeParentOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>{i18n.t('common.context_menu.remove_parent_confirm', { id: issue.identifier })}</AlertDialog.Title>
+			<AlertDialog.Title>{m['common.context_menu.remove_parent_confirm']({ id: issue.identifier })}</AlertDialog.Title>
 			<AlertDialog.Description>This will turn the issue back into a regular top-level issue.</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline">{i18n.t('common.cancel')}</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={handleRemoveParent}>{i18n.t('common.context_menu.remove_parent_button')}</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline">{m['common.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action variant="destructive" onclick={handleRemoveParent}>{m['common.context_menu.remove_parent_button']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
@@ -428,18 +429,18 @@
 <AlertDialog.Root bind:open={duplicateOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>{i18n.t('common.context_menu.duplicate_confirm', { id: issue.identifier })}</AlertDialog.Title>
+			<AlertDialog.Title>{m['common.context_menu.duplicate_confirm']({ id: issue.identifier })}</AlertDialog.Title>
 			<AlertDialog.Description>Create a copy of this issue with a new identifier.</AlertDialog.Description>
 		</AlertDialog.Header>
 		{#if (issue.sub_issue_count ?? 0) > 0}
 			<label class="flex items-center gap-2 rounded-md border border-[var(--app-border)] p-2 text-sm text-[var(--color-text-secondary)]">
 				<input type="checkbox" bind:checked={includeSubIssues} class="h-4 w-4 accent-[var(--app-accent)]" />
-				{i18n.t('common.context_menu.include_sub_issues')}
+				{m['common.context_menu.include_sub_issues']()}
 			</label>
 		{/if}
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline">{i18n.t('common.cancel')}</AlertDialog.Cancel>
-			<AlertDialog.Action onclick={handleDuplicate}>{i18n.t('common.context_menu.duplicate_button')}</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline">{m['common.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action onclick={handleDuplicate}>{m['common.context_menu.duplicate_button']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
@@ -447,12 +448,12 @@
 <AlertDialog.Root bind:open={convertOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>{i18n.t('common.context_menu.convert_confirm', { id: issue.identifier })}</AlertDialog.Title>
+			<AlertDialog.Title>{m['common.context_menu.convert_confirm']({ id: issue.identifier })}</AlertDialog.Title>
 			<AlertDialog.Description>This will add the issue and its direct sub-issues to a new project and remove those sub-issue links.</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline">{i18n.t('common.cancel')}</AlertDialog.Cancel>
-			<AlertDialog.Action onclick={handleConvertToProject}>{i18n.t('common.context_menu.convert_button')}</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline">{m['common.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action onclick={handleConvertToProject}>{m['common.context_menu.convert_button']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

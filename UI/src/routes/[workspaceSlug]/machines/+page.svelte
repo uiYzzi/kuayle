@@ -15,7 +15,8 @@
 	import MachineStatusBadge from '$lib/features/dev-machines/MachineStatusBadge.svelte';
 	import { appToast } from '$lib/features/toast/toast';
 	import { Button } from '$lib/components/ui/button';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	const issueId = $derived(page.url.searchParams.get('issue_id') ?? '');
@@ -87,30 +88,30 @@
 		<div class="flex items-center gap-2">
 			<SidebarToggle />
 			<Server size={16} />
-			<h1 class="text-sm font-medium">{i18n.t('machines.title')}</h1>
-			{#if issueId}<span class="ml-2 text-[10px] text-[var(--color-text-tertiary)]">{i18n.t('machines.filtered_by_issue')}</span>{/if}
+			<h1 class="text-sm font-medium">{m['machines.title']()}</h1>
+			{#if issueId}<span class="ml-2 text-[10px] text-[var(--color-text-tertiary)]">{m['machines.filtered_by_issue']()}</span>{/if}
 		</div>
-		<div class="flex gap-2">{#if canAdminDevMachines}<Button size="sm" variant="outline" onclick={() => (cleanupConfirm = true)}><Trash2 size={14} />{i18n.t('machines.delete_old')}</Button>{/if}<Button size="sm" onclick={() => (createOpen = true)}><Plus size={14} />{i18n.t('machines.new_machine')}</Button></div>
+		<div class="flex gap-2">{#if canAdminDevMachines}<Button size="sm" variant="outline" onclick={() => (cleanupConfirm = true)}><Trash2 size={14} />{m['machines.delete_old']()}</Button>{/if}<Button size="sm" onclick={() => (createOpen = true)}><Plus size={14} />{m['machines.new_machine']()}</Button></div>
 	</header>
 
 	<div class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 		{#if loading}
 			<LoadingState />
 		{:else if failed}
-			<ErrorState message={i18n.t('machines.failed_load')} onretry={() => load(currentPage)} />
+			<ErrorState message={m['machines.failed_load']()} onretry={() => load(currentPage)} />
 		{:else if machines.length === 0}
-			<EmptyState title={issueId ? i18n.t('machines.no_machines_for_issue') : i18n.t('machines.no_machines')} description={issueId ? i18n.t('machines.create_from_issue') : i18n.t('machines.create_isolated_env')} action={{ label: i18n.t('machines.new_machine'), onclick: () => (createOpen = true) }} />
+			<EmptyState title={issueId ? m['machines.no_machines_for_issue']() : m['machines.no_machines']()} description={issueId ? m['machines.create_from_issue']() : m['machines.create_isolated_env']()} action={{ label: m['machines.new_machine'](), onclick: () => (createOpen = true) }} />
 		{:else}
 			<div class="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
 				{#each machines as machine}
-					<a href="/{slug}/machines/{machine.id}" class="group block"><Card.Root class="h-full transition group-hover:border-[var(--color-text-tertiary)]"><Card.Header><div class="flex items-start justify-between gap-3"><div class="min-w-0"><Card.Title class="truncate text-sm">{machine.name}</Card.Title><Card.Description class="truncate">{machine.repo_owner && machine.repo_name ? `${machine.repo_owner}/${machine.repo_name}` : i18n.t('machines.no_repository')}</Card.Description></div><MachineStatusBadge status={machine.status} /></div></Card.Header><Card.Content><div class="flex items-center gap-3 text-[11px] text-muted-foreground"><span class="flex items-center gap-1"><GitBranch size={12} />{machine.working_branch || i18n.t('machines.waiting_checkout')}</span></div></Card.Content><Card.Footer class="justify-between border-t pt-3 text-[11px]"><span class="capitalize text-muted-foreground">{machine.machine_size} · {machine.cpu_millis / 1000} CPU · {machine.memory_mb / 1024} GB</span><span class="flex items-center gap-1 text-muted-foreground"><Clock3 size={12} />{remaining(machine)}</span></Card.Footer></Card.Root></a>
+					<a href="/{slug}/machines/{machine.id}" class="group block"><Card.Root class="h-full transition group-hover:border-[var(--color-text-tertiary)]"><Card.Header><div class="flex items-start justify-between gap-3"><div class="min-w-0"><Card.Title class="truncate text-sm">{machine.name}</Card.Title><Card.Description class="truncate">{machine.repo_owner && machine.repo_name ? `${machine.repo_owner}/${machine.repo_name}` : m['machines.no_repository']()}</Card.Description></div><MachineStatusBadge status={machine.status} /></div></Card.Header><Card.Content><div class="flex items-center gap-3 text-[11px] text-muted-foreground"><span class="flex items-center gap-1"><GitBranch size={12} />{machine.working_branch || m['machines.waiting_checkout']()}</span></div></Card.Content><Card.Footer class="justify-between border-t pt-3 text-[11px]"><span class="capitalize text-muted-foreground">{machine.machine_size} · {machine.cpu_millis / 1000} CPU · {machine.memory_mb / 1024} GB</span><span class="flex items-center gap-1 text-muted-foreground"><Clock3 size={12} />{remaining(machine)}</span></Card.Footer></Card.Root></a>
 				{/each}
 			</div>
 			{#if totalCount > machines.length || hasMore}
 				<div class="mt-4 flex items-center justify-center gap-2">
-					<Button variant="outline" size="sm" disabled={currentPage <= 1} onclick={() => load(currentPage - 1)}><ChevronLeft size={14} /> {i18n.t('machines.prev')}</Button>
-					<span class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('machines.pagination', { page: currentPage, total: totalCount })}</span>
-					<Button variant="outline" size="sm" disabled={!hasMore} onclick={() => load(currentPage + 1)}>{i18n.t('machines.next')} <ChevronRight size={14} /></Button>
+					<Button variant="outline" size="sm" disabled={currentPage <= 1} onclick={() => load(currentPage - 1)}><ChevronLeft size={14} /> {m['machines.prev']()}</Button>
+					<span class="text-xs text-[var(--color-text-tertiary)]">{m['machines.pagination']({ page: currentPage, total: totalCount })}</span>
+					<Button variant="outline" size="sm" disabled={!hasMore} onclick={() => load(currentPage + 1)}>{m['machines.next']()} <ChevronRight size={14} /></Button>
 				</div>
 			{/if}
 		{/if}
@@ -118,4 +119,4 @@
 </div>
 
 <CreateMachineDialog bind:open={createOpen} {slug} oncreated={(machine) => (window.location.href = `/${slug}/machines/${machine.id}`)} />
-<AlertDialog.Root bind:open={cleanupConfirm}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>{i18n.t('machines.cleanup_title')}</AlertDialog.Title><AlertDialog.Description>{i18n.t('machines.cleanup_desc')}</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel>{i18n.t('common.cancel')}</AlertDialog.Cancel><AlertDialog.Action variant="destructive" onclick={cleanupOldMachines} disabled={cleanupBusy}>{cleanupBusy ? i18n.t('machines.deleting') : i18n.t('machines.cleanup_action')}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
+<AlertDialog.Root bind:open={cleanupConfirm}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>{m['machines.cleanup_title']()}</AlertDialog.Title><AlertDialog.Description>{m['machines.cleanup_desc']()}</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel>{m['common.cancel']()}</AlertDialog.Cancel><AlertDialog.Action variant="destructive" onclick={cleanupOldMachines} disabled={cleanupBusy}>{cleanupBusy ? m['machines.deleting']() : m['machines.cleanup_action']()}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>

@@ -4,7 +4,8 @@
 	import type { Cycle } from '$lib/types/cycle';
 	import * as echarts from 'echarts';
 	import { Filter, X } from 'lucide-svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		issues,
@@ -60,7 +61,7 @@
 	}
 
 	function formatDate(d: Date): string {
-		return d.toLocaleDateString(i18n.dateLocale, { month: 'short', day: 'numeric' });
+		return d.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
 	}
 
 	function escapeHtml(value: string): string {
@@ -257,7 +258,7 @@
 					const issue = sortedIssues[idx];
 					if (!issue) return '';
 					const created = formatDate(new Date(issue.created_at));
-					const due = issue.due_date ? formatDate(new Date(issue.due_date)) : i18n.t('projects.gantt.no_due_date');
+					const due = issue.due_date ? formatDate(new Date(issue.due_date)) : m['projects.gantt.no_due_date']();
 					return `<div style="max-width:280px">
 						<div style="font-weight:500;color:${colorTextPrimary};margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(issue.title)}</div>
 						<div style="display:flex;gap:8px;font-size:10px">
@@ -379,7 +380,7 @@
 						label: {
 							show: true,
 							position: 'start',
-							formatter: i18n.t('projects.gantt.today'),
+							formatter: m['projects.gantt.today'](),
 							fontSize: 9,
 							color: '#ef4444',
 							padding: [0, 0, 0, 4]
@@ -418,7 +419,7 @@
 			class="flex items-center gap-1.5 rounded-md border border-[var(--app-border)] px-2.5 py-1 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] {hasActiveFilters ? 'border-[var(--app-accent)] text-[var(--app-accent)]' : ''}"
 		>
 			<Filter size={12} />
-			{i18n.t('projects.gantt.filter')}
+			{m['projects.gantt.filter']()}
 			{#if hasActiveFilters}
 				<span class="rounded-full bg-[var(--app-accent)] px-1.5 text-[9px] font-medium text-white">{filterStatus.size + (filterHasDueDate !== 'all' ? 1 : 0)}</span>
 			{/if}
@@ -429,17 +430,17 @@
 				class="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
 			>
 				<X size={12} />
-				{i18n.t('projects.gantt.clear')}
+				{m['projects.gantt.clear']()}
 			</button>
 		{/if}
-		<span class="text-[11px] text-[var(--color-text-tertiary)]">{i18n.t('projects.gantt.issues_count', { count: filteredIssues.length, plural: filteredIssues.length !== 1 ? 's' : '' })}</span>
+		<span class="text-[11px] text-[var(--color-text-tertiary)]">{m['projects.gantt.issues_count']({ count: filteredIssues.length, plural: filteredIssues.length !== 1 ? 's' : '' })}</span>
 	</div>
 
 	<!-- Filter bar -->
 	{#if showFilters}
 		<div class="flex flex-wrap items-center gap-3 rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-3 py-2 mb-3">
 			<div class="flex items-center gap-1.5">
-				<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('projects.gantt.status')}</span>
+				<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{m['projects.gantt.status']()}</span>
 				{#each statusOptions as s}
 					<button
 						onclick={() => toggleStatus(s)}
@@ -451,8 +452,8 @@
 			</div>
 			<div class="h-4 w-px bg-[var(--app-border)]"></div>
 			<div class="flex items-center gap-1.5">
-				<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('projects.gantt.due_date')}</span>
-				{#each [['all', i18n.t('projects.gantt.all')], ['yes', i18n.t('projects.gantt.has_due')], ['no', i18n.t('projects.gantt.no_due')]] as [val, label]}
+				<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{m['projects.gantt.due_date']()}</span>
+				{#each [['all', m['projects.gantt.all']()], ['yes', m['projects.gantt.has_due']()], ['no', m['projects.gantt.no_due']()]] as [val, label]}
 					<button
 						onclick={() => filterHasDueDate = val as any}
 						class="rounded-md px-2 py-0.5 text-[11px] {filterHasDueDate === val ? 'bg-[var(--app-accent)] text-white' : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]'}"
@@ -471,7 +472,7 @@
 
 	{#if filteredIssues.length === 0}
 		<div class="flex h-24 items-center justify-center text-sm text-[var(--color-text-tertiary)]">
-			{hasActiveFilters ? i18n.t('projects.gantt.no_match') : i18n.t('projects.gantt.no_issues')}
+			{hasActiveFilters ? m['projects.gantt.no_match']() : m['projects.gantt.no_issues']()}
 		</div>
 	{/if}
 </div>

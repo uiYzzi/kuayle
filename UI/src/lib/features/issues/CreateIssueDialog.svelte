@@ -23,7 +23,8 @@
 	import DatePickerPopover from '$lib/components/shared/DatePickerPopover.svelte';
 	import { StatusSelector, PrioritySelector, AssigneeSelector, LabelSelector, ProjectSelector, CycleSelector, TeamSelector } from './selectors';
 	import { listTemplates } from '$lib/api/issue-templates';
-import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import {
 		User,
 		Tag,
@@ -315,7 +316,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						<span class="flex h-4 w-4 items-center justify-center rounded bg-[var(--app-accent)] text-[9px] font-bold text-[var(--app-accent-foreground)]">
 							{selectedTeam?.key?.charAt(0) ?? 'T'}
 						</span>
-						{selectedTeam?.key ?? i18n.t('sharedComponents.create_issue.team')}
+						{selectedTeam?.key ?? m['sharedComponents.create_issue.team']()}
 					</button>
 				{/snippet}
 			</TeamSelector>
@@ -325,7 +326,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 					<Popover.Trigger>
 						<button tabindex="-1" class="flex max-w-52 items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
 							<FileText size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
-							<span class="truncate">{selectedTemplate?.title || i18n.t('sharedComponents.create_issue.template')}</span>
+							<span class="truncate">{selectedTemplate?.title || m['sharedComponents.create_issue.template']()}</span>
 						</button>
 					</Popover.Trigger>
 					<Popover.Content class="w-56 p-1" align="start">
@@ -334,7 +335,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 						>
 							<FileText size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
-							<span class="truncate">{i18n.t('sharedComponents.create_issue.no_template')}</span>
+							<span class="truncate">{m['sharedComponents.create_issue.no_template']()}</span>
 						</button>
 						{#each templates as tmpl (tmpl.id)}
 							<button
@@ -342,14 +343,14 @@ import { i18n } from '$lib/i18n/index.svelte';
 								class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 							>
 								<FileText size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
-								<span class="truncate">{tmpl.title || i18n.t('sharedComponents.create_issue.untitled_template')}</span>
+								<span class="truncate">{tmpl.title || m['sharedComponents.create_issue.untitled_template']()}</span>
 							</button>
 						{/each}
 					</Popover.Content>
 				</Popover.Root>
 			{:else}
 				<span class="text-xs font-medium text-[var(--color-text-secondary)]">
-					{parentIssue ? i18n.t('sharedComponents.create_issue.new_sub_issue', { identifier: parentIssue.identifier }) : i18n.t('sharedComponents.create_issue.new_issue')}
+					{parentIssue ? m['sharedComponents.create_issue.new_sub_issue']({ identifier: parentIssue.identifier }) : m['sharedComponents.create_issue.new_issue']()}
 				</span>
 			{/if}
 		</div>
@@ -363,7 +364,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				type="text"
 				bind:value={title}
 				onpaste={handleTitlePaste}
-				placeholder={i18n.t("sharedComponents.create_issue.issue_title_placeholder")}
+				placeholder={m['sharedComponents.create_issue.issue_title_placeholder']()}
 				class="w-full bg-transparent text-lg font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] max-sm:shrink-0"
 			/>
 			<div class="mt-4 max-h-[calc(60vh-120px)] overflow-y-auto max-sm:flex-1 max-sm:[max-height:none] max-sm:overflow-y-auto">
@@ -373,7 +374,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 					workspaceSlug={slug}
 					{members}
 					issues={issuesState.issues}
-					placeholder={i18n.t("sharedComponents.create_issue.description_placeholder")}
+					placeholder={m['sharedComponents.create_issue.description_placeholder']()}
 					bubbleMenu={true}
 					borderless={true}
 					minHeight="120px"
@@ -396,7 +397,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
 						<IssueStatusIcon category={selectedStatus?.category} color={selectedStatus?.color} size={12} />
-						{selectedStatus?.name ?? i18n.t('sharedComponents.create_issue.status')}
+						{selectedStatus?.name ?? m['sharedComponents.create_issue.status']()}
 					</button>
 				{/snippet}
 			</StatusSelector>
@@ -425,7 +426,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {selectedProject ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						<FolderKanban size={12} />
-						{selectedProject?.name ?? i18n.t('sharedComponents.create_issue.project')}
+						{selectedProject?.name ?? m['sharedComponents.create_issue.project']()}
 					</button>
 				{/snippet}
 			</ProjectSelector>
@@ -447,11 +448,11 @@ import { i18n } from '$lib/i18n/index.svelte';
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {selectedAssignees.length > 0 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						<User size={12} />
 						{#if selectedAssignees.length === 0}
-							{i18n.t("sharedComponents.create_issue.assignee")}
+							{m['sharedComponents.create_issue.assignee']()}
 						{:else if selectedAssignees.length === 1}
 							{selectedAssignees[0].name || selectedAssignees[0].email}
 						{:else}
-							{i18n.t("sharedComponents.create_issue.assignees_count", { count: selectedAssignees.length })}
+							{m['sharedComponents.create_issue.assignees_count']({ count: selectedAssignees.length })}
 						{/if}
 					</button>
 				{/snippet}
@@ -470,11 +471,11 @@ import { i18n } from '$lib/i18n/index.svelte';
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {selectedLabels.length > 0 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						<Tag size={12} />
 						{#if selectedLabels.length === 0}
-							{i18n.t("sharedComponents.create_issue.labels")}
+							{m['sharedComponents.create_issue.labels']()}
 						{:else if selectedLabels.length === 1}
 							{selectedLabels[0].name}
 						{:else}
-							{i18n.t("sharedComponents.create_issue.labels_count", { count: selectedLabels.length })}
+							{m['sharedComponents.create_issue.labels_count']({ count: selectedLabels.length })}
 						{/if}
 					</button>
 				{/snippet}
@@ -490,9 +491,9 @@ import { i18n } from '$lib/i18n/index.svelte';
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {cycleId ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						{#if cycleId}
-							{cycles?.find(c => c.id === cycleId)?.name ?? i18n.t('sharedComponents.create_issue.cycle')}
+							{cycles?.find(c => c.id === cycleId)?.name ?? m['sharedComponents.create_issue.cycle']()}
 						{:else}
-							{i18n.t("sharedComponents.create_issue.cycle")}
+							{m['sharedComponents.create_issue.cycle']()}
 						{/if}
 					</button>
 				{/snippet}
@@ -502,7 +503,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 			<DatePickerPopover
 				value={dueDate}
 				onchange={(d) => (dueDate = d)}
-				placeholder={i18n.t("sharedComponents.create_issue.due_date_placeholder")}
+				placeholder={m['sharedComponents.create_issue.due_date_placeholder']()}
 				dueDateMode
 			/>
 		</div>
@@ -511,7 +512,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 		<div class="flex items-center justify-end gap-3 px-4 py-2.5 max-sm:sticky max-sm:bottom-0 max-sm:shrink-0 max-sm:flex-col max-sm:items-stretch max-sm:border-t max-sm:border-[var(--app-border)] max-sm:bg-[var(--color-bg-secondary)] max-sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
 			<label class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
 				<Switch bind:checked={createMore} size="sm" />
-				{i18n.t("sharedComponents.create_issue.create_more")}
+				{m['sharedComponents.create_issue.create_more']()}
 			</label>
 			<Button
 				class="max-sm:w-full"
@@ -519,7 +520,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				disabled={!title.trim() || !teamId}
 				onclick={handleSubmit}
 			>
-				{i18n.t("sharedComponents.create_issue.create_issue")}
+				{m['sharedComponents.create_issue.create_issue']()}
 			</Button>
 		</div>
 	</Dialog.Content>

@@ -9,7 +9,8 @@
 	import IssueStatusIcon from './IssueStatusIcon.svelte';
 	import IssuePriorityIcon from './IssuePriorityIcon.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
-import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { appToast } from '$lib/features/toast/toast';
 	import * as Sheet from '$lib/components/ui/sheet';
 	import { StatusSelector, PrioritySelector } from './selectors';
@@ -228,7 +229,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 									>{comment.user?.name ?? 'User'}</span
 								>
 								<span class="text-[var(--color-text-tertiary)]"
-									>{formatRelativeTime(comment.created_at, i18n.dateLocale)}</span
+									>{formatRelativeTime(comment.created_at, getLocale())}</span
 								>
 							</div>
 							<div class="mt-1 prose prose-invert prose-sm max-w-none text-[var(--color-text-secondary)]" use:mentionInteractivity={{ slug, members, issues: issuesState.issues }}>
@@ -295,7 +296,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 										{/if}
 									{/if}
 									<span class="text-[var(--color-text-tertiary)]">&middot;</span>
-									<span>{formatRelativeTime(entry.created_at, i18n.dateLocale)}</span>
+									<span>{formatRelativeTime(entry.created_at, getLocale())}</span>
 								</div>
 							</div>
 						{/each}

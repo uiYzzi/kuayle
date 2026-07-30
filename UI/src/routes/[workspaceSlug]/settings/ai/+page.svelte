@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
 	import { getAISettings, updateAISettings } from '$lib/api/ai-settings';
@@ -28,7 +29,7 @@
 			prompt = settings.description_expand_prompt;
 			issueCopyPrompt = settings.issue_copy_prompt;
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.ai.failed_load'));
+			appToast.apiError(err, m['settings.ai.failed_load']());
 		}
 	});
 
@@ -50,9 +51,9 @@
 			prompt = settings.description_expand_prompt;
 			issueCopyPrompt = settings.issue_copy_prompt;
 			apiKey = '';
-			appToast.success(i18n.t('settings.ai.updated'));
+			appToast.success(m['settings.ai.updated']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.ai.failed_update'));
+			appToast.apiError(err, m['settings.ai.failed_update']());
 		} finally {
 			saving = false;
 		}
@@ -68,20 +69,20 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.ai.title')}</h1>
-	<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">{i18n.t('settings.ai.desc')}</p>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['settings.ai.title']()}</h1>
+	<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">{m['settings.ai.desc']()}</p>
 
 	{#if settings}
 		<div class="mt-8 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.ai.provider')}</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.ai.provider_desc')}</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.provider']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.provider_desc']()}</p>
 				</div>
 				<Select.Root type="single" value={provider} onValueChange={(v) => v && (provider = v)}>
-					<Select.Trigger size="sm" class="w-[190px]">{i18n.t('settings.ai.provider_label')}</Select.Trigger>
+					<Select.Trigger size="sm" class="w-[190px]">{m['settings.ai.provider_label']()}</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="openai_compatible">{i18n.t('settings.ai.provider_label')}</Select.Item>
+						<Select.Item value="openai_compatible">{m['settings.ai.provider_label']()}</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>
@@ -90,13 +91,13 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.ai.base_url')}</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.ai.base_url_example')}</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.base_url']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.base_url_example']()}</p>
 				</div>
 				<input
 					type="url"
 					bind:value={baseUrl}
-					placeholder={i18n.t('settings.ai.base_url_placeholder')}
+					placeholder={m['settings.ai.base_url_placeholder']()}
 					class="w-[300px] rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
@@ -105,13 +106,13 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.ai.model')}</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.ai.model_desc')}</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.model']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.model_desc']()}</p>
 				</div>
 				<input
 					type="text"
 					bind:value={model}
-					placeholder={i18n.t('settings.ai.model_placeholder')}
+					placeholder={m['settings.ai.model_placeholder']()}
 					class="w-[240px] rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
@@ -120,15 +121,15 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.ai.api_key')}</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.api_key']()}</p>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						{settings.has_api_key ? i18n.t('settings.ai.key_configured') : i18n.t('settings.ai.key_not_configured')}
+						{settings.has_api_key ? m['settings.ai.key_configured']() : m['settings.ai.key_not_configured']()}
 					</p>
 				</div>
 				<input
 					type="password"
 					bind:value={apiKey}
-					placeholder={settings.has_api_key ? i18n.t('settings.ai.key_configured_placeholder') : i18n.t('settings.ai.key_placeholder')}
+					placeholder={settings.has_api_key ? m['settings.ai.key_configured_placeholder']() : m['settings.ai.key_placeholder']()}
 					class="w-[240px] rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
@@ -137,10 +138,10 @@
 		<div class="mt-8">
 			<div class="flex items-center justify-between gap-4">
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.ai.desc_prompt')}</h2>
-					<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.ai.desc_prompt_desc')}</p>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.desc_prompt']()}</h2>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.desc_prompt_desc']()}</p>
 				</div>
-				<Button variant="outline" size="sm" onclick={resetPrompt}>{i18n.t('settings.ai.reset')}</Button>
+				<Button variant="outline" size="sm" onclick={resetPrompt}>{m['settings.ai.reset']()}</Button>
 			</div>
 			<textarea
 				bind:value={prompt}
@@ -152,12 +153,12 @@
 		<div class="mt-8">
 			<div class="flex items-center justify-between gap-4">
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.ai.copy_prompt')}</h2>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.copy_prompt']()}</h2>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						{i18n.t('settings.ai.copy_prompt_desc')}
+						{m['settings.ai.copy_prompt_desc']()}
 					</p>
 				</div>
-				<Button variant="outline" size="sm" onclick={resetIssueCopyPrompt}>{i18n.t('settings.ai.reset')}</Button>
+				<Button variant="outline" size="sm" onclick={resetIssueCopyPrompt}>{m['settings.ai.reset']()}</Button>
 			</div>
 			<textarea
 				bind:value={issueCopyPrompt}
@@ -167,7 +168,7 @@
 		</div>
 
 		<div class="mt-4 flex justify-end">
-			<Button onclick={saveSettings} disabled={saving}>{saving ? i18n.t('settings.saving') : i18n.t('settings.ai.save_settings')}</Button>
+			<Button onclick={saveSettings} disabled={saving}>{saving ? m['settings.saving']() : m['settings.ai.save_settings']()}</Button>
 		</div>
 	{:else}
 		<div class="mt-8 flex justify-center py-8">
