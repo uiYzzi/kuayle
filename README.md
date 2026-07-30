@@ -14,7 +14,11 @@
 
 ## 🌍 Contributors
 
-[![Kuayle contributors](https://contrib.rocks/image?repo=carbogninalberto/kuayle)][contributors-url]
+<!-- contributors:start -->
+<a href="https://github.com/carbogninalberto"><img src="https://avatars.githubusercontent.com/u/17618905?v=4&amp;s=64" width="64" height="64" alt="@carbogninalberto" title="@carbogninalberto"></a>
+<a href="https://github.com/uiYzzi"><img src="https://avatars.githubusercontent.com/u/40852301?v=4&amp;s=64" width="64" height="64" alt="@uiYzzi" title="@uiYzzi"></a>
+<a href="https://github.com/manelpb"><img src="https://avatars.githubusercontent.com/u/1784206?v=4&amp;s=64" width="64" height="64" alt="@manelpb" title="@manelpb"></a>
+<!-- contributors:end -->
 
 ## 🚦 Current Implementation State
 
@@ -442,7 +446,6 @@ Alberto Carbognin, [@carbogninalberto](https://github.com/carbogninalberto)
 <!-- MARKDOWN LINKS & IMAGES -->
 
 [contributors-shield]: https://img.shields.io/github/contributors/carbogninalberto/kuayle.svg?style=for-the-badge
-[contributors-url]: https://github.com/carbogninalberto/kuayle/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/carbogninalberto/kuayle.svg?style=for-the-badge
 [forks-url]: https://github.com/carbogninalberto/kuayle/network/members
 [stars-shield]: https://img.shields.io/github/stars/carbogninalberto/kuayle.svg?style=for-the-badge

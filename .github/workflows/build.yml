@@ -73,12 +73,29 @@ jobs:
               }]' \
             > UI/static/releases.json
 
+      - name: Update README contributors
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate "repos/${{ github.repository }}/contributors?per_page=100" --slurp \
+            | jq -r 'add
+              | map(select(.type == "User"))
+              | map("<a href=\"\(.html_url)\"><img src=\"\(.avatar_url)&amp;s=64\" width=\"64\" height=\"64\" alt=\"@\(.login)\" title=\"@\(.login)\"></a>")
+              | join("\n")' \
+            > /tmp/contributors.html
+
+          sed '/<!-- contributors:start -->/q' README.md > /tmp/README.md
+          cat /tmp/contributors.html >> /tmp/README.md
+          sed -n '/<!-- contributors:end -->/,$p' README.md >> /tmp/README.md
+          mv /tmp/README.md README.md
+
       - name: Commit version bump
         if: github.event_name == 'release'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add UI/package.json UI/package-lock.json UI/static/releases.json
+          git add README.md UI/package.json UI/package-lock.json UI/static/releases.json
 
           if git diff --cached --quiet; then
             echo "Version is already ${{ steps.version.outputs.version }}"
