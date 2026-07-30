@@ -251,7 +251,7 @@ test('shows workspace analytics and opens the explorer', async ({ page }) => {
 
 	await page.goto('/test/insights?tab=explore&slice=team');
 	const teamQueryCount = issueListQueries.length;
-	await page.getByText('Engineering', { exact: true }).last().click();
+	await page.getByRole('row').filter({ hasText: 'Engineering' }).click();
 	await expect(page).toHaveURL(`/test/my-issues?team=${teamId}`);
 	await expect.poll(() => issueListQueries.length).toBeGreaterThan(teamQueryCount);
 	expect(issueListQueries.at(-1)!.get('team')).toBe(teamId);
