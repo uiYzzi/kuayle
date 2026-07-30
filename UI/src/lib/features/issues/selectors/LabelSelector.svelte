@@ -7,7 +7,8 @@
 	import type { Snippet } from 'svelte';
 	import { Plus } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -56,14 +57,14 @@
 			onchange(label.id);
 			open = false;
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('sharedComponents.selectors.create_label_failed'));
+			appToast.apiError(err, m['sharedComponents.selectors.create_label_failed']());
 		} finally {
 			creating = false;
 		}
 	}
 </script>
 
-<ComboboxPopover bind:open placeholder={i18n.t('sharedComponents.selectors.search_labels')} emptyMessage={i18n.t('sharedComponents.selectors.no_labels')} {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={m['sharedComponents.selectors.search_labels']()} emptyMessage={m['sharedComponents.selectors.no_labels']()} {width} {align} {shortcutKey} {trigger}>
 	{#snippet children(searchValue: string)}
 		{@const labelName = searchValue.trim()}
 		{@const canCreate = slug && labelName && !visibleLabels.some((label) => label.name.toLowerCase() === labelName.toLowerCase())}
@@ -74,7 +75,7 @@
 				class="flex items-center gap-2"
 			>
 				<Plus size={14} />
-				<span class="truncate">{creating ? i18n.t('common.creating') : i18n.t('sharedComponents.selectors.create_label', { name: labelName })}</span>
+				<span class="truncate">{creating ? m['common.creating']() : m['sharedComponents.selectors.create_label']({ name: labelName })}</span>
 			</Command.Item>
 		{/if}
 		{#each visibleLabels as label (label.id)}

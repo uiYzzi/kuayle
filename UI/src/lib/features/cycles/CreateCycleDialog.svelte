@@ -7,7 +7,8 @@
 	import DateRangePickerPopover from '$lib/components/shared/DateRangePickerPopover.svelte';
 	import type { Cycle } from '$lib/types/cycle';
 	import type { DateValue } from '@internationalized/date';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -29,7 +30,7 @@
 
 	$effect(() => {
 		if (open) {
-			name = i18n.t('cycles.title') + ' ' + nextNumber;
+			name = m['cycles.title']() + ' ' + nextNumber;
 			description = '';
 			goals = '';
 			startDate = '';
@@ -66,54 +67,54 @@
 		<form onsubmit={handleSubmit}>
 			<div class="px-5 pt-5 pb-4 space-y-4">
 				<div>
-					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{i18n.t('cycles.create.title')}</h2>
-					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{i18n.t('cycles.create.description')}</p>
+					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{m['cycles.create.title']()}</h2>
+					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{m['cycles.create.description']()}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.name')}</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['cycles.field.name']()}</Label>
 					<Input
 						bind:value={name}
-						placeholder={i18n.t('cycles.create.name_placeholder')}
+						placeholder={m['cycles.create.name_placeholder']()}
 						required
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.description')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.field.optional')}</span></Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['cycles.field.description']()} <span class="text-[var(--color-text-tertiary)]">{m['cycles.field.optional']()}</span></Label>
 					<Input
 						bind:value={description}
-						placeholder={i18n.t('cycles.create.description_placeholder')}
+						placeholder={m['cycles.create.description_placeholder']()}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.goals')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('cycles.field.optional')}</span></Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['cycles.goals']()} <span class="text-[var(--color-text-tertiary)]">{m['cycles.field.optional']()}</span></Label>
 					<Textarea
 						bind:value={goals}
-						placeholder={i18n.t('cycles.create.goals_placeholder')}
+						placeholder={m['cycles.create.goals_placeholder']()}
 						rows={2}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)] resize-none text-sm"
 					/>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('cycles.field.date_range')}</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['cycles.field.date_range']()}</Label>
 					<DateRangePickerPopover
 						startDate={startDate || null}
 						endDate={endDate || null}
 						onchange={(s, e) => { startDate = s; endDate = e; }}
 						{isDateDisabled}
-						placeholder={i18n.t('cycles.select_date_range')}
+						placeholder={m['cycles.select_date_range']()}
 					/>
 				</div>
 			</div>
 
 			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
-				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>{i18n.t('common.cancel')}</Button>
-				<Button size="sm" type="submit" disabled={!name.trim() || !startDate || !endDate}>{i18n.t('cycles.create.title')}</Button>
+				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>{m['common.cancel']()}</Button>
+				<Button size="sm" type="submit" disabled={!name.trim() || !startDate || !endDate}>{m['cycles.create.title']()}</Button>
 			</div>
 		</form>
 	</Dialog.Content>

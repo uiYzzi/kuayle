@@ -8,7 +8,8 @@
 	import type { ViewFilter, ViewScope } from '$lib/types/view';
 	import { Bookmark, Building2, Check, CircleUser, SquareUser } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -40,20 +41,20 @@
 	}>>([
 		{
 			value: 'personal',
-			label: i18n.t('sharedComponents.save_view.scope_personal'),
-			description: i18n.t('sharedComponents.save_view.scope_personal_desc'),
+			label: m['sharedComponents.save_view.scope_personal'](),
+			description: m['sharedComponents.save_view.scope_personal_desc'](),
 			icon: CircleUser
 		},
 		{
 			value: 'workspace',
-			label: i18n.t('sharedComponents.save_view.scope_workspace'),
-			description: i18n.t('sharedComponents.save_view.scope_workspace_desc'),
+			label: m['sharedComponents.save_view.scope_workspace'](),
+			description: m['sharedComponents.save_view.scope_workspace_desc'](),
 			icon: Building2
 		},
 		{
 			value: 'team',
-			label: i18n.t('sharedComponents.save_view.scope_team'),
-			description: i18n.t('sharedComponents.save_view.scope_team_desc'),
+			label: m['sharedComponents.save_view.scope_team'](),
+			description: m['sharedComponents.save_view.scope_team_desc'](),
 			icon: SquareUser
 		}
 	]);
@@ -77,7 +78,7 @@
 		e.preventDefault();
 		if (!name.trim()) return;
 		if (scope === 'team' && !defaultTeamId) {
-			appToast.error(i18n.t('sharedComponents.save_view.toast.team_only'));
+			appToast.error(m['sharedComponents.save_view.toast.team_only']());
 			return;
 		}
 
@@ -100,10 +101,10 @@
 				filters: nextFilters,
 				is_shared: scope !== 'personal'
 			});
-			appToast.success(i18n.t('sharedComponents.save_view.toast.saved'));
+			appToast.success(m['sharedComponents.save_view.toast.saved']());
 			open = false;
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('sharedComponents.save_view.toast.save_failed'));
+			appToast.apiError(err, m['sharedComponents.save_view.toast.save_failed']());
 		}
 	}
 </script>
@@ -112,10 +113,10 @@
 	{#if showTrigger}
 		<Dialog.Trigger
 			class="flex items-center gap-1 rounded-md border border-[var(--app-border)] px-2 py-1 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)]"
-			title={i18n.t('sharedComponents.save_view.trigger_title')}
+			title={m['sharedComponents.save_view.trigger_title']()}
 		>
 			<Bookmark size={12} />
-			{i18n.t('sharedComponents.save_view.trigger')}
+			{m['sharedComponents.save_view.trigger']()}
 		</Dialog.Trigger>
 	{/if}
 
@@ -125,15 +126,15 @@
 		<form onsubmit={handleSubmit}>
 			<div class="px-5 pt-5 pb-4 space-y-4">
 				<div>
-					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{i18n.t('sharedComponents.save_view.title')}</h2>
-					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{i18n.t('sharedComponents.save_view.description')}</p>
+					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{m['sharedComponents.save_view.title']()}</h2>
+					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{m['sharedComponents.save_view.description']()}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('sharedComponents.save_view.name')}</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['sharedComponents.save_view.name']()}</Label>
 					<Input
 						bind:value={name}
-						placeholder={i18n.t('sharedComponents.save_view.name_placeholder')}
+						placeholder={m['sharedComponents.save_view.name_placeholder']()}
 						required
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
@@ -141,17 +142,17 @@
 
 				<div class="space-y-1.5">
 					<Label class="text-xs text-[var(--color-text-secondary)]"
-						>{i18n.t('sharedComponents.save_view.description_label')} <span class="text-[var(--color-text-tertiary)]">{i18n.t('sharedComponents.save_view.optional')}</span></Label
+						>{m['sharedComponents.save_view.description_label']()} <span class="text-[var(--color-text-tertiary)]">{m['sharedComponents.save_view.optional']()}</span></Label
 					>
 					<Input
 						bind:value={description}
-						placeholder={i18n.t('sharedComponents.save_view.description_placeholder')}
+						placeholder={m['sharedComponents.save_view.description_placeholder']()}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 
 				<div class="space-y-2">
-					<Label class="text-xs text-[var(--color-text-secondary)]">{i18n.t('sharedComponents.save_view.visibility')}</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['sharedComponents.save_view.visibility']()}</Label>
 					<div class="grid gap-2">
 						{#each visibleScopeOptions as option}
 							{@const Icon = option.icon}
@@ -166,7 +167,7 @@
 								<span class="min-w-0 flex-1">
 									<span class="block text-sm font-medium text-[var(--color-text-primary)]">{option.label}</span>
 									<span class="block text-xs text-[var(--color-text-tertiary)]">
-										{option.value === 'team' && currentTeam ? i18n.t('sharedComponents.save_view.shared_with_team', { teamName: currentTeam.name }) : option.description}
+										{option.value === 'team' && currentTeam ? m['sharedComponents.save_view.shared_with_team']({ teamName: currentTeam.name }) : option.description}
 									</span>
 								</span>
 								{#if scope === option.value}
@@ -182,14 +183,14 @@
 						class="flex items-center gap-2 rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-xs text-[var(--color-text-secondary)]"
 					>
 						<SquareUser size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
-						<span>{i18n.t('sharedComponents.save_view.saved_to_team', { teamName: currentTeam.name })}</span>
+						<span>{m['sharedComponents.save_view.saved_to_team']({ teamName: currentTeam.name })}</span>
 					</div>
 				{/if}
 			</div>
 
 			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
-				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>{i18n.t('sharedComponents.save_view.cancel')}</Button>
-				<Button size="sm" type="submit" disabled={!name.trim()}>{i18n.t('sharedComponents.save_view.save')}</Button>
+				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>{m['sharedComponents.save_view.cancel']()}</Button>
+				<Button size="sm" type="submit" disabled={!name.trim()}>{m['sharedComponents.save_view.save']()}</Button>
 			</div>
 		</form>
 	</Dialog.Content>

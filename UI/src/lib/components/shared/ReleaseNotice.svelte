@@ -17,7 +17,8 @@
 	import { authState } from '$lib/features/auth/auth.state.svelte';
 	import { renderMarkdown } from '$lib/markdown';
 	import Info from '@lucide/svelte/icons/info';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const DISMISSED_KEY = 'kuayle_release_notice_dismissed';
 	const PRERELEASE_KEY = 'kuayle_release_notice_include_prerelease';
@@ -179,28 +180,28 @@
 				</div>
 
 				<div class="space-y-2">
-					<p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">{i18n.t("sharedComponents.release_notice.upgrade_required")}</p>
+					<p class="text-xs font-medium tracking-wide text-muted-foreground uppercase">{m['sharedComponents.release_notice.upgrade_required']()}</p>
 					<h1 id="upgrade-required-title" class="text-2xl leading-tight font-semibold tracking-tight">
-						{i18n.t("sharedComponents.release_notice.no_longer_supported")}
+						{m['sharedComponents.release_notice.no_longer_supported']()}
 					</h1>
 				</div>
 			</div>
 			<div class="space-y-4 px-6 pb-6 text-sm leading-6 text-muted-foreground">
 				<p id="upgrade-required-description">
-					{i18n.t("sharedComponents.release_notice.current_version")} <strong class="font-medium text-foreground">{currentVersionLabel}</strong>. {i18n.t("sharedComponents.release_notice.required_version")}
-					<strong class="font-medium text-foreground">{requiredVersionLabel}</strong> {i18n.t("sharedComponents.release_notice.or_newer")}
+					{m['sharedComponents.release_notice.current_version']()} <strong class="font-medium text-foreground">{currentVersionLabel}</strong>. {m['sharedComponents.release_notice.required_version']()}
+					<strong class="font-medium text-foreground">{requiredVersionLabel}</strong> {m['sharedComponents.release_notice.or_newer']()}
 				</p>
 				<p>
 					{requiredRelease.upgrade_message ||
-						i18n.t("sharedComponents.release_notice.upgrade_message")}
+						m['sharedComponents.release_notice.upgrade_message']()}
 				</p>
 				<div class="rounded-lg border border-border bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
 					bash selfhosting/update.sh
 				</div>
 			</div>
 			<div class="flex flex-col-reverse gap-2 border-t border-border p-6 pt-4 sm:flex-row sm:justify-end">
-				<Button variant="outline" onclick={() => window.location.reload()}>{i18n.t("sharedComponents.release_notice.refresh_app")}</Button>
-				<Button href={upgradeUrl} target="_blank" rel="noopener">{i18n.t("sharedComponents.release_notice.open_release")}</Button>
+				<Button variant="outline" onclick={() => window.location.reload()}>{m['sharedComponents.release_notice.refresh_app']()}</Button>
+				<Button href={upgradeUrl} target="_blank" rel="noopener">{m['sharedComponents.release_notice.open_release']()}</Button>
 			</div>
 		</div>
 	</div>
@@ -212,7 +213,7 @@
 			<div class="flex max-h-[calc(100dvh-2rem)] flex-col sm:max-h-[80dvh]">
 				<Dialog.Header class="border-b border-[var(--app-border)] px-5 py-4 pr-12">
 					<p class="text-xs font-semibold tracking-widest text-[var(--app-accent-light)] uppercase">
-						{releaseIsNewer ? i18n.t("sharedComponents.release_notice.update_available") : i18n.t("sharedComponents.release_notice.release")}
+						{releaseIsNewer ? m['sharedComponents.release_notice.update_available']() : m['sharedComponents.release_notice.release']()}
 					</p>
 					<Dialog.Title class="flex items-center gap-2 text-[var(--color-text-primary)]">
 						<span aria-hidden="true">{releaseIsNewer ? '🚀' : 'ℹ️'}</span>
@@ -221,7 +222,7 @@
 					<Dialog.Description class="flex items-center gap-1.5 text-[var(--color-text-secondary)]">
 						<Info class="size-3.5" />
 						<span
-							>{i18n.t("sharedComponents.release_notice.current_is")} <strong class="font-semibold text-[var(--color-text-primary)]">{currentVersionLabel}</strong
+							>{m['sharedComponents.release_notice.current_is']()} <strong class="font-semibold text-[var(--color-text-primary)]">{currentVersionLabel}</strong
 							></span
 						>
 					</Dialog.Description>
@@ -232,22 +233,22 @@
 						<summary
 							class="cursor-pointer text-sm font-medium text-[var(--color-text-primary)] outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0"
 						>
-							{i18n.t("sharedComponents.release_notice.changelog")}
+							{m['sharedComponents.release_notice.changelog']()}
 						</summary>
 						<div class="mt-3 flex items-center justify-between gap-2 text-xs text-[var(--color-text-tertiary)]">
 							<span>
-								{i18n.t("sharedComponents.release_notice.showing_changes_from")} <strong class="font-semibold text-[var(--color-text-secondary)]"
+								{m['sharedComponents.release_notice.showing_changes_from']()} <strong class="font-semibold text-[var(--color-text-secondary)]"
 									>{currentVersionLabel}</strong
 								>
-								{i18n.t("sharedComponents.release_notice.to")} <strong class="font-semibold text-[var(--color-text-secondary)]">{latestRelease.tag_name}</strong>
+								{m['sharedComponents.release_notice.to']()} <strong class="font-semibold text-[var(--color-text-secondary)]">{latestRelease.tag_name}</strong>
 							</span>
 							<button
 								type="button"
 								class="cursor-pointer select-none rounded px-1.5 py-0.5 text-[var(--color-text-tertiary)] transition-colors hover:text-[var(--color-text-secondary)]"
 								onclick={togglePrerelease}
-								title={i18n.t("sharedComponents.release_notice.toggle_prerelease")}
+								title={m['sharedComponents.release_notice.toggle_prerelease']()}
 							>
-								{includePrerelease ? i18n.t("sharedComponents.release_notice.hide_prereleases") : i18n.t("sharedComponents.release_notice.show_prereleases")}
+								{includePrerelease ? m['sharedComponents.release_notice.hide_prereleases']() : m['sharedComponents.release_notice.show_prereleases']()}
 							</button>
 						</div>
 						{#if changelogHtml}
@@ -256,7 +257,7 @@
 								{@html changelogHtml}
 							</div>
 						{:else}
-							<p class="mt-3 text-sm text-[var(--color-text-secondary)]">{i18n.t("sharedComponents.release_notice.no_notes")}</p>
+							<p class="mt-3 text-sm text-[var(--color-text-secondary)]">{m['sharedComponents.release_notice.no_notes']()}</p>
 						{/if}
 					</details>
 				</div>
@@ -264,9 +265,9 @@
 				<div
 					class="flex flex-col-reverse gap-2 border-t border-[var(--app-border)] bg-[var(--color-bg)] px-5 py-4 sm:flex-row sm:justify-end"
 				>
-					<Button variant="outline" onclick={() => void loadReleases(false)}>{i18n.t("sharedComponents.release_notice.check_again")}</Button>
-					<Button variant="outline" onclick={() => (dialogOpen = false)}>{i18n.t("sharedComponents.release_notice.dismiss")}</Button>
-					<Button href={latestRelease.html_url} target="_blank" rel="noopener">{i18n.t("sharedComponents.release_notice.release")}</Button>
+					<Button variant="outline" onclick={() => void loadReleases(false)}>{m['sharedComponents.release_notice.check_again']()}</Button>
+					<Button variant="outline" onclick={() => (dialogOpen = false)}>{m['sharedComponents.release_notice.dismiss']()}</Button>
+					<Button href={latestRelease.html_url} target="_blank" rel="noopener">{m['sharedComponents.release_notice.release']()}</Button>
 				</div>
 			</div>
 		</Dialog.Content>

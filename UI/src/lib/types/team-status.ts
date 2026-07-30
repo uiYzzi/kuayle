@@ -1,5 +1,4 @@
-import { i18n } from '$lib/i18n/index.svelte';
-import type { TranslationKey } from '$lib/i18n/locales/en';
+import { m } from '$lib/paraglide/messages.js';
 
 export type StatusCategory = 'backlog' | 'unstarted' | 'started' | 'completed' | 'cancelled';
 
@@ -20,16 +19,16 @@ export interface TeamStatus {
 export const CATEGORY_ORDER: StatusCategory[] = ['backlog', 'unstarted', 'started', 'completed', 'cancelled'];
 
 export function getCategoryLabel(category: StatusCategory): string {
-	const key = `common.category.${category}` as TranslationKey;
-	return i18n.t(key);
+	const key = `common.category.${category}`;
+	return m[key]();
 }
 
 export function getCategoryLabels(): Record<StatusCategory, string> {
 	return {
-		backlog: i18n.t('common.category.backlog'),
-		unstarted: i18n.t('common.category.unstarted'),
-		started: i18n.t('common.category.started'),
-		completed: i18n.t('common.category.completed'),
-		cancelled: i18n.t('common.category.cancelled')
+		backlog: m['common.category.backlog'](),
+		unstarted: m['common.category.unstarted'](),
+		started: m['common.category.started'](),
+		completed: m['common.category.completed'](),
+		cancelled: m['common.category.cancelled']()
 	};
 }

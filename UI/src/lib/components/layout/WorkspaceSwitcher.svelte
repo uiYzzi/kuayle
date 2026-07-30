@@ -8,7 +8,9 @@
 	import { Plus, ChevronsUpDown, Check, Loader2 } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { appToast } from '$lib/features/toast/toast';
-import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
+	import { toSlug } from '$lib/utils/slug';
 
 	let {
 		currentWorkspace,
@@ -38,15 +40,6 @@ import { i18n } from '$lib/i18n/index.svelte';
 		}
 	}
 
-	function toSlug(value: string) {
-		return value
-			.toLowerCase()
-			.replace(/[^a-z0-9]/g, '-')
-			.replace(/-+/g, '-')
-			.replace(/^-|-$/g, '')
-			.slice(0, 50);
-	}
-
 	function handleNameInput() {
 		if (!slugEdited) {
 			newWorkspaceSlug = toSlug(newWorkspaceName);
@@ -69,14 +62,14 @@ import { i18n } from '$lib/i18n/index.svelte';
 			const workspace = await createWorkspace(workspaceName, workspaceSlug);
 			workspaces = [...workspaces, workspace].sort((a, b) => a.name.localeCompare(b.name));
 			localStorage.setItem('kuayle_last_workspace', workspace.slug);
-			appToast.success(i18n.t('sidebar.workspace_created'));
+			appToast.success(m['sidebar.workspace_created']());
 			showCreateWorkspace = false;
 			newWorkspaceName = '';
 			newWorkspaceSlug = '';
 			slugEdited = false;
 			goto(`/${workspace.slug}/inbox`);
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('sidebar.failed_create_workspace'));
+			appToast.apiError(err, m['sidebar.failed_create_workspace']());
 		} finally {
 			creating = false;
 		}
@@ -99,7 +92,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 	</Popover.Trigger>
 	<Popover.Content class="w-56 p-1" align="start">
 		<div class="px-2 py-1">
-			<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{i18n.t('sidebar.workspaces')}</span>
+			<span class="text-[10px] font-medium uppercase text-[var(--color-text-tertiary)]">{m['sidebar.workspaces']()}</span>
 		</div>
 		{#each workspaces as ws}
 			<button
@@ -123,7 +116,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]"
 			>
 				<Plus size={14} />
-				{i18n.t('sidebar.create_workspace')}
+				{m['sidebar.create_workspace']()}
 			</button>
 		</div>
 	</Popover.Content>
@@ -132,13 +125,13 @@ import { i18n } from '$lib/i18n/index.svelte';
 <Dialog.Root bind:open={showCreateWorkspace}>
 	<Dialog.Content class="sm:max-w-md border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<Dialog.Header>
-			<Dialog.Title>{i18n.t('sidebar.create_workspace')}</Dialog.Title>
-			<Dialog.Description>{i18n.t('sidebar.create_workspace_desc')}</Dialog.Description>
+			<Dialog.Title>{m['sidebar.create_workspace']()}</Dialog.Title>
+			<Dialog.Description>{m['sidebar.create_workspace_desc']()}</Dialog.Description>
 		</Dialog.Header>
 
 		<form onsubmit={handleCreateWorkspace} class="space-y-4 py-2">
 			<div>
-				<label for="workspace-name" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{i18n.t('sidebar.workspace_name')}</label>
+				<label for="workspace-name" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{m['sidebar.workspace_name']()}</label>
 				<input
 					id="workspace-name"
 					type="text"
@@ -146,13 +139,13 @@ import { i18n } from '$lib/i18n/index.svelte';
 					oninput={handleNameInput}
 					required
 					maxlength="100"
-					placeholder={i18n.t('sidebar.workspace_name_placeholder')}
+					placeholder={m['sidebar.workspace_name_placeholder']()}
 					class="w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
 
 			<div>
-				<label for="workspace-slug" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{i18n.t('sidebar.workspace_url')}</label>
+				<label for="workspace-slug" class="mb-1 block text-sm text-[var(--color-text-secondary)]">{m['sidebar.workspace_url']()}</label>
 				<input
 					id="workspace-slug"
 					type="text"
@@ -163,20 +156,20 @@ import { i18n } from '$lib/i18n/index.svelte';
 					}}
 					required
 					maxlength="50"
-					placeholder={i18n.t('sidebar.workspace_url_placeholder')}
+					placeholder={m['sidebar.workspace_url_placeholder']()}
 					class="w-full rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
-				<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">{i18n.t('sidebar.workspace_url_desc')}</p>
+				<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">{m['sidebar.workspace_url_desc']()}</p>
 			</div>
 
 			<Dialog.Footer>
-				<Button type="button" variant="outline" onclick={() => (showCreateWorkspace = false)} disabled={creating}>{i18n.t('sidebar.cancel')}</Button>
+				<Button type="button" variant="outline" onclick={() => (showCreateWorkspace = false)} disabled={creating}>{m['sidebar.cancel']()}</Button>
 				<Button type="submit" disabled={creating || !newWorkspaceName.trim() || !newWorkspaceSlug.trim()}>
 					{#if creating}
 						<Loader2 size={14} class="animate-spin" />
-						{i18n.t('sidebar.creating')}
+						{m['sidebar.creating']()}
 					{:else}
-						{i18n.t('sidebar.create_workspace')}
+						{m['sidebar.create_workspace']()}
 					{/if}
 				</Button>
 			</Dialog.Footer>

@@ -56,7 +56,10 @@ func (h *WorkspaceHandler) Create(c echo.Context) error {
 	userID := middleware.GetUserID(c)
 	ws, err := h.workspaceSvc.Create(c.Request().Context(), userID, req)
 	if err != nil {
-		return response.Error(c, http.StatusConflict, "CONFLICT", err.Error())
+		if errors.Is(err, service.ErrWorkspaceSlugTaken) {
+			return response.Error(c, http.StatusConflict, "WORKSPACE_SLUG_TAKEN", "Workspace slug is already taken")
+		}
+		return response.InternalError(c)
 	}
 	return response.Success(c, http.StatusCreated, h.toWorkspaceResponse(c, *ws))
 }

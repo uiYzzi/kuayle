@@ -3,7 +3,8 @@
 	import { Kbd } from '$lib/components/ui/kbd';
 	import { Separator } from '$lib/components/ui/separator';
 	import type { ShortcutDef } from '$lib/utils/keyboard';
-import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -61,8 +62,8 @@ import { i18n } from '$lib/i18n/index.svelte';
 <Dialog.Root bind:open>
 	<Dialog.Content class="sm:max-w-[480px] border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-0 overflow-hidden rounded-xl">
 		<div class="px-5 pt-5 pb-2">
-			<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{i18n.t('sidebar.keyboard_shortcuts')}</h2>
-			<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{i18n.t('sidebar.shortcuts_desc')}</p>
+			<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{m['sidebar.keyboard_shortcuts']()}</h2>
+			<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{m['sidebar.shortcuts_desc']()}</p>
 		</div>
 
 		<div class="max-h-[400px] overflow-y-auto px-5 pb-5">
@@ -80,7 +81,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 									{#each getKeyDisplay(shortcut) as keyGroup}
 										{#each keyGroup as key, ki}
 											{#if ki > 0 && 'keys' in shortcut}
-												<span class="text-[10px] text-[var(--color-text-tertiary)]">{i18n.t('sidebar.shortcut_then')}</span>
+												<span class="text-[10px] text-[var(--color-text-tertiary)]">{m['sidebar.shortcut_then']()}</span>
 											{/if}
 											<Kbd>{key}</Kbd>
 										{/each}

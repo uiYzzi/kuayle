@@ -2,17 +2,36 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/kuayle/kuayle-backend/internal/domain"
 	"github.com/stretchr/testify/require"
 )
+
+func TestWorkspaceCreateErrorReturnsTypedSlugConflict(t *testing.T) {
+	err := workspaceCreateError(&pgconn.PgError{
+		Code:           "23505",
+		ConstraintName: "workspaces_slug_key",
+	})
+
+	require.ErrorIs(t, err, ErrWorkspaceSlugTaken)
+}
+
+func TestWorkspaceCreateErrorPreservesOtherErrors(t *testing.T) {
+	databaseErr := errors.New("database unavailable")
+	otherConstraintErr := &pgconn.PgError{Code: "23505", ConstraintName: "other_key"}
+
+	require.ErrorIs(t, workspaceCreateError(databaseErr), databaseErr)
+	require.ErrorIs(t, workspaceCreateError(otherConstraintErr), otherConstraintErr)
+}
 
 func TestWorkspaceDeleteWaitsForEnvironmentImageCleanup(t *testing.T) {
 	databaseURL := os.Getenv("DATABASE_URL")

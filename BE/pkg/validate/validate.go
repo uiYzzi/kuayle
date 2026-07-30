@@ -1,13 +1,26 @@
 package validate
 
 import (
+	"regexp"
+
 	"github.com/go-playground/validator/v10"
 )
+
+// slugPattern matches lowercase alphanumeric groups joined by single hyphens.
+// Leading, trailing and consecutive hyphens are rejected.
+var slugPattern = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
 
 var V *validator.Validate
 
 func init() {
 	V = validator.New(validator.WithRequiredStructEnabled())
+	if err := V.RegisterValidation("slug", isSlug); err != nil {
+		panic(err)
+	}
+}
+
+func isSlug(fl validator.FieldLevel) bool {
+	return slugPattern.MatchString(fl.Field().String())
 }
 
 func Struct(s interface{}) error {
@@ -41,6 +54,8 @@ func formatMessage(e validator.FieldError) string {
 		return "must be a valid UUID"
 	case "oneof":
 		return "must be one of: " + e.Param()
+	case "slug":
+		return "must contain only lowercase letters, digits and single hyphens between them"
 	default:
 		return "invalid value"
 	}

@@ -12,6 +12,10 @@
 
 [![Kuayle Screenshot](assets/product-screenshot.png)](https://github.com/carbogninalberto/kuayle)
 
+## 🌍 Contributors
+
+[![Kuayle contributors](https://contrib.rocks/image?repo=carbogninalberto/kuayle)][contributors-url]
+
 ## 🚦 Current Implementation State
 
 Kuayle's published releases are runnable MVPs, not a mature enterprise platform. This development branch also contains unreleased work described below. The repository includes the Go API, SvelteKit frontend, database migrations, development tooling, and reference self-hosting configuration.
@@ -430,10 +434,6 @@ Apache 2.0, see [`LICENSE`](LICENSE).
 ## 📬 Contact
 
 Alberto Carbognin, [@carbogninalberto](https://github.com/carbogninalberto)
-
-## 🌍 Contributors
-
-View the full contributor graph on GitHub: [contributors](https://github.com/carbogninalberto/kuayle/graphs/contributors).
 
 ---
 

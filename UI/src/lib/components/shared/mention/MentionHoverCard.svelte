@@ -4,7 +4,8 @@
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import Avatar from '$lib/components/shared/Avatar.svelte';
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		anchor,
@@ -58,7 +59,7 @@
 				<div class="truncate font-medium">{displayName}</div>
 				{#if member}
 					<div class="truncate text-xs text-[var(--color-text-tertiary)]">{member.email}</div>
-					<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{i18n.t('common.role.' + member.role)}</div>
+					<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{m['common.role.' + member.role]()}</div>
 				{/if}
 			</div>
 		</div>

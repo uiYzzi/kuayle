@@ -12,7 +12,8 @@
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Select from '$lib/components/ui/select';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Plus, Trash2, FileText } from 'lucide-svelte';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
@@ -51,7 +52,7 @@
 
 	async function handleCreate() {
 		if (!formTitle.trim()) {
-			appToast.error(i18n.t('settings.templates.title_required'));
+			appToast.error(m['settings.templates.title_required']());
 			return;
 		}
 		creating = true;
@@ -66,9 +67,9 @@
 			templates = [template, ...templates];
 			showCreate = false;
 			resetForm();
-			appToast.success(i18n.t('settings.templates.created'));
+			appToast.success(m['settings.templates.created']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.templates.failed_create'));
+			appToast.apiError(err, m['settings.templates.failed_create']());
 		} finally {
 			creating = false;
 		}
@@ -78,9 +79,9 @@
 		try {
 			await deleteTemplate(slug, id);
 			templates = templates.filter((t) => t.id !== id);
-			appToast.success(i18n.t('settings.templates.deleted'));
+			appToast.success(m['settings.templates.deleted']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.templates.failed_delete'));
+			appToast.apiError(err, m['settings.templates.failed_delete']());
 		}
 	}
 
@@ -99,22 +100,22 @@
 
 <div class="mx-auto max-w-2xl px-8 py-10">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.templates.title')}</h1>
+		<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['settings.templates.title']()}</h1>
 		<button
 			onclick={openCreateDialog}
 			class="flex items-center gap-1 rounded-md bg-[var(--app-accent)] px-3 py-1.5 text-sm text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)]"
 		>
 			<Plus size={14} />
-			{i18n.t('settings.templates.new')}
+			{m['settings.templates.new']()}
 		</button>
 	</div>
 
 	<div class="mt-8">
 		{#if !loading && templates.length === 0}
 			<EmptyState
-				title={i18n.t("settings.templates.no_templates")}
-				description={i18n.t("settings.templates.no_templates_desc")}
-				action={{ label: i18n.t('settings.templates.new'), onclick: openCreateDialog }}
+				title={m['settings.templates.no_templates']()}
+				description={m['settings.templates.no_templates_desc']()}
+				action={{ label: m['settings.templates.new'](), onclick: openCreateDialog }}
 			/>
 		{:else}
 			<div class="rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
@@ -122,7 +123,7 @@
 					<div class="group flex items-center gap-4 px-5 py-3.5 {i > 0 ? 'border-t border-[var(--app-border)]' : ''}">
 						<FileText size={16} class="shrink-0 text-[var(--color-text-tertiary)]" />
 						<div class="flex-1 min-w-0">
-							<span class="text-sm font-medium text-[var(--color-text-primary)]">{template.title || i18n.t('settings.templates.untitled')}</span>
+							<span class="text-sm font-medium text-[var(--color-text-primary)]">{template.title || m['settings.templates.untitled']()}</span>
 						</div>
 						{#if template.status}
 							<Badge variant="outline" class="text-[10px]">{statusLabel(template.status)}</Badge>
@@ -148,27 +149,27 @@
 <Dialog.Root bind:open={showCreate}>
 	<Dialog.Content class="sm:max-w-md">
 		<Dialog.Header>
-			<Dialog.Title>{i18n.t("settings.templates.create_title")}</Dialog.Title>
-			<Dialog.Description>{i18n.t("settings.templates.create_desc")}</Dialog.Description>
+			<Dialog.Title>{m['settings.templates.create_title']()}</Dialog.Title>
+			<Dialog.Description>{m['settings.templates.create_desc']()}</Dialog.Description>
 		</Dialog.Header>
 		<div class="flex flex-col gap-4 py-4">
 			<div class="flex flex-col gap-1.5">
-				<label for="tpl-title" class="text-sm text-[var(--color-text-secondary)]">{i18n.t("settings.templates.title_field")}</label>
+				<label for="tpl-title" class="text-sm text-[var(--color-text-secondary)]">{m['settings.templates.title_field']()}</label>
 				<input
 					id="tpl-title"
 					type="text"
 					bind:value={formTitle}
-					placeholder={i18n.t("settings.templates.title_placeholder")}
+					placeholder={m['settings.templates.title_placeholder']()}
 					class="rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-3 py-2 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
 			<div class="flex flex-col gap-1.5">
-				<label for="tpl-desc" class="text-sm text-[var(--color-text-secondary)]">{i18n.t("settings.templates.description")}</label>
+				<label for="tpl-desc" class="text-sm text-[var(--color-text-secondary)]">{m['settings.templates.description']()}</label>
 				{#key editorVersion}
 				<RichEditor
 					content={formDescription}
 					workspaceSlug={slug}
-					placeholder={i18n.t("settings.templates.description_placeholder")}
+					placeholder={m['settings.templates.description_placeholder']()}
 					bubbleMenu={true}
 					borderless={true}
 					minHeight="120px"
@@ -178,7 +179,7 @@
 			</div>
 			<div class="flex gap-4">
 				<div class="flex flex-1 flex-col gap-1.5">
-					<span class="text-sm text-[var(--color-text-secondary)]">{i18n.t("settings.templates.default_status")}</span>
+					<span class="text-sm text-[var(--color-text-secondary)]">{m['settings.templates.default_status']()}</span>
 					<Select.Root
 						type="single"
 						value={formStatus}
@@ -200,7 +201,7 @@
 					</Select.Root>
 				</div>
 				<div class="flex flex-1 flex-col gap-1.5">
-					<span class="text-sm text-[var(--color-text-secondary)]">{i18n.t("settings.templates.default_priority")}</span>
+					<span class="text-sm text-[var(--color-text-secondary)]">{m['settings.templates.default_priority']()}</span>
 					<Select.Root
 						type="single"
 						value={String(formPriority)}
@@ -221,9 +222,9 @@
 			</div>
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (showCreate = false)}>{i18n.t("settings.cancel")}</Button>
+			<Button variant="outline" onclick={() => (showCreate = false)}>{m['settings.cancel']()}</Button>
 			<Button onclick={handleCreate} disabled={creating}>
-				{creating ? i18n.t('settings.creating') : i18n.t('settings.templates.create_title')}
+				{creating ? m['settings.creating']() : m['settings.templates.create_title']()}
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

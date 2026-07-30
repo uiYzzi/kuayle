@@ -35,7 +35,8 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { dndzone } from 'svelte-dnd-action';
 	import { appToast } from '$lib/features/toast/toast';
-import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import {
 		ArrowUpRight,
 		Bookmark,
@@ -361,7 +362,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 
 	function copyLink(path: string) {
 		navigator.clipboard.writeText(`${window.location.origin}${path}`);
-		appToast.success(i18n.t('sidebar.link_copied'));
+		appToast.success(m['sidebar.link_copied']());
 	}
 
 	function requestDeleteView(view: View) {
@@ -376,10 +377,10 @@ import { i18n } from '$lib/i18n/index.svelte';
 			await deleteView(slug, view.id);
 			views = views.filter((item) => item.id !== view.id);
 			orderedViews = orderedViews.filter((item) => item.id !== view.id);
-			appToast.success(i18n.t('sidebar.view_deleted'));
+			appToast.success(m['sidebar.view_deleted']());
 			if (currentPath === `/${slug}/views/${view.id}`) goto(`/${slug}/my-issues`);
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('sidebar.failed_delete_view'));
+			appToast.apiError(err, m['sidebar.failed_delete_view']());
 		} finally {
 			deleteViewOpen = false;
 			pendingDeleteView = null;
@@ -392,10 +393,10 @@ import { i18n } from '$lib/i18n/index.svelte';
 			projects = projects.filter((item) => item.id !== project.id);
 			orderedProjects = orderedProjects.filter((item) => item.id !== project.id);
 			sidebarState.projects = orderedProjects;
-			appToast.success(i18n.t('sidebar.project_deleted'));
+			appToast.success(m['sidebar.project_deleted']());
 			if (currentPath === `/${slug}/projects/${project.id}`) goto(`/${slug}/projects`);
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('sidebar.failed_delete_project'));
+			appToast.apiError(err, m['sidebar.failed_delete_project']());
 		}
 	}
 
@@ -589,7 +590,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				ondblclick={onHandleDblClick}
 				onmouseenter={() => (hoveringHandle = true)}
 				onmouseleave={() => (hoveringHandle = false)}
-				title={i18n.t('sidebar.drag_resize')}
+				title={m['sidebar.drag_resize']()}
 			>
 				<div
 					class="mx-auto h-full w-[3px] rounded-full transition-colors {hoveringHandle || dragging
@@ -609,7 +610,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 		<div
 			role="button"
 			tabindex="0"
-			aria-label={i18n.t('sidebar.close_sidebar')}
+			aria-label={m['sidebar.close_sidebar']()}
 			class="fixed inset-0 top-[49px] z-40 transition-[background-color] duration-300 {drawerOpen
 				? 'pointer-events-auto'
 				: 'pointer-events-none'}"
@@ -641,14 +642,14 @@ import { i18n } from '$lib/i18n/index.svelte';
 <AlertDialog.Root bind:open={deleteViewOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>{i18n.t('sidebar.delete_view_question')}</AlertDialog.Title>
+			<AlertDialog.Title>{m['sidebar.delete_view_question']()}</AlertDialog.Title>
 			<AlertDialog.Description>
-				{i18n.t('sidebar.delete_view_confirm', { name: pendingDeleteView?.name ?? i18n.t('sidebar.this_view') })}
+				{m['sidebar.delete_view_confirm']({ name: pendingDeleteView?.name ?? m['sidebar.this_view']() })}
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>{i18n.t('sidebar.cancel')}</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={handleDeleteView}>{i18n.t('sidebar.delete_view_button')}</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>{m['sidebar.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action variant="destructive" onclick={handleDeleteView}>{m['sidebar.delete_view_button']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
@@ -664,7 +665,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				<button
 					onclick={onsearch}
 					class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-					title={i18n.t('sidebar.search')}
+					title={m['sidebar.search']()}
 				>
 					<Search size={16} />
 				</button>
@@ -673,7 +674,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 				<button
 					onclick={oncreateissue}
 					class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-					title={i18n.t('sidebar.new_issue')}
+					title={m['sidebar.new_issue']()}
 				>
 					<SquarePen size={16} />
 				</button>
@@ -698,7 +699,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<Inbox size={16} class="shrink-0" />
-					<span class="truncate">{i18n.t('sidebar.inbox')}</span>
+					<span class="truncate">{m['sidebar.inbox']()}</span>
 					{#if unreadCount > 0}
 						<span
 							class="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--app-accent)] px-1 text-[10px] font-medium text-[var(--app-accent-foreground)]"
@@ -714,7 +715,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<CircleUser size={16} class="shrink-0" />
-					<span class="truncate">{i18n.t('sidebar.my_issues')}</span>
+					<span class="truncate">{m['sidebar.my_issues']()}</span>
 				</a>
 				<a
 					href="/{slug}/insights"
@@ -723,7 +724,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<BarChart3 size={16} class="shrink-0" />
-					<span class="truncate">{i18n.t('sidebar.insights')}</span>
+					<span class="truncate">{m['sidebar.insights']()}</span>
 				</a>
 				{#if canManageDevMachines}
 				<a
@@ -733,7 +734,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<Box size={16} class="shrink-0" />
-					<span class="truncate">{i18n.t('sidebar.dev_machines')}</span>
+					<span class="truncate">{m['sidebar.dev_machines']()}</span>
 				</a>
 				{/if}
 			</div>
@@ -746,7 +747,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						class="flex w-full items-center px-2 py-1"
 					>
 						<span class="flex items-center gap-1">
-							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{i18n.t('sidebar.favorites')}</span>
+							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.favorites']()}</span>
 							<ChevronDown
 								size={12}
 								class="text-[var(--color-text-tertiary)] transition-transform {favoritesCollapsed ? '-rotate-90' : ''}"
@@ -794,7 +795,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 					}}
 				>
 					<span class="flex items-center gap-1">
-						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{i18n.t('sidebar.teams')}</span>
+						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.teams']()}</span>
 						<ChevronDown
 							size={12}
 							class="text-[var(--color-text-tertiary)] transition-transform {teamsCollapsed ? '-rotate-90' : ''}"
@@ -807,7 +808,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 								oncreateteam?.();
 							}}
 							class="rounded p-0.5 text-[var(--color-text-tertiary)] opacity-0 transition-opacity group-hover/teams:opacity-100 hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)]"
-							title={i18n.t('sidebar.create_team')}
+							title={m['sidebar.create_team']()}
 						>
 							<Plus size={14} />
 						</button>
@@ -860,16 +861,16 @@ import { i18n } from '$lib/i18n/index.svelte';
 												<DropdownMenu.Content side="right" align="start" class="w-44">
 													<DropdownMenu.Item onclick={() => goto(`/${slug}/settings/teams/${team.id}`)}>
 														<Settings size={14} class="mr-2" />
-														{i18n.t('sidebar.team_settings')}
+														{m['sidebar.team_settings']()}
 													</DropdownMenu.Item>
 													<DropdownMenu.Separator />
 													<DropdownMenu.Item onclick={() => onleaveteam?.(team)} class="text-[var(--color-error)]">
 														<LogOut size={14} class="mr-2" />
-														{i18n.t('sidebar.leave_team')}
+														{m['sidebar.leave_team']()}
 													</DropdownMenu.Item>
 													<DropdownMenu.Item onclick={() => ondeleteteam?.(team)} class="text-[var(--color-error)]">
 														<Trash2 size={14} class="mr-2" />
-														{i18n.t('sidebar.delete_team')}
+														{m['sidebar.delete_team']()}
 													</DropdownMenu.Item>
 												</DropdownMenu.Content>
 											</DropdownMenu.Root>
@@ -878,11 +879,11 @@ import { i18n } from '$lib/i18n/index.svelte';
 									<ContextMenu.Content class="w-44">
 										<ContextMenu.Item onclick={() => goto(`/${slug}/teams/${team.id}`)}>
 											<SquareUser class={menuIconClass} />
-											{i18n.t('sidebar.open_team')}
+											{m['sidebar.open_team']()}
 										</ContextMenu.Item>
 										<ContextMenu.Item onclick={() => goto(`/${slug}/settings/teams/${team.id}`)}>
 											<Settings class={menuIconClass} />
-											{i18n.t('sidebar.team_settings')}
+											{m['sidebar.team_settings']()}
 										</ContextMenu.Item>
 										<ContextMenu.Separator />
 										<ContextMenu.Item
@@ -890,14 +891,14 @@ import { i18n } from '$lib/i18n/index.svelte';
 											class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 										>
 											<LogOut class={menuIconClass} />
-											{i18n.t('sidebar.leave_team')}
+											{m['sidebar.leave_team']()}
 										</ContextMenu.Item>
 										<ContextMenu.Item
 											onclick={() => ondeleteteam?.(team)}
 											class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 										>
 											<Trash2 class={menuIconClass} />
-											{i18n.t('sidebar.delete_team')}
+											{m['sidebar.delete_team']()}
 										</ContextMenu.Item>
 									</ContextMenu.Content>
 								</ContextMenu.Root>
@@ -916,7 +917,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<SquaresSubtract size={13} />
-											{i18n.t('sidebar.issues')}
+											{m['sidebar.issues']()}
 										</a>
 										<a
 											href="/{slug}/teams/{team.id}/cycles"
@@ -927,7 +928,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<RefreshCcwDot size={13} />
-											{i18n.t('sidebar.cycles')}
+											{m['sidebar.cycles']()}
 										</a>
 										<a
 											href="/{slug}/teams/{team.id}/projects"
@@ -938,7 +939,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<Box size={13} />
-											{i18n.t('sidebar.projects')}
+											{m['sidebar.projects']()}
 										</a>
 										{#if teamProjects.length > 0}
 											<div class="relative ml-[31px]">
@@ -972,17 +973,17 @@ import { i18n } from '$lib/i18n/index.svelte';
 																<ContextMenu.Content class="w-44">
 																	<ContextMenu.Item onclick={() => goto(`/${slug}/projects/${project.id}`)}>
 																		<Box class={menuIconClass} />
-																		{i18n.t('sidebar.open_project')}
+																		{m['sidebar.open_project']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item
 																		onclick={() => window.open(`/${slug}/projects/${project.id}`, '_blank')}
 																	>
 																		<ArrowUpRight class={menuIconClass} />
-																		{i18n.t('sidebar.open_in_new_tab')}
+																		{m['sidebar.open_in_new_tab']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item onclick={() => copyLink(`/${slug}/projects/${project.id}`)}>
 																		<Copy class={menuIconClass} />
-																		{i18n.t('sidebar.copy_link')}
+																		{m['sidebar.copy_link']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Separator />
 																	<ContextMenu.Item
@@ -990,7 +991,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 																		class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 																	>
 																		<Trash2 class={menuIconClass} />
-																		{i18n.t('sidebar.delete_project')}
+																		{m['sidebar.delete_project']()}
 																	</ContextMenu.Item>
 																</ContextMenu.Content>
 															</ContextMenu.Root>
@@ -1008,7 +1009,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<Layers size={13} />
-											{i18n.t('sidebar.views')}
+											{m['sidebar.views']()}
 										</a>
 										{#if team.triage_enabled}
 											<a
@@ -1020,7 +1021,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 													: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 											>
 												<ShieldCheck size={13} />
-												{i18n.t('sidebar.triage')}
+												{m['sidebar.triage']()}
 											</a>
 										{/if}
 										{#if teamViews.length > 0}
@@ -1056,15 +1057,15 @@ import { i18n } from '$lib/i18n/index.svelte';
 																<ContextMenu.Content class="w-44">
 																	<ContextMenu.Item onclick={() => goto(`/${slug}/views/${view.id}`)}>
 																		<Layers class={menuIconClass} />
-																		{i18n.t('sidebar.open_view')}
+																		{m['sidebar.open_view']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item onclick={() => window.open(`/${slug}/views/${view.id}`, '_blank')}>
 																		<ArrowUpRight class={menuIconClass} />
-																		{i18n.t('sidebar.open_in_new_tab')}
+																		{m['sidebar.open_in_new_tab']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item onclick={() => copyLink(`/${slug}/views/${view.id}`)}>
 																		<Copy class={menuIconClass} />
-																		{i18n.t('sidebar.copy_link')}
+																		{m['sidebar.copy_link']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Separator />
 																	<ContextMenu.Item
@@ -1072,7 +1073,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 																		class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 																	>
 																		<Trash2 class={menuIconClass} />
-																		{i18n.t('sidebar.delete_view')}
+																		{m['sidebar.delete_view']()}
 																	</ContextMenu.Item>
 																</ContextMenu.Content>
 															</ContextMenu.Root>
@@ -1091,7 +1092,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 								class="flex w-full items-center gap-2 rounded-md px-2 py-1 text-sm text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 							>
 								<Plus size={14} />
-								{i18n.t('sidebar.create_first_team')}
+								{m['sidebar.create_first_team']()}
 							</button>
 						{/if}
 					</div>
@@ -1106,7 +1107,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						class="flex w-full items-center px-2 py-1"
 					>
 						<span class="flex items-center gap-1">
-							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{i18n.t('sidebar.views')}</span>
+							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.views']()}</span>
 							<ChevronDown
 								size={12}
 								class="text-[var(--color-text-tertiary)] transition-transform {viewsCollapsed ? '-rotate-90' : ''}"
@@ -1122,7 +1123,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 									: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 							>
 								<Bookmark size={16} class="shrink-0" />
-								<span class="truncate">{i18n.t('sidebar.my_views')}</span>
+								<span class="truncate">{m['sidebar.my_views']()}</span>
 								{#if personalViews.length > 0}
 									<span class="ml-auto text-[10px] text-[var(--color-text-tertiary)]">{personalViews.length}</span>
 								{/if}
@@ -1161,15 +1162,15 @@ import { i18n } from '$lib/i18n/index.svelte';
 											<ContextMenu.Content class="w-44">
 												<ContextMenu.Item onclick={() => goto(`/${slug}/views/${view.id}`)}>
 													<Layers class={menuIconClass} />
-													{i18n.t('sidebar.open_view')}
+													{m['sidebar.open_view']()}
 												</ContextMenu.Item>
 												<ContextMenu.Item onclick={() => window.open(`/${slug}/views/${view.id}`, '_blank')}>
 													<ArrowUpRight class={menuIconClass} />
-													{i18n.t('sidebar.open_in_new_tab')}
+													{m['sidebar.open_in_new_tab']()}
 												</ContextMenu.Item>
 												<ContextMenu.Item onclick={() => copyLink(`/${slug}/views/${view.id}`)}>
 													<Copy class={menuIconClass} />
-													{i18n.t('sidebar.copy_link')}
+													{m['sidebar.copy_link']()}
 												</ContextMenu.Item>
 												<ContextMenu.Separator />
 												<ContextMenu.Item
@@ -1177,7 +1178,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 													class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 												>
 													<Trash2 class={menuIconClass} />
-													{i18n.t('sidebar.delete_view')}
+													{m['sidebar.delete_view']()}
 												</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
@@ -1197,7 +1198,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 					onclick={() => (projectsCollapsed = toggleSection('projects', projectsCollapsed))}
 				>
 					<span class="flex items-center gap-1">
-						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{i18n.t('sidebar.projects')}</span>
+						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.projects']()}</span>
 						<ChevronDown
 							size={12}
 							class="text-[var(--color-text-tertiary)] transition-transform {projectsCollapsed ? '-rotate-90' : ''}"
@@ -1213,7 +1214,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 								: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 						>
 							<Box size={16} />
-							{i18n.t('sidebar.all_projects')}
+							{m['sidebar.all_projects']()}
 						</a>
 					</div>
 				{/if}
@@ -1245,7 +1246,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 					class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 				>
 					<Settings size={14} />
-					{i18n.t('sidebar.settings')}
+					{m['sidebar.settings']()}
 				</a>
 				<div class="mt-1 border-t border-[var(--app-border)] pt-1">
 					<a
@@ -1262,7 +1263,7 @@ import { i18n } from '$lib/i18n/index.svelte';
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<LogOut size={14} />
-						{i18n.t('sidebar.log_out')}
+						{m['sidebar.log_out']()}
 					</button>
 				</div>
 			</Popover.Content>
@@ -1270,8 +1271,8 @@ import { i18n } from '$lib/i18n/index.svelte';
 		<button
 			onclick={() => onshortcutshelp?.()}
 			class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--app-border)] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			aria-label={i18n.t('sidebar.keyboard_shortcuts')}
-			title={i18n.t('sidebar.keyboard_shortcuts_hint')}
+			aria-label={m['sidebar.keyboard_shortcuts']()}
+			title={m['sidebar.keyboard_shortcuts_hint']()}
 		>
 			<CircleQuestionMark size={16} />
 		</button>

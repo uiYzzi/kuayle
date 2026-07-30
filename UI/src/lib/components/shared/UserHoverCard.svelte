@@ -2,7 +2,8 @@
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import Avatar from './Avatar.svelte';
 	import * as HoverCard from '$lib/components/ui/hover-card';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		member,
@@ -27,7 +28,7 @@
 			<div class="min-w-0">
 				<div class="truncate text-sm font-medium text-[var(--color-text-primary)]">{displayName}</div>
 				<div class="truncate text-xs text-[var(--color-text-tertiary)]">{member.email}</div>
-				<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{i18n.t('common.role.' + member.role)}</div>
+				<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{m['common.role.' + member.role]()}</div>
 			</div>
 		</div>
 	</HoverCard.Content>

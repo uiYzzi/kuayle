@@ -5,7 +5,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { RangeCalendar } from '$lib/components/ui/range-calendar';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		startDate = '',
@@ -34,7 +35,7 @@
 	function formatDate(value: string): string {
 		const parsed = parseDate(value);
 		if (!parsed) return value;
-		return new Date(parsed.year, parsed.month - 1, parsed.day).toLocaleDateString(i18n.dateLocale, {
+		return new Date(parsed.year, parsed.month - 1, parsed.day).toLocaleDateString(getLocale(), {
 			month: 'short',
 			day: 'numeric',
 			year: 'numeric'
@@ -48,7 +49,7 @@
 	});
 
 	const displayText = $derived(
-		startDate && endDate ? `${formatDate(startDate)} - ${formatDate(endDate)}` : i18n.t('insights.select_date_range')
+		startDate && endDate ? `${formatDate(startDate)} - ${formatDate(endDate)}` : m['insights.select_date_range']()
 	);
 
 	function handleValueChange(range: { start: DateValue | undefined; end: DateValue | undefined } | undefined) {
@@ -72,7 +73,7 @@
 <Popover.Root bind:open>
 	<Popover.Trigger>
 		{#snippet child({ props })}
-			<Button {...props} variant="outline" size="sm" aria-label={i18n.t('insights.date_range')} class="min-w-[220px] justify-start font-normal">
+			<Button {...props} variant="outline" size="sm" aria-label={m['insights.date_range']()} class="min-w-[220px] justify-start font-normal">
 				<CalendarRange data-icon="inline-start" />
 				<span class="truncate">{displayText}</span>
 			</Button>
@@ -80,13 +81,13 @@
 	</Popover.Trigger>
 	<Popover.Content align="start" class="w-auto p-0">
 		<div class="flex items-center gap-1 border-b border-[var(--app-border)] p-2">
-			<Button variant="ghost" size="xs" onclick={() => applyPreset(30)}>{i18n.t('insights.days_30')}</Button>
-			<Button variant="ghost" size="xs" onclick={() => applyPreset(90)}>{i18n.t('insights.days_90')}</Button>
-			<Button variant="ghost" size="xs" onclick={() => applyPreset(180)}>{i18n.t('insights.months_6')}</Button>
+			<Button variant="ghost" size="xs" onclick={() => applyPreset(30)}>{m['insights.days_30']()}</Button>
+			<Button variant="ghost" size="xs" onclick={() => applyPreset(90)}>{m['insights.days_90']()}</Button>
+			<Button variant="ghost" size="xs" onclick={() => applyPreset(180)}>{m['insights.months_6']()}</Button>
 			{#if allowClear && (startDate || endDate)}
 				<Button variant="ghost" size="xs" class="ml-auto" onclick={() => { onchange('', ''); open = false; }}>
 					<X data-icon="inline-start" />
-					{i18n.t('insights.clear')}
+					{m['insights.clear']()}
 				</Button>
 			{/if}
 		</div>

@@ -21,7 +21,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Popover from '$lib/components/ui/popover';
 	import { appToast } from '$lib/features/toast/toast';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { formatRelativeTime } from '$lib/utils/format';
 	import { CheckCircle2, Play, Clock, Trash2, MoreHorizontal, Search, Plus, SquareUser, RefreshCcwDot, ChevronRight } from 'lucide-svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
@@ -78,7 +79,7 @@
 			// Load issues for this cycle using server-side cycle filter
 			issuesState.load(slug, { cycle: cycleId, per_page: '200' });
 		} catch {
-			appToast.error(i18n.t('cycles.toast.not_found'));
+			appToast.error(m['cycles.toast.not_found']());
 			goto(`/${slug}/teams/${teamId}/cycles`);
 		} finally {
 			loading = false;
@@ -122,10 +123,10 @@
 				carry_over: data.carry_over
 			});
 			cycle = result.cycle;
-			appToast.success(i18n.t('cycles.toast.completed'));
+			appToast.success(m['cycles.toast.completed']());
 			issuesState.load(slug, { cycle: cycleId, per_page: '200' });
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('cycles.toast.failed_complete'));
+			appToast.apiError(err, m['cycles.toast.failed_complete']());
 		}
 	}
 
@@ -133,9 +134,9 @@
 		if (!cycle) return;
 		try {
 			cycle = await updateCycle(slug, teamId, cycle.id, { status: 'active' });
-			appToast.success(i18n.t('cycles.toast.activated'));
+			appToast.success(m['cycles.toast.activated']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('cycles.toast.failed_activate'));
+			appToast.apiError(err, m['cycles.toast.failed_activate']());
 		}
 	}
 
@@ -143,10 +144,10 @@
 		if (!cycle) return;
 		try {
 			await deleteCycle(slug, teamId, cycle.id);
-			appToast.success(i18n.t('cycles.toast.deleted'));
+			appToast.success(m['cycles.toast.deleted']());
 			goto(`/${slug}/teams/${teamId}/cycles`);
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('cycles.toast.failed_delete'));
+			appToast.apiError(err, m['cycles.toast.failed_delete']());
 		}
 	}
 
@@ -154,9 +155,9 @@
 		if (!cycle) return;
 		try {
 			cycle = await updateCycle(slug, teamId, cycle.id, { start_date: start, end_date: end });
-			appToast.success(i18n.t('cycles.toast.dates_updated'));
+			appToast.success(m['cycles.toast.dates_updated']());
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('cycles.toast.failed_update_dates'));
+			appToast.apiError(err, m['cycles.toast.failed_update_dates']());
 		}
 	}
 
@@ -166,9 +167,9 @@
 			// Reload to reflect change
 			issuesState.load(slug, { cycle: cycleId, per_page: '200' });
 			addSearchQuery = '';
-			appToast.success(i18n.t('cycles.toast.added_issue', { identifier: issue.identifier }));
+			appToast.success(m['cycles.toast.added_issue']({ identifier: issue.identifier }));
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('cycles.toast.failed_add_issue'));
+			appToast.apiError(err, m['cycles.toast.failed_add_issue']());
 		}
 	}
 
@@ -204,7 +205,7 @@
 						<ChevronRight size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
 						<a href="/{slug}/teams/{teamId}/cycles" class="flex items-center gap-1.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
 							<RefreshCcwDot size={14} class="shrink-0" />
-							<span class="hidden sm:inline">{i18n.t('cycles.title')}</span>
+							<span class="hidden sm:inline">{m['cycles.title']()}</span>
 						</a>
 						<ChevronRight size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
 					{/if}
@@ -218,13 +219,13 @@
 				{#if cycle.status === 'upcoming'}
 					<Button size="sm" onclick={handleActivate}>
 						<Play size={14} class="mr-1" />
-						{i18n.t('cycles.start_cycle')}
+						{m['cycles.start_cycle']()}
 					</Button>
 				{/if}
 				{#if cycle.status === 'active'}
 					<Button size="sm" onclick={handleComplete}>
 						<CheckCircle2 size={14} class="mr-1" />
-						{i18n.t('cycles.complete')}
+						{m['cycles.complete']()}
 					</Button>
 				{/if}
 				<Popover.Root bind:open={actionsOpen}>
@@ -239,7 +240,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-hover)]"
 						>
 							<Trash2 size={14} />
-							{i18n.t('cycles.delete_cycle')}
+							{m['cycles.delete_cycle']()}
 						</button>
 					</Popover.Content>
 				</Popover.Root>
@@ -254,17 +255,17 @@
 						startDate={cycle.start_date}
 						endDate={cycle.end_date}
 						onchange={handleDateRangeChange}
-						placeholder={i18n.t('cycles.select_dates')}
+						placeholder={m['cycles.select_dates']()}
 					/>
 				</div>
 				{#if cycle.progress}
 					<div class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
-						<span>{i18n.t('cycles.issues_done', { completed: cycle.progress.completed, total: cycle.progress.total })}</span>
+						<span>{m['cycles.issues_done']({ completed: cycle.progress.completed, total: cycle.progress.total })}</span>
 					</div>
 				{/if}
 				{#if cycle.completed_at}
 					<div class="text-xs text-[var(--color-text-tertiary)]">
-						Completed {formatRelativeTime(cycle.completed_at, i18n.dateLocale)}
+						Completed {formatRelativeTime(cycle.completed_at, getLocale())}
 					</div>
 				{/if}
 			</div>
@@ -273,13 +274,13 @@
 			{/if}
 			{#if cycle.goals}
 				<div class="mt-2">
-					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{i18n.t('cycles.goals')}</span>
+					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{m['cycles.goals']()}</span>
 					<p class="mt-0.5 text-sm text-[var(--color-text-secondary)]">{cycle.goals}</p>
 				</div>
 			{/if}
 			{#if cycle.retrospective}
 				<div class="mt-2">
-					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{i18n.t('cycles.retrospective')}</span>
+					<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{m['cycles.retrospective']()}</span>
 					<p class="mt-0.5 text-sm text-[var(--color-text-secondary)]">{cycle.retrospective}</p>
 				</div>
 			{/if}
@@ -301,7 +302,7 @@
 						oninput={() => searchAvailableIssues()}
 						onfocus={() => (addSearchOpen = true)}
 						onblur={() => setTimeout(() => (addSearchOpen = false), 200)}
-						placeholder={i18n.t('cycles.search_issues_placeholder')}
+						placeholder={m['cycles.search_issues_placeholder']()}
 						class="w-full bg-transparent text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
 					/>
 				</div>
@@ -326,8 +327,8 @@
 		<div class="flex-1 overflow-y-auto">
 			{#if !issuesState.loading && issuesState.issues.length === 0}
 				<EmptyState
-					title={i18n.t('cycles.no_issues')}
-					description={i18n.t('cycles.no_issues_desc')}
+					title={m['cycles.no_issues']()}
+					description={m['cycles.no_issues_desc']()}
 				/>
 			{:else}
 				{#each issuesState.issues as issue (issue.id)}

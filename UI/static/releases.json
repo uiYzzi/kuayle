@@ -1,5 +1,27 @@
 [
   {
+    "tag_name": "v0.1.14",
+    "html_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.14",
+    "body": "## What's Changed\r\n* fix(workspace): accept hyphenated slugs when creating the first workspace by @manelpb in https://github.com/carbogninalberto/kuayle/pull/48\r\n\r\n## New Contributors\r\n* @manelpb made their first contribution in https://github.com/carbogninalberto/kuayle/pull/48\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.13...v0.1.14",
+    "published_at": "2026-07-29T21:59:50Z",
+    "prerelease": false,
+    "force_upgrade": false,
+    "minimum_supported_version": null,
+    "upgrade_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.14",
+    "upgrade_message": null
+  },
+  {
+    "tag_name": "v0.1.13",
+    "html_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.13",
+    "body": "## What's Changed\r\n* Alberto/kua 50 implementing dev machines & agents runs by @carbogninalberto in https://github.com/carbogninalberto/kuayle/pull/46\r\n\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.12...v0.1.13",
+    "published_at": "2026-07-29T20:15:10Z",
+    "prerelease": false,
+    "force_upgrade": false,
+    "minimum_supported_version": null,
+    "upgrade_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.13",
+    "upgrade_message": null
+  },
+  {
     "tag_name": "v0.1.12",
     "html_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.12",
     "body": "## What's Changed\r\n* fix(issues): replace IntersectionObserver with scroll-based load more by @carbogninalberto in https://github.com/carbogninalberto/kuayle/pull/45\r\n\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.11...v0.1.12",
@@ -24,7 +46,7 @@
   {
     "tag_name": "v0.1.10",
     "html_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.10",
-    "body": "## What's Changed\r\n* fix(issues): prevent loading state flicker on WebSocket updates by @carbogninalberto in https://github.com/carbogninalberto/kuayle/pull/42\r\n* feat(analytics): add workspace/team overviews, burn-up, and configurable issue insights by @carbogninalberto in https://github.com/carbogninalberto/kuayle/pull/43\r\n\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.9...v0.1.10",
+    "body": "## What's Changed\r\n* fix(issues): prevent loading state flicker on WebSocket updates by @carbogninalberto in https://github.com/carbogninalberto/kuayle/pull/42\r\n* Alberto/kua 48 addanalytics wire backend with frontend for analyt by @carbogninalberto in https://github.com/carbogninalberto/kuayle/pull/43\r\n\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.9...v0.1.10",
     "published_at": "2026-07-13T06:12:21Z",
     "prerelease": false,
     "force_upgrade": false,

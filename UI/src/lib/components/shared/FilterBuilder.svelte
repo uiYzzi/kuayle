@@ -14,7 +14,8 @@
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
 	import IssuePriorityIcon from '$lib/features/issues/IssuePriorityIcon.svelte';
 	import { Plus, X, Search, CircleDashed, Signal, User, FolderKanban, Tag, CornerDownRight } from 'lucide-svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		filters = $bindable<ViewFilter>({}),
@@ -68,19 +69,19 @@
 
 	// Which filter types are available to add
 	const FILTER_OPTIONS = $derived([
-		{ key: 'status', label: i18n.t('sharedComponents.filter_builder.status'), icon: CircleDashed },
-		{ key: 'priority', label: i18n.t('sharedComponents.filter_builder.priority'), icon: Signal },
-		{ key: 'assignee', label: i18n.t('sharedComponents.filter_builder.assignee'), icon: User },
-		{ key: 'project', label: i18n.t('sharedComponents.filter_builder.project'), icon: FolderKanban },
-		{ key: 'label', label: i18n.t('sharedComponents.filter_builder.label'), icon: Tag },
-		{ key: 'sub_issues', label: i18n.t('sharedComponents.filter_builder.sub_issues'), icon: CornerDownRight }
+		{ key: 'status', label: m['sharedComponents.filter_builder.status'](), icon: CircleDashed },
+		{ key: 'priority', label: m['sharedComponents.filter_builder.priority'](), icon: Signal },
+		{ key: 'assignee', label: m['sharedComponents.filter_builder.assignee'](), icon: User },
+		{ key: 'project', label: m['sharedComponents.filter_builder.project'](), icon: FolderKanban },
+		{ key: 'label', label: m['sharedComponents.filter_builder.label'](), icon: Tag },
+		{ key: 'sub_issues', label: m['sharedComponents.filter_builder.sub_issues'](), icon: CornerDownRight }
 	]);
 
 	const SUB_ISSUE_FILTERS = $derived([
-		{ value: 'include', label: i18n.t('sharedComponents.filter_builder.show_all_issues') },
-		{ value: 'exclude', label: i18n.t('sharedComponents.filter_builder.hide_sub_issues') },
-		{ value: 'only', label: i18n.t('sharedComponents.filter_builder.only_sub_issues') },
-		{ value: 'has_sub_issues', label: i18n.t('sharedComponents.filter_builder.has_sub_issues') }
+		{ value: 'include', label: m['sharedComponents.filter_builder.show_all_issues']() },
+		{ value: 'exclude', label: m['sharedComponents.filter_builder.hide_sub_issues']() },
+		{ value: 'only', label: m['sharedComponents.filter_builder.only_sub_issues']() },
+		{ value: 'has_sub_issues', label: m['sharedComponents.filter_builder.has_sub_issues']() }
 	]);
 
 	let availableFilters = $derived(FILTER_OPTIONS.filter((f) => !visibleFilters.has(f.key)));
@@ -188,44 +189,44 @@
 	// Display labels for active chips
 	function getStatusChipLabel(): string {
 		const vals = getStatusValues();
-		if (vals.length === 0) return i18n.t('sharedComponents.filter_builder.status');
+		if (vals.length === 0) return m['sharedComponents.filter_builder.status']();
 		if (vals.length === 1) {
 			const ts = getStatusByValue(vals[0]);
 			return ts ? ts.name : (getStatusLabel(vals[0] as IssueStatus) ?? vals[0]);
 		}
-		return i18n.t('sharedComponents.filter_builder.statuses_count', { count: vals.length });
+		return m['sharedComponents.filter_builder.statuses_count']({ count: vals.length });
 	}
 
 	function getPriorityChipLabel(): string {
 		const vals = getPriorityValues();
-		if (vals.length === 0) return i18n.t('sharedComponents.filter_builder.priority');
+		if (vals.length === 0) return m['sharedComponents.filter_builder.priority']();
 		if (vals.length === 1) return getPriorityLabel(Number(vals[0]) as IssuePriority) ?? vals[0];
-		return i18n.t('sharedComponents.filter_builder.priorities_count', { count: vals.length });
+		return m['sharedComponents.filter_builder.priorities_count']({ count: vals.length });
 	}
 
 	function getAssigneeChipLabel(): string {
-		if (!filters.assignee) return i18n.t('sharedComponents.filter_builder.assignee');
-		if (filters.assignee === 'none') return i18n.t('sharedComponents.filter_builder.unassigned');
+		if (!filters.assignee) return m['sharedComponents.filter_builder.assignee']();
+		if (filters.assignee === 'none') return m['sharedComponents.filter_builder.unassigned']();
 		const m = members.find((m) => m.user_id === filters.assignee);
-		return m?.name || m?.email || i18n.t('sharedComponents.filter_builder.assignee');
+		return m?.name || m?.email || m['sharedComponents.filter_builder.assignee']();
 	}
 
 	function getProjectChipLabel(): string {
-		if (!filters.project) return i18n.t('sharedComponents.filter_builder.project');
-		if (filters.project === 'none') return i18n.t('sharedComponents.filter_builder.no_project');
+		if (!filters.project) return m['sharedComponents.filter_builder.project']();
+		if (filters.project === 'none') return m['sharedComponents.filter_builder.no_project']();
 		const p = projects.find((p) => p.id === filters.project);
-		return p?.name || i18n.t('sharedComponents.filter_builder.project');
+		return p?.name || m['sharedComponents.filter_builder.project']();
 	}
 
 	function getLabelChipLabel(): string {
-		if (!filters.label) return i18n.t('sharedComponents.filter_builder.label');
-		if (filters.label === 'none') return i18n.t('sharedComponents.filter_builder.no_label');
+		if (!filters.label) return m['sharedComponents.filter_builder.label']();
+		if (filters.label === 'none') return m['sharedComponents.filter_builder.no_label']();
 		const l = labels.find((l) => l.id === filters.label);
-		return l?.name || i18n.t('sharedComponents.filter_builder.label');
+		return l?.name || m['sharedComponents.filter_builder.label']();
 	}
 
 	function getSubIssuesChipLabel(): string {
-		return SUB_ISSUE_FILTERS.find((option) => option.value === filters.sub_issues)?.label ?? i18n.t('sharedComponents.filter_builder.sub_issues');
+		return SUB_ISSUE_FILTERS.find((option) => option.value === filters.sub_issues)?.label ?? m['sharedComponents.filter_builder.sub_issues']();
 	}
 
 	function getChipLabel(key: string): string {
@@ -241,13 +242,13 @@
 			case 'label':
 				return getLabelChipLabel();
 			case 'status_type':
-				return i18n.t('sharedComponents.filter_builder.status_type', { type: filters.status_type ?? '' });
+				return m['sharedComponents.filter_builder.status_type']({ type: filters.status_type ?? '' });
 			case 'cycle':
-				return filters.cycle === 'none' ? i18n.t('sharedComponents.filter_builder.no_cycle') : i18n.t('sharedComponents.filter_builder.cycle');
+				return filters.cycle === 'none' ? m['sharedComponents.filter_builder.no_cycle']() : m['sharedComponents.filter_builder.cycle']();
 			case 'team':
-				return i18n.t('sharedComponents.filter_builder.team');
+				return m['sharedComponents.filter_builder.team']();
 			case 'creator':
-				return i18n.t('sharedComponents.filter_builder.creator');
+				return m['sharedComponents.filter_builder.creator']();
 			case 'sub_issues':
 				return getSubIssuesChipLabel();
 			default:
@@ -274,7 +275,7 @@
 				type="text"
 				value={searchValue}
 				oninput={handleSearchInput}
-				placeholder={i18n.t('sharedComponents.filter_builder.search_placeholder')}
+				placeholder={m['sharedComponents.filter_builder.search_placeholder']()}
 				class="h-8 w-[min(58vw,14rem)] rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] pl-7 pr-2 text-xs text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--app-accent)] sm:h-7 sm:w-40"
 			/>
 		</div>
@@ -321,7 +322,7 @@
 				{/each}
 			{:else if key === 'assignee'}
 				<div class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-tertiary)]">
-					{i18n.t('sharedComponents.filter_builder.unassigned')}
+					{m['sharedComponents.filter_builder.unassigned']()}
 				</div>
 				{#each members as member}
 					{@const selected = filters.assignee === member.user_id}
@@ -332,7 +333,7 @@
 				{/each}
 			{:else if key === 'project'}
 				<div class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-tertiary)]">
-					{i18n.t('sharedComponents.filter_builder.no_project')}
+					{m['sharedComponents.filter_builder.no_project']()}
 				</div>
 				{#each projects as project}
 					{@const selected = filters.project === project.id}
@@ -350,7 +351,7 @@
 					</div>
 				{/each}
 				{#if labels.length === 0}
-					<p class="px-2 py-3 text-center text-xs text-[var(--color-text-tertiary)]">{i18n.t('sharedComponents.filter_builder.no_labels')}</p>
+					<p class="px-2 py-3 text-center text-xs text-[var(--color-text-tertiary)]">{m['sharedComponents.filter_builder.no_labels']()}</p>
 				{/if}
 			{:else if key === 'sub_issues'}
 				{#each SUB_ISSUE_FILTERS as option}
@@ -401,7 +402,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<X size={12} />
-						{i18n.t('sharedComponents.filter_builder.remove_filter')}
+						{m['sharedComponents.filter_builder.remove_filter']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -432,7 +433,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<X size={12} />
-						{i18n.t('sharedComponents.filter_builder.remove_filter')}
+						{m['sharedComponents.filter_builder.remove_filter']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -454,7 +455,7 @@
 							? 'bg-[var(--color-bg-hover)]'
 							: ''}"
 					>
-					{i18n.t('sharedComponents.filter_builder.unassigned')}
+					{m['sharedComponents.filter_builder.unassigned']()}
 					</button>
 					{#each members as member}
 						<button
@@ -474,7 +475,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<X size={12} />
-						{i18n.t('sharedComponents.filter_builder.remove_filter')}
+						{m['sharedComponents.filter_builder.remove_filter']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -496,7 +497,7 @@
 							? 'bg-[var(--color-bg-hover)]'
 							: ''}"
 					>
-						{i18n.t('sharedComponents.filter_builder.no_project')}
+						{m['sharedComponents.filter_builder.no_project']()}
 					</button>
 					{#each projects as project}
 						<button
@@ -516,7 +517,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<X size={12} />
-						{i18n.t('sharedComponents.filter_builder.remove_filter')}
+						{m['sharedComponents.filter_builder.remove_filter']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -544,7 +545,7 @@
 						</button>
 					{/each}
 					{#if labels.length === 0}
-						<p class="px-2 py-3 text-center text-xs text-[var(--color-text-tertiary)]">{i18n.t('sharedComponents.filter_builder.no_labels')}</p>
+						<p class="px-2 py-3 text-center text-xs text-[var(--color-text-tertiary)]">{m['sharedComponents.filter_builder.no_labels']()}</p>
 					{/if}
 					<Separator class="my-1" />
 					<button
@@ -552,7 +553,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<X size={12} />
-						{i18n.t('sharedComponents.filter_builder.remove_filter')}
+						{m['sharedComponents.filter_builder.remove_filter']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -585,7 +586,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<X size={12} />
-						{i18n.t('sharedComponents.filter_builder.remove_filter')}
+						{m['sharedComponents.filter_builder.remove_filter']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -593,7 +594,7 @@
 
 		{#each Array.from(visibleFilters).filter((key) => !FILTER_OPTIONS.some((option) => option.key === key)) as key}
 			{#if filters[key]}
-				<button class={chipClass(true)} onclick={() => removeFilter(key)} title="{i18n.t('sharedComponents.filter_builder.remove_filter')}">
+				<button class={chipClass(true)} onclick={() => removeFilter(key)} title="{m['sharedComponents.filter_builder.remove_filter']()}">
 					{getChipLabel(key)}
 					<X size={12} />
 				</button>
@@ -608,7 +609,7 @@
 						class="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)]"
 					>
 						<Plus size={14} />
-						{i18n.t('sharedComponents.filter_builder.filter')}
+						{m['sharedComponents.filter_builder.filter']()}
 					</button>
 				</Popover.Trigger>
 				<Popover.Content class="w-44 p-1" align="start">
@@ -634,7 +635,7 @@
 				onclick={clearAll}
 				class="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
 			>
-				{i18n.t('sharedComponents.filter_builder.clear_filters')}
+				{m['sharedComponents.filter_builder.clear_filters']()}
 			</button>
 		{/if}
 	{/if}

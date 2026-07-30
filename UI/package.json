@@ -1,7 +1,7 @@
 {
 	"name": "ui",
 	"private": true,
-	"version": "0.1.12",
+	"version": "0.1.14",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -45,6 +45,7 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@inlang/paraglide-js": "^2.23.0",
 		"@tiptap/core": "^3.20.4",
 		"@tiptap/extension-bubble-menu": "^3.20.4",
 		"@tiptap/extension-code-block-lowlight": "^3.20.4",

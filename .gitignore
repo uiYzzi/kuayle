@@ -31,3 +31,4 @@ coverage/
 # Editors
 .vscode/
 /.claude/settings.local.json
+test-results/

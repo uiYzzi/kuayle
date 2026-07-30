@@ -6,7 +6,8 @@
 	import IssueLabelChips from './IssueLabelChips.svelte';
 	import { formatRelativeTime, formatDate } from '$lib/utils/format';
 	import { CalendarDays } from 'lucide-svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		issue,
@@ -16,8 +17,8 @@
 		onclick: (issue: PublicIssue) => void;
 	} = $props();
 
-	const createdAtText = $derived(issue.created_at ? formatRelativeTime(issue.created_at, i18n.dateLocale) : '');
-	const createdAtTooltip = $derived(createdAtText ? `${createdAtText} • ${formatDate(issue.created_at, i18n.dateLocale)}` : '');
+	const createdAtText = $derived(issue.created_at ? formatRelativeTime(issue.created_at, getLocale()) : '');
+	const createdAtTooltip = $derived(createdAtText ? `${createdAtText} • ${formatDate(issue.created_at, getLocale())}` : '');
 </script>
 
 <button
@@ -54,7 +55,7 @@
 		{@const diffDays = Math.ceil((due.getTime() - now.getTime()) / 86400000)}
 		<span class="hidden shrink-0 items-center gap-1 rounded-full border border-[var(--app-border)] px-1.5 py-0 text-[11px] leading-5 sm:inline-flex">
 			<CalendarDays size={11} class={diffDays < 0 ? 'text-red-500' : diffDays === 0 ? 'text-orange-500' : diffDays <= 7 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} />
-			<span class="text-[var(--color-text-tertiary)]">{due.toLocaleDateString(i18n.dateLocale, { month: 'short', day: 'numeric' })}</span>
+			<span class="text-[var(--color-text-tertiary)]">{due.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })}</span>
 		</span>
 	{/if}
 

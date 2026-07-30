@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { AlertTriangle, ExternalLink, RefreshCw, ShieldCheck } from 'lucide-svelte';
-	import { i18n } from '$lib/i18n/index.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { getSystemUpdateStatus, startSystemUpdate, type SystemUpdateStatus } from '$lib/api/system';
@@ -55,9 +56,9 @@
 		releaseError = '';
 		try {
 			releases = await fetchReleases();
-			if (releases.length === 0) releaseError = i18n.t('settings.version.no_releases');
+			if (releases.length === 0) releaseError = m['settings.version.no_releases']();
 		} catch {
-			releaseError = i18n.t('settings.version.failed_load_releases');
+			releaseError = m['settings.version.failed_load_releases']();
 		} finally {
 			loadingReleases = false;
 		}
@@ -70,7 +71,7 @@
 			updateStatus = await getSystemUpdateStatus();
 		} catch (err: any) {
 			updateStatus = null;
-			appToast.apiError(err, i18n.t('settings.version.failed_updater_status'));
+			appToast.apiError(err, m['settings.version.failed_updater_status']());
 		} finally {
 			loadingStatus = false;
 		}
@@ -84,7 +85,7 @@
 			confirmOpen = false;
 			appToast.success(result.message);
 		} catch (err: any) {
-			appToast.apiError(err, i18n.t('settings.version.failed_start_update'));
+			appToast.apiError(err, m['settings.version.failed_start_update']());
 		} finally {
 			startingUpdate = false;
 		}
@@ -94,22 +95,22 @@
 <div class="mx-auto max-w-3xl px-8 py-10">
 	<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 		<div>
-			<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{i18n.t('settings.version.title')}</h1>
+			<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['settings.version.title']()}</h1>
 			<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">
-				{i18n.t('settings.version.desc')}
+				{m['settings.version.desc']()}
 			</p>
 		</div>
 		<Button variant="outline" onclick={loadReleases} disabled={loadingReleases}>
 			<RefreshCw size={14} class={loadingReleases ? 'animate-spin' : ''} />
-			{loadingReleases ? i18n.t('settings.version.checking') : i18n.t('settings.version.check_releases')}
+			{loadingReleases ? m['settings.version.checking']() : m['settings.version.check_releases']()}
 		</Button>
 	</div>
 
 	<div class="mt-8 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<div class="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.version.installed')}</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">{i18n.t('settings.version.installed_desc')}</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.version.installed']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.version.installed_desc']()}</p>
 			</div>
 			<div class="flex items-center gap-2">
 				<span class="rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-2 py-1 font-mono text-sm text-[var(--color-text-primary)]">
@@ -117,7 +118,7 @@
 				</span>
 				<Button variant="outline" size="sm" href={currentReleaseUrl} target="_blank" rel="noopener">
 					<ExternalLink size={13} />
-					{i18n.t('settings.version.release')}
+					{m['settings.version.release']()}
 				</Button>
 			</div>
 		</div>
@@ -126,22 +127,22 @@
 
 		<div class="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.version.latest')}</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.version.latest']()}</p>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
 					{#if loadingReleases}
-						{i18n.t('settings.version.checking_manifest')}
+						{m['settings.version.checking_manifest']()}
 					{:else if releaseError}
 						{releaseError}
 					{:else if releaseIsNewer}
-						{i18n.t('settings.version.newer_available')}
+						{m['settings.version.newer_available']()}
 					{:else}
-						{i18n.t('settings.version.up_to_date')}
+						{m['settings.version.up_to_date']()}
 					{/if}
 				</p>
 			</div>
 			<div class="flex items-center gap-2">
 				<span class="rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-2 py-1 font-mono text-sm text-[var(--color-text-primary)]">
-					{latestRelease?.tag_name ?? i18n.t('settings.unknown')}
+					{latestRelease?.tag_name ?? m['settings.unknown']()}
 				</span>
 				{#if latestRelease}
 					<Button variant="outline" size="sm" href={latestRelease.html_url} target="_blank" rel="noopener">
@@ -156,9 +157,9 @@
 	<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<div class="flex flex-col gap-3 border-b border-[var(--app-border)] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
-				<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.version.changelog')}</h2>
+				<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.version.changelog']()}</h2>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
-					{i18n.t('settings.version.changelog_desc')}
+					{m['settings.version.changelog_desc']()}
 				</p>
 			</div>
 			<button
@@ -166,19 +167,19 @@
 				class="w-fit rounded-md px-2 py-1 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 				onclick={() => (includePrerelease = !includePrerelease)}
 			>
-				{i18n.t('settings.version.pre_releases')}
+				{m['settings.version.pre_releases']()}
 			</button>
 		</div>
 		<div class="px-5 py-4">
 			{#if loadingReleases}
-				<p class="text-sm text-[var(--color-text-secondary)]">{i18n.t('settings.version.loading_changelog')}</p>
+				<p class="text-sm text-[var(--color-text-secondary)]">{m['settings.version.loading_changelog']()}</p>
 			{:else if changelogHtml}
 				<!-- eslint-disable svelte/no-at-html-tags -->
 				<div class="changelog-md text-sm leading-relaxed text-[var(--color-text-secondary)]">
 					{@html changelogHtml}
 				</div>
 			{:else}
-				<p class="text-sm text-[var(--color-text-secondary)]">{i18n.t('settings.version.no_release_notes')}</p>
+				<p class="text-sm text-[var(--color-text-secondary)]">{m['settings.version.no_release_notes']()}</p>
 			{/if}
 		</div>
 	</div>
@@ -188,22 +189,22 @@
 			{#if isSysadmin}
 				<ShieldCheck size={18} class="mt-0.5 shrink-0 text-[var(--app-accent-light)]" />
 				<div class="min-w-0 flex-1">
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.version.system_update')}</h2>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.version.system_update']()}</h2>
 					<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">
-						{i18n.t('settings.version.update_desc')}
+						{m['settings.version.update_desc']()}
 					</p>
 
 					<div class="mt-4 rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 text-xs text-[var(--color-text-secondary)]">
 						{#if loadingStatus}
-							{i18n.t('settings.version.checking_updater')}
+							{m['settings.version.checking_updater']()}
 						{:else if updateStatus?.enabled === false}
-							{updateStatus.message ?? i18n.t('settings.version.no_updater')}
+							{updateStatus.message ?? m['settings.version.no_updater']()}
 						{:else if updateStatus?.running}
-							{updateStatus.message ?? i18n.t('settings.version.update_running')}
+							{updateStatus.message ?? m['settings.version.update_running']()}
 						{:else if updateStatus}
-							{updateStatus.message ?? i18n.t('settings.version.updater_ready')}
+							{updateStatus.message ?? m['settings.version.updater_ready']()}
 						{:else}
-							{i18n.t('settings.version.updater_unavailable')}
+							{m['settings.version.updater_unavailable']()}
 						{/if}
 					</div>
 
@@ -214,18 +215,18 @@
 					{/if}
 
 					<div class="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
-						<Button variant="outline" onclick={loadUpdateStatus} disabled={loadingStatus}>{i18n.t('settings.version.check_updater')}</Button>
+						<Button variant="outline" onclick={loadUpdateStatus} disabled={loadingStatus}>{m['settings.version.check_updater']()}</Button>
 						<Button onclick={() => (confirmOpen = true)} disabled={!canStartUpdate}>
-							{startingUpdate ? i18n.t('settings.starting') : updateStatus?.running ? i18n.t('settings.version.update_running') : i18n.t('settings.version.run_update')}
+							{startingUpdate ? m['settings.starting']() : updateStatus?.running ? m['settings.version.update_running']() : m['settings.version.run_update']()}
 						</Button>
 					</div>
 				</div>
 			{:else}
 				<AlertTriangle size={18} class="mt-0.5 shrink-0 text-[var(--color-text-tertiary)]" />
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{i18n.t('settings.version.system_update')}</h2>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.version.system_update']()}</h2>
 					<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">
-						{i18n.t('settings.version.non_sysadmin')}
+						{m['settings.version.non_sysadmin']()}
 					</p>
 				</div>
 			{/if}
@@ -236,17 +237,17 @@
 <Dialog.Root bind:open={confirmOpen}>
 	<Dialog.Content class="sm:max-w-md border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<Dialog.Header>
-			<Dialog.Title>{i18n.t('settings.version.run_confirm')}</Dialog.Title>
+			<Dialog.Title>{m['settings.version.run_confirm']()}</Dialog.Title>
 			<Dialog.Description>
-					{i18n.t('settings.version.run_confirm_desc')}
+					{m['settings.version.run_confirm_desc']()}
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-2 font-mono text-xs text-[var(--color-text-secondary)]">
 			bash selfhosting/update.sh
 		</div>
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (confirmOpen = false)} disabled={startingUpdate}>{i18n.t('settings.cancel')}</Button>
-			<Button onclick={runUpdate} disabled={startingUpdate}>{startingUpdate ? i18n.t('settings.starting') : i18n.t('settings.version.start_update')}</Button>
+			<Button variant="outline" onclick={() => (confirmOpen = false)} disabled={startingUpdate}>{m['settings.cancel']()}</Button>
+			<Button onclick={runUpdate} disabled={startingUpdate}>{startingUpdate ? m['settings.starting']() : m['settings.version.start_update']()}</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
