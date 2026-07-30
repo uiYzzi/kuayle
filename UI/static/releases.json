@@ -1,5 +1,16 @@
 [
   {
+    "tag_name": "v0.1.15",
+    "html_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.15",
+    "body": "## What's Changed\r\n* feat(i18n): add internationalization with zh-CN/zh-TW support by @uiYzzi in https://github.com/carbogninalberto/kuayle/pull/50\r\n\r\n## New Contributors\r\n* @uiYzzi made their first contribution in https://github.com/carbogninalberto/kuayle/pull/50\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.14...v0.1.15",
+    "published_at": "2026-07-30T09:13:26Z",
+    "prerelease": false,
+    "force_upgrade": false,
+    "minimum_supported_version": null,
+    "upgrade_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.15",
+    "upgrade_message": null
+  },
+  {
     "tag_name": "v0.1.14",
     "html_url": "https://github.com/carbogninalberto/kuayle/releases/tag/v0.1.14",
     "body": "## What's Changed\r\n* fix(workspace): accept hyphenated slugs when creating the first workspace by @manelpb in https://github.com/carbogninalberto/kuayle/pull/48\r\n\r\n## New Contributors\r\n* @manelpb made their first contribution in https://github.com/carbogninalberto/kuayle/pull/48\r\n\r\n**Full Changelog**: https://github.com/carbogninalberto/kuayle/compare/v0.1.13...v0.1.14",
