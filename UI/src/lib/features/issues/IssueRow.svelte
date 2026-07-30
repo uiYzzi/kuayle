@@ -15,7 +15,7 @@
 	import * as HoverCard from '$lib/components/ui/hover-card';
 	import * as Popover from '$lib/components/ui/popover';
 	import { issuesState } from './issues.state.svelte';
-	import { formatRelativeTime, formatDate } from '$lib/utils/format';
+	import { formatDate, formatIssueListDate, formatIssueListRelativeTime } from '$lib/utils/format';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import { Ban, CalendarDays, CircleUser, Copy, Link, OctagonAlert, RefreshCw } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
@@ -56,7 +56,7 @@
 	const blockedByCount = $derived(issue.relation_counts?.blocked_by ?? 0);
 	const blockingCount = $derived(issue.relation_counts?.blocking ?? 0);
 	const duplicateCount = $derived(issue.relation_counts?.duplicate ?? 0);
-	const createdAtText = $derived(issue.created_at ? formatRelativeTime(issue.created_at, getLocale()) : '');
+	const createdAtText = $derived(issue.created_at ? formatIssueListRelativeTime(issue.created_at, getLocale()) : '');
 	const createdAtTooltip = $derived(createdAtText ? `${createdAtText} • ${formatDate(issue.created_at, getLocale())}` : '');
 	const relatedIssues = $derived(issue.relation_summary?.related ?? []);
 	const blockedByIssues = $derived(issue.relation_summary?.blocked_by ?? []);
@@ -317,7 +317,7 @@
 			{@const diffDays = Math.ceil((due.getTime() - now.getTime()) / 86400000)}
 			<span class="group/due hidden shrink-0 items-center gap-1 rounded-full border border-[var(--app-border)] px-1.5 py-0 text-[11px] leading-5 sm:inline-flex hover:border-[var(--app-border-hover)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
 				<CalendarDays size={11} class={diffDays < 0 ? 'text-red-500' : diffDays === 0 ? 'text-orange-500' : diffDays <= 7 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} />
-				<span class="text-[var(--color-text-tertiary)] group-hover/due:text-[var(--color-text-primary)] transition-colors">{due.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })}</span>
+				<span class="text-[var(--color-text-tertiary)] group-hover/due:text-[var(--color-text-primary)] transition-colors">{formatIssueListDate(issue.due_date, getLocale())}</span>
 			</span>
 		{/if}
 
