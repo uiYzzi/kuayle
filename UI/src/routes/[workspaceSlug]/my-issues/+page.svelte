@@ -26,6 +26,8 @@
 	import { CircleUser, PenLine } from 'lucide-svelte';
 	import { createKeyboardHandler } from '$lib/utils/keyboard';
 	import BulkActionBar from '$lib/features/issues/BulkActionBar.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 
@@ -164,7 +166,7 @@
 	<div class="flex h-[49px] items-center justify-between border-b border-[var(--app-border)] px-6">
 		<div class="flex items-center gap-2">
 			<SidebarToggle />
-			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">My Issues</h1>
+			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">{m['my_issues.title']()}</h1>
 		</div>
 		<ViewSwitcher bind:layout onchange={handleLayoutChange} />
 	</div>
@@ -177,14 +179,14 @@
 				class="flex-none h-auto rounded-full border border-[var(--app-border)] px-2.5 py-1 text-xs text-[var(--color-text-tertiary)] shadow-none data-[state=active]:border-[var(--app-accent)]/30 data-[state=active]:bg-[var(--app-accent)]/10 data-[state=active]:text-[var(--app-accent-light)] data-[state=active]:shadow-none"
 			>
 				<CircleUser size={13} class="mr-1" />
-				Assigned to me
+				{m['my_issues.tab.assigned']()}
 			</Tabs.Trigger>
 			<Tabs.Trigger
 				value="created"
 				class="flex-none h-auto rounded-full border border-[var(--app-border)] px-2.5 py-1 text-xs text-[var(--color-text-tertiary)] shadow-none data-[state=active]:border-[var(--app-accent)]/30 data-[state=active]:bg-[var(--app-accent)]/10 data-[state=active]:text-[var(--app-accent-light)] data-[state=active]:shadow-none"
 			>
 				<PenLine size={13} class="mr-1" />
-				Created by me
+				{m['my_issues.tab.created']()}
 			</Tabs.Trigger>
 		</Tabs.List>
 	</Tabs.Root>
@@ -197,10 +199,10 @@
 		<div class="flex-1 overflow-y-auto">
 			{#if !issuesState.loading && issuesState.issues.length === 0}
 				<EmptyState
-					title={activeTab === 'assigned' ? 'No issues assigned to you' : 'No issues created by you'}
+					title={activeTab === 'assigned' ? m['my_issues.empty.assigned.title']() : m['my_issues.empty.created.title']()}
 					description={activeTab === 'assigned'
-						? 'Issues assigned to you will appear here'
-						: 'Issues you created will appear here'}
+						? m['my_issues.empty.assigned.description']()
+						: m['my_issues.empty.created.description']()}
 				/>
 			{:else if issuesState.groupBy}
 				{#each issuesState.groupedIssues as group (group.key)}

@@ -2,6 +2,8 @@
 	import { ChevronDown, ChevronUp, SquareTerminal, X } from 'lucide-svelte';
 	import { useTerminalDock } from './terminal-dock-context.svelte';
 	import TerminalSession from './TerminalSession.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const dock = useTerminalDock();
 
@@ -65,7 +67,7 @@
 			<button
 				type="button"
 				class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 hover:bg-[var(--color-bg-hover)] hover:text-zinc-200"
-				aria-label={dock.expanded ? 'Collapse terminal dock' : 'Expand terminal dock'}
+				aria-label={dock.expanded ? m['machines.collapse_dock']() : m['machines.expand_dock']()}
 				onclick={() => dock.toggle()}
 			>
 				{#if dock.expanded}
@@ -74,7 +76,7 @@
 					<ChevronUp class="size-3.5" />
 				{/if}
 			</button>
-			<div class="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto px-1" role="tablist" aria-label="Terminal sessions">
+			<div class="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto px-1" role="tablist" aria-label={m['machines.terminal_sessions']()}>
 				{#each dock.tabs as t (t.id)}
 					<div class="flex min-w-0 max-w-[200px] shrink-0 items-center gap-1 rounded-t border border-b-0 px-2.5 py-1 text-xs transition-colors {dock.activeTabId === t.id ? 'border-[var(--app-border)] border-b-transparent bg-zinc-950 text-zinc-200' : 'border-transparent text-zinc-500'}">
 						<button
@@ -90,7 +92,7 @@
 						<button
 							type="button"
 							class="ml-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-zinc-500 hover:bg-red-500/10 hover:text-red-400"
-							aria-label="Close tab: {t.runtimeTitle ?? t.sessionName ?? t.machineName}"
+							aria-label={m['machines.close_tab']({ name: t.runtimeTitle ?? t.sessionName ?? t.machineName })}
 							data-testid="close-tab"
 							onclick={(e) => handleCloseTab(t.id, e)}
 						>
@@ -104,7 +106,7 @@
 					<button
 						type="button"
 						class="flex h-6 w-6 items-center justify-center rounded text-zinc-500 hover:bg-red-500/10 hover:text-red-400"
-						aria-label="Close all terminal tabs"
+						aria-label={m['machines.close_all_tabs']()}
 						data-testid="close-all-tabs"
 						onclick={handleCloseAll}
 					>
@@ -118,7 +120,7 @@
 			<div
 				class="h-1 cursor-ns-resize bg-zinc-800 hover:bg-zinc-600 active:bg-zinc-500"
 				role="separator"
-				aria-label="Resize terminal dock"
+				aria-label={m['machines.resize_dock']()}
 				aria-orientation="horizontal"
 				data-testid="terminal-resize-handle"
 				onpointerdown={onPointerDown}

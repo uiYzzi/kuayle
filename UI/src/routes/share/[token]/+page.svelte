@@ -6,7 +6,7 @@
 	import type { PaginatedResponse } from '$lib/types/common';
 	import type { ViewFilter, ViewLayout } from '$lib/types/view';
 	import type { IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel, getPriorityLabels } from '$lib/types/issue';
 	import PublicIssueRow from '$lib/features/issues/PublicIssueRow.svelte';
 	import PublicIssueDetail from '$lib/features/issues/PublicIssueDetail.svelte';
 	import PublicKanbanBoard from '$lib/features/issues/PublicKanbanBoard.svelte';
@@ -263,14 +263,14 @@
 					{#if getPriorityValues().length === 0}
 						Priority
 					{:else if getPriorityValues().length === 1}
-						{PRIORITY_LABELS[Number(getPriorityValues()[0]) as IssuePriority]}
+						{getPriorityLabel(Number(getPriorityValues()[0]) as IssuePriority)}
 					{:else}
 						{getPriorityValues().length} priorities
 					{/if}
 				</button>
 			</Popover.Trigger>
 			<Popover.Content class="w-44 p-1" align="start">
-				{#each Object.entries(PRIORITY_LABELS) as [value, label]}
+				{#each Object.entries(getPriorityLabels()) as [value, label]}
 					<button
 						onclick={() => togglePriority(value)}
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"

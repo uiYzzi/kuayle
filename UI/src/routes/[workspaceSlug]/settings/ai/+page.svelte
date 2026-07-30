@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Button } from '$lib/components/ui/button';
 	import * as Select from '$lib/components/ui/select';
 	import { getAISettings, updateAISettings } from '$lib/api/ai-settings';
@@ -27,7 +29,7 @@
 			prompt = settings.description_expand_prompt;
 			issueCopyPrompt = settings.issue_copy_prompt;
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to load AI settings');
+			appToast.apiError(err, m['settings.ai.failed_load']());
 		}
 	});
 
@@ -49,9 +51,9 @@
 			prompt = settings.description_expand_prompt;
 			issueCopyPrompt = settings.issue_copy_prompt;
 			apiKey = '';
-			appToast.success('AI settings updated');
+			appToast.success(m['settings.ai.updated']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update AI settings');
+			appToast.apiError(err, m['settings.ai.failed_update']());
 		} finally {
 			saving = false;
 		}
@@ -67,20 +69,20 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">AI</h1>
-	<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">Configure a workspace AI provider for issue description expansion.</p>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['settings.ai.title']()}</h1>
+	<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">{m['settings.ai.desc']()}</p>
 
 	{#if settings}
 		<div class="mt-8 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Provider</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Any OpenAI-compatible API, including DeepSeek.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.provider']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.provider_desc']()}</p>
 				</div>
 				<Select.Root type="single" value={provider} onValueChange={(v) => v && (provider = v)}>
-					<Select.Trigger size="sm" class="w-[190px]">OpenAI-compatible</Select.Trigger>
+					<Select.Trigger size="sm" class="w-[190px]">{m['settings.ai.provider_label']()}</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="openai_compatible">OpenAI-compatible</Select.Item>
+						<Select.Item value="openai_compatible">{m['settings.ai.provider_label']()}</Select.Item>
 					</Select.Content>
 				</Select.Root>
 			</div>
@@ -89,13 +91,13 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Base URL</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Example: https://api.deepseek.com/v1</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.base_url']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.base_url_example']()}</p>
 				</div>
 				<input
 					type="url"
 					bind:value={baseUrl}
-					placeholder="https://api.deepseek.com/v1"
+					placeholder={m['settings.ai.base_url_placeholder']()}
 					class="w-[300px] rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
@@ -104,13 +106,13 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Model</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">The chat model used for description expansion.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.model']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.model_desc']()}</p>
 				</div>
 				<input
 					type="text"
 					bind:value={model}
-					placeholder="deepseek-chat"
+					placeholder={m['settings.ai.model_placeholder']()}
 					class="w-[240px] rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
@@ -119,15 +121,15 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">API key</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.api_key']()}</p>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						{settings.has_api_key ? 'A key is configured. Enter a new one to replace it.' : 'No API key configured yet.'}
+						{settings.has_api_key ? m['settings.ai.key_configured']() : m['settings.ai.key_not_configured']()}
 					</p>
 				</div>
 				<input
 					type="password"
 					bind:value={apiKey}
-					placeholder={settings.has_api_key ? 'Configured' : 'sk-...'}
+					placeholder={settings.has_api_key ? m['settings.ai.key_configured_placeholder']() : m['settings.ai.key_placeholder']()}
 					class="w-[240px] rounded-md border border-[var(--app-border)] bg-[var(--color-bg)] px-3 py-1.5 text-sm text-[var(--color-text-primary)] outline-none focus:border-[var(--app-accent)]"
 				/>
 			</div>
@@ -136,10 +138,10 @@
 		<div class="mt-8">
 			<div class="flex items-center justify-between gap-4">
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">Description expansion prompt</h2>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Customize how issue descriptions are generated or rewritten.</p>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.desc_prompt']()}</h2>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.ai.desc_prompt_desc']()}</p>
 				</div>
-				<Button variant="outline" size="sm" onclick={resetPrompt}>Reset</Button>
+				<Button variant="outline" size="sm" onclick={resetPrompt}>{m['settings.ai.reset']()}</Button>
 			</div>
 			<textarea
 				bind:value={prompt}
@@ -151,12 +153,12 @@
 		<div class="mt-8">
 			<div class="flex items-center justify-between gap-4">
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">Issue copy prompt</h2>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.ai.copy_prompt']()}</h2>
 					<p class="text-xs text-[var(--color-text-tertiary)]">
-						Template used by the issue AI prompt copy button. Use placeholders like {'{{issue_identifier}}'}, {'{{team_key}}'}, and {'{{issue_xml}}'}.
+						{m['settings.ai.copy_prompt_desc']({ title: '{title}', description: '{description}', identifier: '{identifier}' })}
 					</p>
 				</div>
-				<Button variant="outline" size="sm" onclick={resetIssueCopyPrompt}>Reset</Button>
+				<Button variant="outline" size="sm" onclick={resetIssueCopyPrompt}>{m['settings.ai.reset']()}</Button>
 			</div>
 			<textarea
 				bind:value={issueCopyPrompt}
@@ -166,7 +168,7 @@
 		</div>
 
 		<div class="mt-4 flex justify-end">
-			<Button onclick={saveSettings} disabled={saving}>{saving ? 'Saving...' : 'Save AI settings'}</Button>
+			<Button onclick={saveSettings} disabled={saving}>{saving ? m['settings.saving']() : m['settings.ai.save_settings']()}</Button>
 		</div>
 	{:else}
 		<div class="mt-8 flex justify-center py-8">

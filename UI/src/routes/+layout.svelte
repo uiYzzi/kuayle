@@ -4,6 +4,8 @@
 	import { onMount } from 'svelte';
 	import ReleaseNotice from '$lib/components/shared/ReleaseNotice.svelte';
 	import { preferencesState } from '$lib/features/preferences/preferences.state.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let { children } = $props();
 

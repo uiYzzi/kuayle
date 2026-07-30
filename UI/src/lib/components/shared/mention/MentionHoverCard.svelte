@@ -4,6 +4,8 @@
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import Avatar from '$lib/components/shared/Avatar.svelte';
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		anchor,
@@ -23,6 +25,7 @@
 	let left = $state(0);
 	let top = $state(0);
 	const displayName = $derived(member?.name || member?.email || label);
+	const dynamicMessage = m as unknown as Record<string, () => string>;
 
 	onMount(() => {
 		left = anchor.left;
@@ -57,7 +60,7 @@
 				<div class="truncate font-medium">{displayName}</div>
 				{#if member}
 					<div class="truncate text-xs text-[var(--color-text-tertiary)]">{member.email}</div>
-					<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{member.role}</div>
+					<div class="mt-0.5 text-[11px] capitalize text-[var(--color-text-tertiary)]">{dynamicMessage['common.role.' + member.role]()}</div>
 				{/if}
 			</div>
 		</div>

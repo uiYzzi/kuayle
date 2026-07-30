@@ -1,3 +1,6 @@
+import { m } from '$lib/paraglide/messages.js';
+import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
+
 import type { Label } from './label';
 import type { User } from './auth';
 
@@ -167,19 +170,46 @@ export interface Comment {
 
 export const STATUS_ORDER: IssueStatus[] = ['in_progress', 'in_review', 'todo', 'backlog', 'done', 'cancelled'];
 
-export const STATUS_LABELS: Record<IssueStatus, string> = {
-	backlog: 'Backlog',
-	todo: 'Todo',
-	in_progress: 'In Progress',
-	in_review: 'In Review',
-	done: 'Done',
-	cancelled: 'Cancelled'
-};
+export function getStatusLabel(status: IssueStatus): string {
+	const labels: Record<IssueStatus, string> = {
+		backlog: m['common.status.backlog'](),
+		todo: m['common.status.todo'](),
+		in_progress: m['common.status.in_progress'](),
+		in_review: m['common.status.in_review'](),
+		done: m['common.status.done'](),
+		cancelled: m['common.status.cancelled']()
+	};
+	return labels[status];
+}
 
-export const PRIORITY_LABELS: Record<IssuePriority, string> = {
-	0: 'No priority',
-	1: 'Urgent',
-	2: 'High',
-	3: 'Medium',
-	4: 'Low'
-};
+export function getStatusLabels(): Record<IssueStatus, string> {
+	return {
+		backlog: m['common.status.backlog'](),
+		todo: m['common.status.todo'](),
+		in_progress: m['common.status.in_progress'](),
+		in_review: m['common.status.in_review'](),
+		done: m['common.status.done'](),
+		cancelled: m['common.status.cancelled']()
+	};
+}
+
+export function getPriorityLabel(priority: IssuePriority): string {
+	const labels: Record<IssuePriority, string> = {
+		0: m['common.priority.no_priority'](),
+		1: m['common.priority.urgent'](),
+		2: m['common.priority.high'](),
+		3: m['common.priority.medium'](),
+		4: m['common.priority.low']()
+	};
+	return labels[priority];
+}
+
+export function getPriorityLabels(): Record<IssuePriority, string> {
+	return {
+		0: m['common.priority.no_priority'](),
+		1: m['common.priority.urgent'](),
+		2: m['common.priority.high'](),
+		3: m['common.priority.medium'](),
+		4: m['common.priority.low']()
+	};
+}

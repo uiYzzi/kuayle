@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { AlertTriangle, Check, Info, X, XCircle } from 'lucide-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	export type AppToastVariant = 'success' | 'error' | 'info' | 'warning';
 
@@ -38,7 +40,7 @@
 	<div class="content">
 		<div class="header">
 			<div class="title">{title}</div>
-			<button class="close" type="button" aria-label="Close toast" onclick={dismiss}>
+			<button class="close" type="button" aria-label={m['sharedComponents.app_toast.close']()} onclick={dismiss}>
 				<X size={16} />
 			</button>
 		</div>

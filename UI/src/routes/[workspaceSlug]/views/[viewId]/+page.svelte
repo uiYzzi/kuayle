@@ -26,6 +26,8 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { appToast } from '$lib/features/toast/toast';
 	import { ArrowLeft, Pencil, Trash2, MoreHorizontal, Check, X, Share2 } from 'lucide-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import FilterBuilder from '$lib/components/shared/FilterBuilder.svelte';
 	import ShareLinkDialog from '$lib/components/shared/ShareLinkDialog.svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
@@ -74,7 +76,7 @@
 				await loadIssues();
 			})
 			.catch(() => {
-				appToast.error('View not found');
+				appToast.error(m['views.toast.not_found']());
 				goto(`/${s}/inbox`);
 			})
 			.finally(() => {
@@ -113,9 +115,9 @@
 		try {
 			view = await updateView(slug, view.id, { name: editNameValue.trim() });
 			editingName = false;
-			appToast.success('View name updated');
+			appToast.success(m['views.toast.name_updated']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update view');
+			appToast.apiError(err, m['views.toast.failed_update']());
 		}
 	}
 
@@ -127,10 +129,10 @@
 		if (!view) return;
 		try {
 			await deleteView(slug, view.id);
-			appToast.success('View deleted');
+			appToast.success(m['views.toast.deleted']());
 			goto(`/${slug}/inbox`);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete view');
+			appToast.apiError(err, m['views.toast.failed_delete']());
 		} finally {
 			deleteOpen = false;
 		}
@@ -153,7 +155,7 @@
 		try {
 			view = await updateView(slug, view.id, { filters: { ...filters, ...viewMetadata(view.filters) } });
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to save filters');
+			appToast.apiError(err, m['views.toast.failed_save_filters']());
 		}
 	}
 
@@ -209,7 +211,7 @@
 				{#if view.is_shared}
 					<span
 						class="rounded bg-[var(--color-bg-tertiary)] px-1.5 py-0.5 text-[10px] text-[var(--color-text-tertiary)]"
-						>Shared</span
+						>{m['views.shared']()}</span
 					>
 				{/if}
 			</div>
@@ -229,7 +231,7 @@
 						</Tooltip.Trigger>
 						<Tooltip.Content>
 							<p class="text-sm font-medium">{owner.name || owner.email}</p>
-							<p class="text-xs text-[var(--color-text-tertiary)]">Owner</p>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['views.owner']()}</p>
 						</Tooltip.Content>
 					</Tooltip.Root>
 				{/if}
@@ -248,7 +250,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 						>
 							<Share2 size={14} />
-							Share link
+							{m['views.share_link']()}
 						</button>
 						<button
 							onclick={() => {
@@ -258,7 +260,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-error)] hover:bg-[var(--color-bg-hover)]"
 						>
 							<Trash2 size={14} />
-							Delete view
+							{m['views.delete_view']()}
 						</button>
 					</Popover.Content>
 				</Popover.Root>
@@ -288,7 +290,7 @@
 		<!-- Issues list -->
 		<div class="flex-1 overflow-y-auto">
 			{#if issues.length === 0}
-				<EmptyState title="No issues match this view" description="Adjust the filters or add new issues" />
+				<EmptyState title={m['views.no_issues_match']()} description={m['views.no_issues_match_desc']()} />
 			{:else}
 				{#each visibleTreeIssues as issue (issue.id)}
 					<IssueTreeItem
@@ -315,12 +317,12 @@
 	<AlertDialog.Root bind:open={deleteOpen}>
 		<AlertDialog.Content>
 			<AlertDialog.Header>
-				<AlertDialog.Title>Delete view?</AlertDialog.Title>
-				<AlertDialog.Description>This will permanently delete {view.name}.</AlertDialog.Description>
+				<AlertDialog.Title>{m['views.delete_title']()}</AlertDialog.Title>
+				<AlertDialog.Description>{m['views.delete_desc']({ name: view.name })}</AlertDialog.Description>
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
-				<AlertDialog.Cancel variant="outline">Cancel</AlertDialog.Cancel>
-				<AlertDialog.Action variant="destructive" onclick={handleDelete}>Delete view</AlertDialog.Action>
+				<AlertDialog.Cancel variant="outline">{m['common.cancel']()}</AlertDialog.Cancel>
+				<AlertDialog.Action variant="destructive" onclick={handleDelete}>{m['views.delete_view']()}</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
 	</AlertDialog.Root>

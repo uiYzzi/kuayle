@@ -6,6 +6,8 @@
 	import { authState } from '$lib/features/auth/auth.state.svelte';
 	import type { User } from '$lib/types/auth';
 	import { Copy } from 'lucide-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let user = $state<User | null>(null);
 	let name = $state('');
@@ -22,7 +24,7 @@
 
 	async function saveProfile() {
 		if (!user || !name.trim()) {
-			appToast.error('Name is required');
+			appToast.error(m['settings.profile.name_required']());
 			return;
 		}
 		saving = true;
@@ -37,9 +39,9 @@
 			name = updated.name;
 			displayName = updated.display_name;
 			avatarUrl = updated.avatar_url ?? '';
-			appToast.success('Profile updated');
+			appToast.success(m['settings.profile.updated']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update profile');
+			appToast.apiError(err, m['settings.profile.failed_update']());
 		} finally {
 			saving = false;
 		}
@@ -49,23 +51,23 @@
 		if (!user) return;
 		try {
 			await navigator.clipboard.writeText(user.id);
-			appToast.success('User ID copied');
+			appToast.success(m['settings.profile.id_copied']());
 		} catch {
-			appToast.error('Failed to copy user ID');
+			appToast.error(m['settings.profile.failed_copy_id']());
 		}
 	}
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">Profile</h1>
-	<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">Manage the personal information shown across Kuayle.</p>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['settings.profile.title']()}</h1>
+	<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">{m['settings.profile.desc']()}</p>
 
 	{#if user}
 		<div class="mt-8 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Email</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Used for sign in. Email changes are not supported yet.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.profile.email']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.profile.email_desc']()}</p>
 				</div>
 				<span class="truncate text-sm text-[var(--color-text-secondary)]">{user.email}</span>
 			</div>
@@ -74,14 +76,14 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">User ID</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Use this UUID in the server SYSADMINS setting.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.profile.user_id']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.profile.user_id_desc']()}</p>
 				</div>
 				<div class="flex min-w-0 items-center gap-2">
 					<span class="truncate font-mono text-xs text-[var(--color-text-secondary)]">{user.id}</span>
 					<Button variant="outline" size="sm" onclick={copyUserId}>
 						<Copy size={13} />
-						Copy
+						{m['settings.profile.copy']()}
 					</Button>
 				</div>
 			</div>
@@ -90,8 +92,8 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Name</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Your full name.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.profile.name']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.profile.name_desc']()}</p>
 				</div>
 				<input
 					type="text"
@@ -104,8 +106,8 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Display name</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">The shorter name shown in comments and mentions.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.profile.display_name']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.profile.display_name_desc']()}</p>
 				</div>
 				<input
 					type="text"
@@ -118,8 +120,8 @@
 
 			<div class="flex items-center justify-between gap-4 px-5 py-4">
 				<div>
-					<p class="text-sm font-medium text-[var(--color-text-primary)]">Avatar URL</p>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Public image URL for your avatar.</p>
+					<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.profile.avatar_url']()}</p>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.profile.avatar_url_desc']()}</p>
 				</div>
 				<input
 					type="url"
@@ -131,7 +133,7 @@
 		</div>
 
 		<div class="mt-4 flex justify-end">
-			<Button onclick={saveProfile} disabled={saving || !name.trim()}>{saving ? 'Saving...' : 'Save profile'}</Button>
+			<Button onclick={saveProfile} disabled={saving || !name.trim()}>{saving ? m['settings.profile.saving']() : m['settings.profile.save_profile']()}</Button>
 		</div>
 	{:else}
 		<div class="mt-8 flex justify-center py-8">

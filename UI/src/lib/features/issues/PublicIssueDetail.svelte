@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PublicIssue } from '$lib/types/shared-link';
 	import type { IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import IssueStatusIcon from './IssueStatusIcon.svelte';
 	import IssuePriorityIcon from './IssuePriorityIcon.svelte';
 	import { formatRelativeTime } from '$lib/utils/format';
@@ -9,6 +9,8 @@
 	import { X, CalendarDays, ChevronUp, ChevronDown } from 'lucide-svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { onMount, onDestroy } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		issue = $bindable(),
@@ -90,7 +92,7 @@
 		<div class="sticky top-0 z-10 flex items-center justify-between bg-[var(--color-bg)] rounded-tl-2xl px-6 py-3">
 			<span class="text-sm font-medium text-[var(--color-text-tertiary)]">{issue.identifier}</span>
 			<div class="flex items-center gap-1">
-				<span class="text-xs text-[var(--color-text-tertiary)] mr-1">{formatRelativeTime(issue.created_at)}</span>
+				<span class="text-xs text-[var(--color-text-tertiary)] mr-1">{formatRelativeTime(issue.created_at, getLocale())}</span>
 				{#if issues.length > 1}
 					<button
 						onclick={goUp}
@@ -140,7 +142,7 @@
 					<Tooltip.Trigger>
 						<span class="flex items-center gap-1.5 rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-2 py-1 text-xs text-[var(--color-text-secondary)]">
 							<IssuePriorityIcon priority={issue.priority as IssuePriority} size={12} />
-							{PRIORITY_LABELS[issue.priority as IssuePriority]}
+							{getPriorityLabel(issue.priority as IssuePriority)}
 						</span>
 					</Tooltip.Trigger>
 					<Tooltip.Content>Priority</Tooltip.Content>
@@ -174,7 +176,7 @@
 						<Tooltip.Trigger>
 							<span class="flex items-center gap-1 rounded-md border border-[var(--app-border)] bg-[var(--color-bg-secondary)] px-2 py-1 text-xs text-[var(--color-text-secondary)]">
 								<CalendarDays size={11} class={diffDays < 0 ? 'text-red-500' : diffDays === 0 ? 'text-orange-500' : 'text-[var(--color-text-tertiary)]'} />
-								{due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+								{due.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' })}
 							</span>
 						</Tooltip.Trigger>
 						<Tooltip.Content>Due date</Tooltip.Content>

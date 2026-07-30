@@ -34,6 +34,8 @@
 	import { createShortcutEngine, type ShortcutDef } from '$lib/utils/keyboard';
 	import { Menu, Search, SquarePen } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import TerminalDock from '$lib/features/dev-machines/TerminalDock.svelte';
 	import { setTerminalDock } from '$lib/features/dev-machines/terminal-dock-context.svelte';
 
@@ -177,13 +179,13 @@
 	});
 
 	// Full shortcut definitions
-	const shortcutDefs: ShortcutDef[] = [
+	const shortcutDefs = $derived<ShortcutDef[]>([
 		// Navigation sequences (G + key)
-		{ keys: ['g', 'i'], handler: () => goto(`/${slug}/inbox`), label: 'Go to Inbox', category: 'Navigation' },
-		{ keys: ['g', 'm'], handler: () => goto(`/${slug}/my-issues`), label: 'Go to My Issues', category: 'Navigation' },
-		{ keys: ['g', 'a'], handler: () => goto(`/${slug}/insights`), label: 'Go to Insights', category: 'Navigation' },
-		{ keys: ['g', 'p'], handler: () => goto(`/${slug}/projects`), label: 'Go to Projects', category: 'Navigation' },
-		{ keys: ['g', 's'], handler: () => goto(`/${slug}/settings`), label: 'Go to Settings', category: 'Navigation' },
+		{ keys: ['g', 'i'], handler: () => goto(`/${slug}/inbox`), label: m['sidebar.go_inbox'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 'm'], handler: () => goto(`/${slug}/my-issues`), label: m['sidebar.go_my_issues'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 'a'], handler: () => goto(`/${slug}/insights`), label: m['sidebar.go_insights'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 'p'], handler: () => goto(`/${slug}/projects`), label: m['sidebar.go_projects'](), category: m['sidebar.navigation']() },
+		{ keys: ['g', 's'], handler: () => goto(`/${slug}/settings`), label: m['sidebar.go_settings'](), category: m['sidebar.navigation']() },
 		// Actions
 		{
 			key: 'c',
@@ -199,13 +201,13 @@
 					showCreateIssue = true;
 				}
 			},
-			label: 'Create issue',
-			category: 'Actions'
+			label: m['sidebar.create_issue'](),
+			category: m['sidebar.actions']()
 		},
-		{ key: 'k', meta: true, handler: () => (showCommandPalette = !showCommandPalette), label: 'Command palette', category: 'Actions' },
-		{ key: '/', handler: () => (showCommandPalette = true), label: 'Search', category: 'Actions' },
-		{ key: '?', shift: true, handler: () => (showShortcutHelp = !showShortcutHelp), label: 'Keyboard shortcuts', category: 'Help' },
-	];
+		{ key: 'k', meta: true, handler: () => (showCommandPalette = !showCommandPalette), label: m['sidebar.command_palette'](), category: m['sidebar.actions']() },
+		{ key: '/', handler: () => (showCommandPalette = true), label: m['sidebar.search'](), category: m['sidebar.actions']() },
+		{ key: '?', shift: true, handler: () => (showShortcutHelp = !showShortcutHelp), label: m['sidebar.keyboard_shortcuts'](), category: m['sidebar.help']() },
+	]);
 
 	const shortcutEngine = createShortcutEngine(shortcutDefs);
 
@@ -223,9 +225,9 @@
 			const team = await createTeam(slug, data);
 			teams = [...teams, team];
 			sidebarState.teams = teams;
-			appToast.success('Team created');
+			appToast.success(m['sidebar.team_created']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create team');
+			appToast.apiError(err, m['sidebar.failed_create_team']());
 		}
 	}
 
@@ -261,17 +263,17 @@
 			if (confirmAction === 'leave') {
 				const result = await leaveTeam(slug, confirmTeam.id);
 				removeTeamFromState(confirmTeam.id);
-				appToast.success(result.status === 'deleted' ? 'Team deleted' : 'Left team');
+				appToast.success(result.status === 'deleted' ? m['sidebar.team_deleted']() : m['sidebar.left_team']());
 			} else {
 				await deleteTeam(slug, confirmTeam.id);
 				removeTeamFromState(confirmTeam.id);
-				appToast.success('Team deleted');
+				appToast.success(m['sidebar.team_deleted']());
 			}
 			confirmOpen = false;
 			confirmTeam = null;
 			confirmAction = null;
 		} catch (err: any) {
-			appToast.apiError(err, `Failed to ${confirmAction} team`);
+			appToast.apiError(err, confirmAction === 'leave' ? m['sidebar.failed_leave_team']() : m['sidebar.failed_delete_team']());
 		} finally {
 			confirmSubmitting = false;
 		}
@@ -498,8 +500,8 @@
 			<Sheet.Root bind:open={showMobileSidebar}>
 				<Sheet.Content side="left" class="w-[min(88vw,320px)] p-0 [&>button]:hidden" showCloseButton={false}>
 					<Sheet.Header class="sr-only">
-						<Sheet.Title>Workspace navigation</Sheet.Title>
-						<Sheet.Description>Navigate workspace sections, teams, views, and projects.</Sheet.Description>
+						<Sheet.Title>{m['sidebar.workspace_navigation']()}</Sheet.Title>
+						<Sheet.Description>{m['sidebar.navigate_sections']()}</Sheet.Description>
 					</Sheet.Header>
 					<Sidebar
 						{workspace}
@@ -524,16 +526,16 @@
 			{#if !isSettings}
 				<div class="flex h-12 shrink-0 items-center justify-between border-b border-[var(--app-border)] bg-[var(--color-bg)] px-3 md:hidden">
 					<div class="flex min-w-0 items-center gap-2">
-						<Button variant="ghost" size="icon-lg" onclick={() => (showMobileSidebar = true)} aria-label="Open navigation">
+						<Button variant="ghost" size="icon-lg" onclick={() => (showMobileSidebar = true)} aria-label={m['sidebar.open_navigation']()}>
 							<Menu size={18} />
 						</Button>
 						<span class="truncate text-sm font-medium text-[var(--color-text-primary)]">{workspace.name}</span>
 					</div>
 					<div class="flex shrink-0 items-center gap-1">
-						<Button variant="ghost" size="icon-lg" onclick={() => (showCommandPalette = true)} aria-label="Search">
+						<Button variant="ghost" size="icon-lg" onclick={() => (showCommandPalette = true)} aria-label={m['sidebar.search']()}>
 							<Search size={18} />
 						</Button>
-						<Button variant="ghost" size="icon-lg" onclick={openCreateIssue} aria-label="Create issue">
+						<Button variant="ghost" size="icon-lg" onclick={openCreateIssue} aria-label={m['sidebar.create_issue']()}>
 							<SquarePen size={18} />
 						</Button>
 					</div>
@@ -569,7 +571,7 @@
 				const created = await issuesState.create(slug, req);
 				showIssueCreatedToast(slug, created);
 			} catch (err: any) {
-				appToast.apiError(err, 'Failed to create issue');
+				appToast.apiError(err, m['sidebar.failed_create_issue']());
 			}
 		}}
 	/>
@@ -583,20 +585,20 @@
 		<Dialog.Content class="sm:max-w-[420px] border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 			<Dialog.Header>
 				<Dialog.Title>
-					{confirmAction === 'delete' ? 'Delete team' : 'Leave team'}
+					{confirmAction === 'delete' ? m['sidebar.delete_team_title']() : m['sidebar.leave_team_title']()}
 				</Dialog.Title>
 				<Dialog.Description>
 					{#if confirmAction === 'delete'}
-						This will permanently delete {confirmTeam?.name ?? 'this team'} and its issues, cycles, and statuses.
+						{m['sidebar.delete_team_desc']({ name: confirmTeam?.name ?? m['sidebar.this_team']() })}
 					{:else}
-						You will leave {confirmTeam?.name ?? 'this team'}. If you are the last member or workspace owner, the team will be deleted.
+						{m['sidebar.leave_team_desc']({ name: confirmTeam?.name ?? m['sidebar.this_team']() })}
 					{/if}
 				</Dialog.Description>
 			</Dialog.Header>
 			<Dialog.Footer>
-				<Button variant="outline" onclick={() => (confirmOpen = false)} disabled={confirmSubmitting}>Cancel</Button>
+				<Button variant="outline" onclick={() => (confirmOpen = false)} disabled={confirmSubmitting}>{m['sidebar.cancel']()}</Button>
 				<Button variant="destructive" onclick={confirmTeamAction} disabled={confirmSubmitting}>
-					{confirmSubmitting ? 'Working...' : confirmAction === 'delete' ? 'Delete team' : 'Leave team'}
+					{confirmSubmitting ? m['sidebar.working']() : confirmAction === 'delete' ? m['sidebar.delete_team_title']() : m['sidebar.leave_team_title']()}
 				</Button>
 			</Dialog.Footer>
 		</Dialog.Content>

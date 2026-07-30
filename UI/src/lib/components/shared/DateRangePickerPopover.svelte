@@ -4,6 +4,8 @@
 	import { CalendarDate } from '@internationalized/date';
 	import type { DateValue } from '@internationalized/date';
 	import { CalendarIcon, X } from 'lucide-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		startDate = null,
@@ -41,7 +43,7 @@
 
 	function formatDate(value: string): string {
 		try {
-			return new Date(value).toLocaleDateString('en-US', {
+			return new Date(value).toLocaleDateString(getLocale(), {
 				month: 'short',
 				day: 'numeric',
 				year: 'numeric'

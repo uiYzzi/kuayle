@@ -1,8 +1,11 @@
 <script lang="ts">
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
+
 	let {
 		title,
 		message,
-		confirmLabel = 'Confirm',
+		confirmLabel,
 		variant = 'danger',
 		onconfirm,
 		oncancel
@@ -14,13 +17,15 @@
 		onconfirm: () => void;
 		oncancel: () => void;
 	} = $props();
+
+	const effectiveConfirmLabel = $derived(confirmLabel ?? m['sharedComponents.confirm_dialog.confirm']());
 </script>
 
 <div class="fixed inset-0 z-50 flex items-center justify-center">
 	<div
 		role="button"
 		tabindex="0"
-		aria-label="Cancel"
+		aria-label={m['sharedComponents.confirm_dialog.cancel']()}
 		class="fixed inset-0 bg-black/50"
 		onclick={oncancel}
 		onkeydown={(e) => { if (e.key === 'Enter' || e.key === 'Escape') oncancel(); }}
@@ -35,7 +40,7 @@
 				onclick={oncancel}
 				class="rounded-md border border-[var(--app-border)] px-3 py-1.5 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]"
 			>
-				Cancel
+				{m['sharedComponents.confirm_dialog.cancel']()}
 			</button>
 			<button
 				onclick={onconfirm}
@@ -43,7 +48,7 @@
 					? 'bg-[var(--color-error)] hover:bg-red-600'
 					: 'bg-[var(--app-accent)] hover:bg-[var(--app-accent-hover)]'}"
 			>
-				{confirmLabel}
+				{effectiveConfirmLabel}
 			</button>
 		</div>
 	</div>

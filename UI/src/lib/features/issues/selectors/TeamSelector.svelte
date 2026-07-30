@@ -3,6 +3,8 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 	import type { Team } from '$lib/types/team';
 	import type { Snippet } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -25,7 +27,7 @@
 	} = $props();
 </script>
 
-<ComboboxPopover bind:open placeholder="Search teams..." {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={m['sharedComponents.selectors.search_teams']()} {width} {align} {shortcutKey} {trigger}>
 	{#each teams as team (team.id)}
 		<Command.Item
 			value={team.name}

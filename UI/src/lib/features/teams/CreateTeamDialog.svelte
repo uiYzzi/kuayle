@@ -3,6 +3,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -53,12 +55,12 @@
 		<form onsubmit={handleSubmit}>
 			<div class="px-5 pt-5 pb-4 space-y-4">
 				<div>
-					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">Create team</h2>
-					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">Teams organize issues and members.</p>
+					<h2 class="text-base font-semibold text-[var(--color-text-primary)]">{m['sidebar.create_team_title']()}</h2>
+					<p class="mt-0.5 text-xs text-[var(--color-text-tertiary)]">{m['sidebar.create_team_desc']()}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Name</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['sidebar.name']()}</Label>
 					<Input
 						bind:value={name}
 						placeholder="e.g. Engineering"
@@ -68,7 +70,7 @@
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Identifier</Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['sidebar.identifier']()}</Label>
 					<Input
 						bind:value={key}
 						placeholder="e.g. ENG"
@@ -77,22 +79,22 @@
 						oninput={() => (keyManuallyEdited = true)}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)] uppercase"
 					/>
-					<p class="text-[10px] text-[var(--color-text-tertiary)]">Used as issue prefix (e.g. ENG-123)</p>
+					<p class="text-[10px] text-[var(--color-text-tertiary)]">{m['sidebar.identifier_desc']()}</p>
 				</div>
 
 				<div class="space-y-1.5">
-					<Label class="text-xs text-[var(--color-text-secondary)]">Description <span class="text-[var(--color-text-tertiary)]">(optional)</span></Label>
+					<Label class="text-xs text-[var(--color-text-secondary)]">{m['sidebar.description_optional']()}</Label>
 					<Input
 						bind:value={description}
-						placeholder="What does this team work on?"
+						placeholder={m['sidebar.team_desc_placeholder']()}
 						class="bg-[var(--color-bg)] border-[var(--app-border)] text-[var(--color-text-primary)]"
 					/>
 				</div>
 			</div>
 
 			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] px-5 py-3">
-				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>Cancel</Button>
-				<Button size="sm" type="submit" disabled={!name.trim() || !key.trim()}>Create team</Button>
+				<Button variant="outline" size="sm" type="button" onclick={() => (open = false)}>{m['sidebar.cancel']()}</Button>
+				<Button size="sm" type="submit" disabled={!name.trim() || !key.trim()}>{m['sidebar.create_team_title']()}</Button>
 			</div>
 		</form>
 	</Dialog.Content>

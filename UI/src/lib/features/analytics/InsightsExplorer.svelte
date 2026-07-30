@@ -36,6 +36,8 @@
 	import type { TeamStatus } from '$lib/types/team-status';
 	import AnalyticsDateRangePicker from './AnalyticsDateRangePicker.svelte';
 	import { getAnalyticsChartTheme, observeAnalyticsTheme, seriesChartColor, statusChartColor } from './chart-theme';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		slug,
@@ -62,25 +64,46 @@
 	}
 
 	const MEASURES = [
-		{ value: 'issue_count' as const, label: 'Issue count', icon: Hash },
-		{ value: 'issue_age' as const, label: 'Issue age', icon: Hourglass },
-		{ value: 'lead_time' as const, label: 'Lead time', icon: Timer },
-		{ value: 'cycle_time' as const, label: 'Cycle time', icon: Gauge },
-		{ value: 'triage_time' as const, label: 'Triage time', icon: Inbox }
+		{ value: 'issue_count' as const, icon: Hash },
+		{ value: 'issue_age' as const, icon: Hourglass },
+		{ value: 'lead_time' as const, icon: Timer },
+		{ value: 'cycle_time' as const, icon: Gauge },
+		{ value: 'triage_time' as const, icon: Inbox }
 	];
 
+	const MEASURE_LABELS: Record<string, string> = $derived({
+		issue_count: m['insights.measure_issue_count'](),
+		issue_age: m['insights.measure_issue_age'](),
+		lead_time: m['insights.measure_lead_time'](),
+		cycle_time: m['insights.measure_cycle_time'](),
+		triage_time: m['insights.measure_triage_time']()
+	});
+
 	const SLICES = [
-		{ value: 'none' as const, label: 'None', icon: CircleDashed },
-		{ value: 'status' as const, label: 'Status', icon: GitBranch },
-		{ value: 'status_type' as const, label: 'Status type', icon: Layers3 },
-		{ value: 'priority' as const, label: 'Priority', icon: Flag },
-		{ value: 'assignee' as const, label: 'Assignee', icon: User },
-		{ value: 'team' as const, label: 'Team', icon: Users },
-		{ value: 'project' as const, label: 'Project', icon: FolderKanban },
-		{ value: 'cycle' as const, label: 'Cycle', icon: RefreshCcw },
-		{ value: 'label' as const, label: 'Label', icon: Tag },
-		{ value: 'creator' as const, label: 'Creator', icon: User }
+		{ value: 'none' as const, icon: CircleDashed },
+		{ value: 'status' as const, icon: GitBranch },
+		{ value: 'status_type' as const, icon: Layers3 },
+		{ value: 'priority' as const, icon: Flag },
+		{ value: 'assignee' as const, icon: User },
+		{ value: 'team' as const, icon: Users },
+		{ value: 'project' as const, icon: FolderKanban },
+		{ value: 'cycle' as const, icon: RefreshCcw },
+		{ value: 'label' as const, icon: Tag },
+		{ value: 'creator' as const, icon: User }
 	];
+
+	const SLICE_LABELS: Record<string, string> = $derived({
+		none: m['insights.slice_none'](),
+		status: m['insights.slice_status'](),
+		status_type: m['insights.slice_status_type'](),
+		priority: m['insights.slice_priority'](),
+		assignee: m['insights.slice_assignee'](),
+		team: m['insights.slice_team'](),
+		project: m['insights.slice_project'](),
+		cycle: m['insights.slice_cycle'](),
+		label: m['insights.slice_label'](),
+		creator: m['insights.slice_creator']()
+	});
 	const availableSlices = $derived(SLICES.filter((item) => item.value !== 'status' || !!filters.team_id));
 
 	function isMeasure(value: string | null): value is AnalyticsMeasure {
@@ -165,7 +188,7 @@
 				return detail.message;
 			}
 		}
-		return err instanceof Error ? err.message : 'Failed to load insights';
+		return err instanceof Error ? err.message : m['insights.failed_load']();
 	}
 
 	async function load() {
@@ -524,62 +547,62 @@
 		class="flex flex-wrap items-end gap-3 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]/50 p-3"
 	>
 		<div class="flex flex-col gap-1">
-			<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">Measure</span>
+			<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">{m['insights.measure']()}</span>
 			<Select.Root
 				type="single"
 				value={measure}
 				onValueChange={(value) => value && (measure = value as AnalyticsMeasure)}
 			>
-				<Select.Trigger size="sm" aria-label="Measure" class="w-[170px] bg-[var(--color-bg)]">
+				<Select.Trigger size="sm" aria-label={m['insights.measure']()} class="w-[170px] bg-[var(--color-bg)]">
 					<MeasureIcon size={13} />
-					{selectedMeasure.label}
+					{MEASURE_LABELS[selectedMeasure.value]}
 				</Select.Trigger>
 				<Select.Content>
 					{#each MEASURES as item}
 						{@const Icon = item.icon}
-						<Select.Item value={item.value}><Icon size={13} />{item.label}</Select.Item>
+						<Select.Item value={item.value}><Icon size={13} />{MEASURE_LABELS[item.value]}</Select.Item>
 					{/each}
 				</Select.Content>
 			</Select.Root>
 		</div>
 		<div class="flex flex-col gap-1">
-			<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">Group by</span>
+			<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">{m['insights.group_by']()}</span>
 			<Select.Root type="single" value={slice} onValueChange={(value) => value && (slice = value as AnalyticsSlice)}>
-				<Select.Trigger size="sm" aria-label="Group by" class="w-[160px] bg-[var(--color-bg)]">
+				<Select.Trigger size="sm" aria-label={m['insights.group_by']()} class="w-[160px] bg-[var(--color-bg)]">
 					<SliceIcon size={13} />
-					{selectedSlice.label}
+					{SLICE_LABELS[selectedSlice.value]}
 				</Select.Trigger>
 				<Select.Content>
 					{#each availableSlices as item}
 						{@const Icon = item.icon}
-						<Select.Item value={item.value}><Icon size={13} />{item.label}</Select.Item>
+						<Select.Item value={item.value}><Icon size={13} />{SLICE_LABELS[item.value]}</Select.Item>
 					{/each}
 				</Select.Content>
 			</Select.Root>
 		</div>
 		{#if slice !== 'none'}
 			<div class="flex flex-col gap-1">
-				<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">Segment by</span>
+				<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">{m['insights.segment_by']()}</span>
 				<Select.Root
 					type="single"
 					value={segment}
 					onValueChange={(value) => value && (segment = value as AnalyticsSlice)}
 				>
-					<Select.Trigger size="sm" aria-label="Segment by" class="w-[160px] bg-[var(--color-bg)]">
+					<Select.Trigger size="sm" aria-label={m['insights.segment_by']()} class="w-[160px] bg-[var(--color-bg)]">
 						<SegmentIcon size={13} />
-						{selectedSegment.label}
+						{SLICE_LABELS[selectedSegment.value]}
 					</Select.Trigger>
 					<Select.Content>
 						{#each availableSlices.filter((item) => item.value !== slice) as item}
 							{@const Icon = item.icon}
-							<Select.Item value={item.value}><Icon size={13} />{item.label}</Select.Item>
+							<Select.Item value={item.value}><Icon size={13} />{SLICE_LABELS[item.value]}</Select.Item>
 						{/each}
 					</Select.Content>
 				</Select.Root>
 			</div>
 		{/if}
 		<div class="flex min-w-[220px] flex-1 flex-col gap-1 sm:ml-auto sm:flex-none">
-			<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">Date range</span>
+			<span class="text-[11px] font-medium text-[var(--color-text-tertiary)]">{m['insights.date_range']()}</span>
 			<AnalyticsDateRangePicker
 				startDate={fromDate}
 				endDate={toDate}
@@ -595,10 +618,10 @@
 	<!-- Aggregate -->
 	{#if result}
 		<div class="flex gap-4 text-xs text-[var(--color-text-secondary)]">
-			<span>Total: <strong class="text-[var(--color-text-primary)]">{result.total_count ?? '-'}</strong></span>
+			<span>{m['insights.total_label']()} <strong class="text-[var(--color-text-primary)]">{result.total_count ?? '-'}</strong></span>
 			{#if result.aggregate != null}
 				<span
-					>Aggregate: <strong class="text-[var(--color-text-primary)]">{fmtValue(result.aggregate)}</strong>
+					>{m['insights.aggregate']()} <strong class="text-[var(--color-text-primary)]">{fmtValue(result.aggregate)}</strong>
 					{unitLabel()}</span
 				>
 			{/if}
@@ -621,9 +644,9 @@
 			<div class="absolute inset-0 flex items-center justify-center">
 				<p class="text-sm text-[var(--color-text-tertiary)]">
 					{#if result && isDurationMeasure() && !((result.points ?? []).length > 0)}
-						No data points for this measure yet
+						{m['insights.no_data_points']()}
 					{:else}
-						No data available
+						{m['insights.no_data']()}
 					{/if}
 				</p>
 			</div>
@@ -637,14 +660,14 @@
 				<thead>
 					<tr class="border-b border-[var(--app-border)] bg-[var(--color-bg-tertiary)]/40">
 						<th class="px-3 py-2 text-left font-medium text-[var(--color-text-secondary)]">
-							{slice === 'none' ? 'Group' : slice.charAt(0).toUpperCase() + slice.slice(1)}
+							{slice === 'none' ? m['insights.group_column']() : (SLICE_LABELS[slice] ?? slice)}
 						</th>
 						{#if isDurationMeasure()}
-							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">P50</th>
-							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">P75</th>
-							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">P95</th>
+							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">{m['insights.p50']()}</th>
+							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">{m['insights.p75']()}</th>
+							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">{m['insights.p95']()}</th>
 						{:else}
-							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">Count</th>
+							<th class="px-3 py-2 text-right font-medium text-[var(--color-text-secondary)]">{m['insights.count']()}</th>
 						{/if}
 					</tr>
 				</thead>
@@ -701,14 +724,14 @@
 		{#if (result.points ?? []).length > 0}
 			<div class="rounded-lg border border-[var(--app-border)]">
 				<div class="border-b border-[var(--app-border)] bg-[var(--color-bg-tertiary)]/40 px-3 py-1.5">
-					<span class="text-xs font-medium text-[var(--color-text-secondary)]">Issues ({result.points?.length})</span>
+					<span class="text-xs font-medium text-[var(--color-text-secondary)]">{m['insights.issues_count']({ count: result.points?.length ?? 0 })}</span>
 				</div>
 				<table class="w-full text-xs">
 					<thead>
 						<tr class="border-b border-[var(--app-border)]">
-							<th class="px-3 py-1.5 text-left font-medium text-[var(--color-text-tertiary)]">Issue</th>
-							<th class="px-3 py-1.5 text-left font-medium text-[var(--color-text-tertiary)]">Title</th>
-							<th class="px-3 py-1.5 text-right font-medium text-[var(--color-text-tertiary)]">Value</th>
+							<th class="px-3 py-1.5 text-left font-medium text-[var(--color-text-tertiary)]">{m['insights.issue']()}</th>
+							<th class="px-3 py-1.5 text-left font-medium text-[var(--color-text-tertiary)]">{m['insights.issue_title']()}</th>
+							<th class="px-3 py-1.5 text-right font-medium text-[var(--color-text-tertiary)]">{m['insights.value']()}</th>
 						</tr>
 					</thead>
 					<tbody>

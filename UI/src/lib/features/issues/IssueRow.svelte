@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue, RelationType, IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Label } from '$lib/types/label';
@@ -15,10 +15,12 @@
 	import * as HoverCard from '$lib/components/ui/hover-card';
 	import * as Popover from '$lib/components/ui/popover';
 	import { issuesState } from './issues.state.svelte';
-	import { formatRelativeTime, formatDate } from '$lib/utils/format';
+	import { formatDate, formatIssueListDate, formatIssueListRelativeTime } from '$lib/utils/format';
 	import { IsMobile } from '$lib/hooks/is-mobile.svelte';
 	import { Ban, CalendarDays, CircleUser, Copy, Link, OctagonAlert, RefreshCw } from 'lucide-svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		issue,
@@ -54,8 +56,8 @@
 	const blockedByCount = $derived(issue.relation_counts?.blocked_by ?? 0);
 	const blockingCount = $derived(issue.relation_counts?.blocking ?? 0);
 	const duplicateCount = $derived(issue.relation_counts?.duplicate ?? 0);
-	const createdAtText = $derived(issue.created_at ? formatRelativeTime(issue.created_at) : '');
-	const createdAtTooltip = $derived(createdAtText ? `${createdAtText} • ${formatDate(issue.created_at)}` : '');
+	const createdAtText = $derived(issue.created_at ? formatIssueListRelativeTime(issue.created_at, getLocale()) : '');
+	const createdAtTooltip = $derived(createdAtText ? `${createdAtText} • ${formatDate(issue.created_at, getLocale())}` : '');
 	const relatedIssues = $derived(issue.relation_summary?.related ?? []);
 	const blockedByIssues = $derived(issue.relation_summary?.blocked_by ?? []);
 	const blockingIssues = $derived(issue.relation_summary?.blocking ?? []);
@@ -192,7 +194,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] {issue.priority === value ? 'bg-[var(--color-bg-hover)]' : ''}"
 						>
 							<IssuePriorityIcon priority={value} size={14} />
-							{PRIORITY_LABELS[value]}
+							{getPriorityLabel(value)}
 						</button>
 					{/each}
 				</Popover.Content>
@@ -315,7 +317,7 @@
 			{@const diffDays = Math.ceil((due.getTime() - now.getTime()) / 86400000)}
 			<span class="group/due hidden shrink-0 items-center gap-1 rounded-full border border-[var(--app-border)] px-1.5 py-0 text-[11px] leading-5 sm:inline-flex hover:border-[var(--app-border-hover)] hover:bg-[var(--color-bg-tertiary)] transition-colors">
 				<CalendarDays size={11} class={diffDays < 0 ? 'text-red-500' : diffDays === 0 ? 'text-orange-500' : diffDays <= 7 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} />
-				<span class="text-[var(--color-text-tertiary)] group-hover/due:text-[var(--color-text-primary)] transition-colors">{due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+				<span class="text-[var(--color-text-tertiary)] group-hover/due:text-[var(--color-text-primary)] transition-colors">{formatIssueListDate(issue.due_date, getLocale())}</span>
 			</span>
 		{/if}
 
@@ -353,7 +355,7 @@
 						onclick={() => { updateField('assignee_ids', []); assigneeOpen = false; }}
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 					>
-						Clear all
+						{m['common.clear_all']()}
 					</button>
 					{#each members as member}
 						{@const isAssigned = (issue.assignees ?? []).some(a => a.id === member.user_id)}

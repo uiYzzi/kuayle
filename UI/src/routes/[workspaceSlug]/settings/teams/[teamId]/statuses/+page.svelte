@@ -2,12 +2,14 @@
 	import { flip } from 'svelte/animate';
 	import { page } from '$app/state';
 	import type { TeamStatus, StatusCategory } from '$lib/types/team-status';
-	import { CATEGORY_ORDER, CATEGORY_LABELS } from '$lib/types/team-status';
+	import { CATEGORY_ORDER, getCategoryLabel } from '$lib/types/team-status';
 	import { preferencesState, type TeamWorkflowSortMode } from '$lib/features/preferences/preferences.state.svelte';
 	import { listTeamStatuses, createTeamStatus, updateTeamStatus, deleteTeamStatus } from '$lib/api/team-statuses';
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
 	import * as Select from '$lib/components/ui/select';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Plus, Trash2, Pencil, X, Check, GripVertical, ArrowUp, ArrowDown } from 'lucide-svelte';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
@@ -39,12 +41,12 @@
 			? teamWorkflowOverride.workflowSortOrder
 			: preferencesState.getWorkflowSortOrder(slug, teamId)
 	);
-	const workflowSortLabels: Record<TeamWorkflowSortMode, string> = {
-		inherit: 'Use global',
-		default: 'Workflow order',
-		'active-first': 'Active first',
-		custom: 'Custom'
-	};
+	const workflowSortLabels = $derived<Record<TeamWorkflowSortMode, string>>({
+		inherit: m['team_settings.sort_mode.inherit'](),
+		default: m['team_settings.sort_mode.default'](),
+		'active-first': m['team_settings.sort_mode.active_first'](),
+		custom: m['team_settings.sort_mode.custom']()
+	});
 	$effect(() => {
 		const s = slug;
 		const t = teamId;
@@ -74,9 +76,9 @@
 			addColor = '';
 			addingCategory = null;
 			await loadStatuses();
-			appToast.success('Status created');
+			appToast.success(m['team_settings.toast.status_created']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create status');
+			appToast.apiError(err, m['team_settings.toast.status_create_failed']());
 		}
 	}
 
@@ -95,9 +97,9 @@
 			});
 			editingId = null;
 			await loadStatuses();
-			appToast.success('Status updated');
+			appToast.success(m['team_settings.toast.status_updated']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update status');
+			appToast.apiError(err, m['team_settings.toast.status_update_failed']());
 		}
 	}
 
@@ -105,9 +107,9 @@
 		try {
 			await deleteTeamStatus(slug, teamId, statusId);
 			await loadStatuses();
-			appToast.success('Status deleted');
+			appToast.success(m['team_settings.toast.status_deleted']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete status');
+			appToast.apiError(err, m['team_settings.toast.status_delete_failed']());
 		}
 	}
 
@@ -272,7 +274,7 @@
 		try {
 			await Promise.all(updatedCat.map((s, i) => updateTeamStatus(slug, teamId, s.id, { position: i })));
 		} catch {
-			appToast.error('Failed to reorder statuses');
+			appToast.error(m['team_settings.toast.reorder_failed']());
 			await loadStatuses();
 		}
 	}
@@ -281,17 +283,17 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">Issue statuses</h1>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['team_settings.statuses_title']()}</h1>
 	<p class="mt-2 text-sm text-[var(--color-text-tertiary)]">
-		Issue statuses define the workflow that issues go through from start to completion.
+		{m['team_settings.statuses_desc']()}
 	</p>
 
 	<div class="mt-6 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Issue list sorting</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['team_settings.issue_list_sorting']()}</p>
 				<p class="text-xs text-[var(--color-text-tertiary)]">
-					Override status group sorting for this team. Kanban keeps the workflow below.
+					{m['team_settings.issue_list_sorting_desc']()}
 				</p>
 			</div>
 			<Select.Root
@@ -305,10 +307,10 @@
 					{workflowSortLabels[teamWorkflowOverride.mode]}
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value="inherit">Use global</Select.Item>
-					<Select.Item value="default">Workflow order</Select.Item>
-					<Select.Item value="active-first">Active first</Select.Item>
-					<Select.Item value="custom">Custom</Select.Item>
+					<Select.Item value="inherit">{m['team_settings.sort_mode.inherit']()}</Select.Item>
+					<Select.Item value="default">{m['team_settings.sort_mode.default']()}</Select.Item>
+					<Select.Item value="active-first">{m['team_settings.sort_mode.active_first']()}</Select.Item>
+					<Select.Item value="custom">{m['team_settings.sort_mode.custom']()}</Select.Item>
 				</Select.Content>
 			</Select.Root>
 		</div>
@@ -316,7 +318,7 @@
 		{#if teamWorkflowOverride.mode === 'custom'}
 			<div class="border-t border-[var(--app-border)]"></div>
 			<div class="px-5 py-4">
-				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">Custom category order</p>
+				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">{m['team_settings.custom_category_order']()}</p>
 				<div class="space-y-1">
 					{#each teamWorkflowOrder as category, index (category)}
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -348,7 +350,7 @@
 								</span>
 								<span
 									class="text-sm text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-text-primary)]"
-									>{CATEGORY_LABELS[category]}</span
+									>{getCategoryLabel(category)}</span
 								>
 							</div>
 							<div
@@ -358,7 +360,7 @@
 									onclick={() => moveTeamWorkflowCategory(category, -1)}
 									disabled={index === 0}
 									class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-30"
-									aria-label="Move {CATEGORY_LABELS[category]} up"
+									aria-label={m['team_settings.move_category_up_aria']({ name: getCategoryLabel(category) })}
 								>
 									<ArrowUp size={13} />
 								</button>
@@ -366,7 +368,7 @@
 									onclick={() => moveTeamWorkflowCategory(category, 1)}
 									disabled={index === teamWorkflowOrder.length - 1}
 									class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-30"
-									aria-label="Move {CATEGORY_LABELS[category]} down"
+									aria-label={m['team_settings.move_category_down_aria']({ name: getCategoryLabel(category) })}
 								>
 									<ArrowDown size={13} />
 								</button>
@@ -399,11 +401,11 @@
 						ondragleave={(e) => handleSectionDragLeave(e)}
 					>
 						<div class="flex items-center justify-between px-5 py-2.5">
-							<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{CATEGORY_LABELS[cat]}</span>
+							<span class="text-xs font-medium text-[var(--color-text-tertiary)]">{getCategoryLabel(cat)}</span>
 							<button
 								onclick={() => startAdd(cat)}
 								class="rounded p-0.5 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors"
-								title="Add status to {CATEGORY_LABELS[cat]}"
+								title={m['team_settings.add_status_to_aria']({ name: getCategoryLabel(cat) })}
 							>
 								<Plus size={14} />
 							</button>
@@ -459,7 +461,7 @@
 															? 'ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--color-bg)]'
 															: ''}"
 														style="background-color: {c}"
-														aria-label="Select color {c}"
+														aria-label={m['team_settings.select_color_aria']({ color: c })}
 													></button>
 												{/each}
 											</div>
@@ -481,7 +483,7 @@
 											<div class="flex items-center gap-2">
 												<span class="text-sm font-medium text-[var(--color-text-primary)]">{status.name}</span>
 												{#if status.is_default}
-													<span class="text-[10px] text-[var(--color-text-tertiary)]">· Default</span>
+													<span class="text-[10px] text-[var(--color-text-tertiary)]">· {m['team_settings.default_badge']()}</span>
 												{/if}
 											</div>
 										</div>
@@ -514,7 +516,7 @@
 								<input
 									type="text"
 									bind:value={addName}
-									placeholder="Status name..."
+									placeholder={m['team_settings.status_name_placeholder']()}
 									onkeydown={(e) => {
 										if (e.key === 'Enter') handleAdd();
 										if (e.key === 'Escape') addingCategory = null;
@@ -529,7 +531,7 @@
 												? 'ring-2 ring-[var(--app-accent)] ring-offset-1 ring-offset-[var(--color-bg)]'
 												: ''}"
 											style="background-color: {c}"
-											aria-label="Select color"
+											aria-label={m['team_settings.select_color_only_aria']()}
 										></button>
 									{/each}
 								</div>
@@ -538,7 +540,7 @@
 									disabled={!addName.trim()}
 									class="rounded-md bg-[var(--app-accent)] px-2.5 py-1 text-xs text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)] disabled:opacity-50"
 								>
-									Add
+									{m['team_settings.add']()}
 								</button>
 								<button
 									onclick={() => (addingCategory = null)}

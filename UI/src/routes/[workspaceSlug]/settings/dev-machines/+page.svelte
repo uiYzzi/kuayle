@@ -17,6 +17,8 @@
 	import type { DevMachineEnvironment, DevMachinePolicy } from '$lib/types/dev-machine';
 	import type { GitHubRepo } from '$lib/types/github';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	let policy = $state<DevMachinePolicy | null>(null);
@@ -59,7 +61,7 @@
 			defaultEnvironmentId = scope.environment_id ?? 'standard';
 		} catch (error) {
 			failed = true;
-			appToast.apiError(error, 'Failed to load Dev Machine policy');
+			appToast.apiError(error, m['settings.dev_machines.failed_load']());
 		} finally {
 			loading = false;
 		}
@@ -94,9 +96,9 @@
 					environment_id: defaultEnvironmentId === 'standard' ? undefined : defaultEnvironmentId
 				});
 			}
-			appToast.success('Dev Machine policy saved');
+			appToast.success(m['settings.dev_machines.saved']());
 		} catch (error) {
-			appToast.apiError(error, 'Failed to save Dev Machine policy');
+			appToast.apiError(error, m['settings.dev_machines.failed_save']());
 		} finally {
 			saving = false;
 		}
@@ -112,7 +114,7 @@
 	async function createEnvironmentBuilder() {
 		const builderSize = builderSizes.find((size) => size.diskGb <= (policy?.max_disk_gb ?? 0))?.id;
 		if (!builderSize) {
-			appToast.error('Increase the workspace maximum disk policy to at least 20 GB before creating an Environment Builder');
+			appToast.error(m['settings.dev_machines.increase_disk']());
 			return;
 		}
 		builderBusy = true;
@@ -121,10 +123,10 @@
 				size: builderSize, services: { ide: true, browser: false },
 				agents: [], env_vars: [], keep_running: true, environment_builder: true
 			});
-			appToast.success('Environment Builder queued');
+			appToast.success(m['settings.dev_machines.env_queued']());
 			await goto(`/${slug}/machines/${machine.id}`);
 		} catch (error) {
-			appToast.apiError(error, 'Failed to create Environment Builder');
+			appToast.apiError(error, m['settings.dev_machines.failed_create_env']());
 		} finally {
 			builderBusy = false;
 		}
@@ -135,12 +137,12 @@
 		environmentDeleteBusy = true;
 		try {
 			await deleteDevMachineEnvironment(slug, environmentToDelete.id);
-			appToast.success('Development environment deletion requested');
+			appToast.success(m['settings.dev_machines.env_deletion_requested']());
 			environmentToDelete = null;
 			environmentDeleteOpen = false;
 			await load();
 		} catch (error) {
-			appToast.apiError(error, 'Failed to delete development environment');
+			appToast.apiError(error, m['settings.dev_machines.failed_delete_env']());
 		} finally {
 			environmentDeleteBusy = false;
 		}
@@ -148,42 +150,42 @@
 </script>
 
 {#if loading}<LoadingState />
-{:else if failed || !policy}<ErrorState message="Unable to load Dev Machine policy" onretry={load} />
+{:else if failed || !policy}<ErrorState message={m['settings.dev_machines.unable_load']()} onretry={load} />
 {:else}
 	<form onsubmit={save} class="mx-auto max-w-3xl space-y-6 p-6">
-		<div><h1 class="text-lg font-semibold">Dev Machines</h1><p class="mt-1 text-sm text-[var(--color-text-tertiary)]">Control execution capacity, repositories, and provider access for this workspace.</p></div>
-		{#if !canAdmin}<p class="rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-3 text-xs text-[var(--color-text-tertiary)]">Only workspace owners and admins can change this policy.</p>{/if}
+		<div><h1 class="text-lg font-semibold">{m['settings.dev_machines.title']()}</h1><p class="mt-1 text-sm text-[var(--color-text-tertiary)]">{m['settings.dev_machines.desc']()}</p></div>
+		{#if !canAdmin}<p class="rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-3 text-xs text-[var(--color-text-tertiary)]">{m['settings.dev_machines.admin_only']()}</p>{/if}
 		<fieldset disabled={!canAdmin} class="space-y-6">
 		<section class="space-y-4 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-5">
-			<label class="flex items-center justify-between gap-4"><div><p class="text-sm font-medium">Enable Dev Machines</p><p class="text-xs text-[var(--color-text-tertiary)]">The server must also have the manager, gateway, images, wildcard DNS, and TLS configured.</p></div><Switch bind:checked={policy.enabled} /></label>
+			<label class="flex items-center justify-between gap-4"><div><p class="text-sm font-medium">{m['settings.dev_machines.enable']()}</p><p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.dev_machines.enable_desc']()}</p></div><Switch bind:checked={policy.enabled} /></label>
 			<div class="grid gap-4 sm:grid-cols-2">
-				<label class="space-y-1"><Label>Concurrent machines</Label><Input type="number" min="0" max="100" bind:value={policy.max_concurrent_machines} /></label>
-				<label class="space-y-1"><Label>Machines per user</Label><Input type="number" min="0" max="50" bind:value={policy.max_machines_per_user} /></label>
-				<label class="space-y-1"><Label>Daily agent runs</Label><Input type="number" min="0" bind:value={policy.max_daily_agent_runs} /></label>
-				<label class="space-y-1"><Label>Maximum runtime, minutes</Label><Input type="number" min="5" max="1440" bind:value={policy.max_runtime_minutes} /></label>
-				<label class="space-y-1"><Label>Maximum disk, GB</Label><Input type="number" min="20" max="2048" bind:value={policy.max_disk_gb} /></label>
-				<label class="space-y-1"><Label>Pause after inactivity, minutes</Label><Input type="number" min="5" max="10080" bind:value={policy.idle_pause_minutes} /></label>
+				<label class="space-y-1"><Label>{m['settings.dev_machines.concurrent']()}</Label><Input type="number" min="0" max="100" bind:value={policy.max_concurrent_machines} /></label>
+				<label class="space-y-1"><Label>{m['settings.dev_machines.per_user']()}</Label><Input type="number" min="0" max="50" bind:value={policy.max_machines_per_user} /></label>
+				<label class="space-y-1"><Label>{m['settings.dev_machines.daily_runs']()}</Label><Input type="number" min="0" bind:value={policy.max_daily_agent_runs} /></label>
+				<label class="space-y-1"><Label>{m['settings.dev_machines.max_runtime']()}</Label><Input type="number" min="5" max="1440" bind:value={policy.max_runtime_minutes} /></label>
+				<label class="space-y-1"><Label>{m['settings.dev_machines.max_disk']()}</Label><Input type="number" min="20" max="2048" bind:value={policy.max_disk_gb} /></label>
+				<label class="space-y-1"><Label>{m['settings.dev_machines.idle_pause']()}</Label><Input type="number" min="5" max="10080" bind:value={policy.idle_pause_minutes} /></label>
 			</div>
 		</section>
 		<section class="space-y-4 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-5">
-			<div class="flex items-start justify-between gap-4"><div><h2 class="text-sm font-semibold">Development environments</h2><p class="text-xs text-[var(--color-text-tertiary)]">Configure a writable builder through code-server or terminal, pause it, then save an immutable local snapshot.</p></div><Button type="button" variant="outline" onclick={createEnvironmentBuilder} disabled={builderBusy}>{builderBusy ? 'Creating...' : 'New Environment Builder'}</Button></div>
-			{#if environments.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">No saved environments yet.</p>{:else}<div class="space-y-2">{#each environments as environment}<div class="flex items-center justify-between gap-3 rounded-lg border border-[var(--app-border)] p-3"><div class="min-w-0"><p class="truncate text-sm font-medium">{environment.name}</p><p class="truncate text-xs text-[var(--color-text-tertiary)]">{environment.image_ref}</p><p class="mt-1 text-[10px] capitalize text-[var(--color-text-tertiary)]">{environment.status.replaceAll('_', ' ')}</p></div><Button type="button" size="sm" variant="outline" disabled={environment.status === 'delete_requested'} onclick={() => { environmentToDelete = environment; environmentDeleteOpen = true; }}>Delete</Button></div>{/each}</div>{/if}
+			<div class="flex items-start justify-between gap-4"><div><h2 class="text-sm font-semibold">{m['settings.dev_machines.environments']()}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.dev_machines.environments_desc']()}</p></div><Button type="button" variant="outline" onclick={createEnvironmentBuilder} disabled={builderBusy}>{builderBusy ? m['settings.creating']() : m['settings.dev_machines.new_env']()}</Button></div>
+			{#if environments.length === 0}<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.dev_machines.no_envs']()}</p>{:else}<div class="space-y-2">{#each environments as environment}<div class="flex items-center justify-between gap-3 rounded-lg border border-[var(--app-border)] p-3"><div class="min-w-0"><p class="truncate text-sm font-medium">{environment.name}</p><p class="truncate text-xs text-[var(--color-text-tertiary)]">{environment.image_ref}</p><p class="mt-1 text-[10px] capitalize text-[var(--color-text-tertiary)]">{environment.status.replaceAll('_', ' ')}</p></div><Button type="button" size="sm" variant="outline" disabled={environment.status === 'delete_requested'} onclick={() => { environmentToDelete = environment; environmentDeleteOpen = true; }}>{m['settings.dev_machines.delete']()}</Button></div>{/each}</div>{/if}
 		</section>
 		<section class="space-y-4 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-5">
-			<div><h2 class="text-sm font-semibold">Workspace defaults</h2><p class="text-xs text-[var(--color-text-tertiary)]">Teams, projects, and issues can override these values.</p></div>
+			<div><h2 class="text-sm font-semibold">{m['settings.dev_machines.workspace_defaults']()}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.dev_machines.defaults_desc']()}</p></div>
 			<div class="grid gap-4 sm:grid-cols-2">
-				<div class="space-y-1"><Label>Development repository</Label><Select.Root type="single" value={defaultRepositoryId} onValueChange={(value) => value && (defaultRepositoryId = value)}><Select.Trigger class="w-full">{linkedRepositories.find((item) => item.id === defaultRepositoryId)?.full_name ?? 'No default repository'}</Select.Trigger><Select.Content><Select.Item value="none" label="No default repository">No default repository</Select.Item>{#each linkedRepositories as repository}<Select.Item value={repository.id} label={repository.full_name}>{repository.full_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
-				<div class="space-y-1"><Label>Development environment</Label><Select.Root type="single" value={defaultEnvironmentId} onValueChange={(value) => value && (defaultEnvironmentId = value)}><Select.Trigger class="w-full">{readyEnvironments.find((item) => item.id === defaultEnvironmentId)?.name ?? 'Standard Kuayle environment'}</Select.Trigger><Select.Content><Select.Item value="standard" label="Standard Kuayle environment">Standard Kuayle environment</Select.Item>{#each readyEnvironments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+				<div class="space-y-1"><Label>{m['settings.dev_machines.repo']()}</Label><Select.Root type="single" value={defaultRepositoryId} onValueChange={(value) => value && (defaultRepositoryId = value)}><Select.Trigger class="w-full">{linkedRepositories.find((item) => item.id === defaultRepositoryId)?.full_name ?? m['settings.dev_machines.no_default_repo']()}</Select.Trigger><Select.Content><Select.Item value="none" label={m['settings.dev_machines.no_default_repo']()}>{m['settings.dev_machines.no_default_repo']()}</Select.Item>{#each linkedRepositories as repository}<Select.Item value={repository.id} label={repository.full_name}>{repository.full_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+				<div class="space-y-1"><Label>{m['settings.dev_machines.env']()}</Label><Select.Root type="single" value={defaultEnvironmentId} onValueChange={(value) => value && (defaultEnvironmentId = value)}><Select.Trigger class="w-full">{readyEnvironments.find((item) => item.id === defaultEnvironmentId)?.name ?? m['settings.dev_machines.default_env']()}</Select.Trigger><Select.Content><Select.Item value="standard" label={m['settings.dev_machines.default_env']()}>{m['settings.dev_machines.default_env']()}</Select.Item>{#each readyEnvironments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}</Select.Content></Select.Root></div>
 			</div>
 		</section>
 		<section class="space-y-4 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-5">
-			<div><h2 class="text-sm font-semibold">Providers</h2><p class="text-xs text-[var(--color-text-tertiary)]">Only selected providers can be attached to new machines.</p></div>
+			<div><h2 class="text-sm font-semibold">{m['settings.dev_machines.providers']()}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.dev_machines.providers_desc']()}</p></div>
 			<div class="grid gap-3 sm:grid-cols-3">{#each ['claude-code','opencode','codex'] as provider}<label class="flex items-center justify-between gap-3 rounded-lg border border-[var(--app-border)] p-3"><span class="text-sm">{provider}</span><Switch aria-label={provider} checked={policy.allowed_providers.includes(provider)} onCheckedChange={() => toggleProvider(provider)} /></label>{/each}</div>
-			<label class="flex items-center gap-2 text-sm"><Switch bind:checked={policy.allow_custom_providers} />Allow admin-configured custom CLI providers</label>
+			<label class="flex items-center gap-2 text-sm"><Switch bind:checked={policy.allow_custom_providers} />{m['settings.dev_machines.allow_custom']()}</label>
 		</section>
-		<section class="space-y-3 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-5"><div><h2 class="text-sm font-semibold">Repository allowlist</h2><p class="text-xs text-[var(--color-text-tertiary)]">One <code>owner/repository</code> per line. Empty allows any linked repository.</p></div><Textarea bind:value={repositories} rows={6} class="font-mono text-xs" /></section>
-		<div class="flex justify-end"><Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save policy'}</Button></div>
+		<section class="space-y-3 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] p-5"><div><h2 class="text-sm font-semibold">{m['settings.dev_machines.repo_allowlist']()}</h2><p class="text-xs text-[var(--color-text-tertiary)]">{@html m['settings.dev_machines.repo_allowlist_desc']()}</p></div><Textarea bind:value={repositories} rows={6} class="font-mono text-xs" /></section>
+		<div class="flex justify-end"><Button type="submit" disabled={saving}>{saving ? m['settings.saving']() : m['settings.dev_machines.save_policy']()}</Button></div>
 		</fieldset>
 	</form>
-	<AlertDialog.Root bind:open={environmentDeleteOpen}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>Delete development environment?</AlertDialog.Title><AlertDialog.Description>{environmentToDelete?.name} will be marked for deletion. New machines will no longer be able to use the image after cleanup; existing machine history is retained.</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel onclick={() => (environmentToDelete = null)}>Cancel</AlertDialog.Cancel><AlertDialog.Action variant="destructive" onclick={deleteEnvironment} disabled={environmentDeleteBusy}>{environmentDeleteBusy ? 'Deleting...' : 'Delete environment'}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
+	<AlertDialog.Root bind:open={environmentDeleteOpen}><AlertDialog.Content><AlertDialog.Header><AlertDialog.Title>{m['settings.dev_machines.delete_env_title']()}</AlertDialog.Title><AlertDialog.Description>{m['settings.dev_machines.delete_env_desc']({ name: environmentToDelete?.name ?? '' })}</AlertDialog.Description></AlertDialog.Header><AlertDialog.Footer><AlertDialog.Cancel onclick={() => (environmentToDelete = null)}>{m['settings.cancel']()}</AlertDialog.Cancel><AlertDialog.Action variant="destructive" onclick={deleteEnvironment} disabled={environmentDeleteBusy}>{environmentDeleteBusy ? m['settings.deleting']() : m['settings.dev_machines.delete_env_button']()}</AlertDialog.Action></AlertDialog.Footer></AlertDialog.Content></AlertDialog.Root>
 {/if}

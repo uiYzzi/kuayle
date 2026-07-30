@@ -26,6 +26,8 @@
 	} from '$lib/types/dev-machine';
 	import type { Issue } from '$lib/types/issue';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const SIZE_DISK_GB: Record<string, number> = { small: 20, medium: 50, large: 100 };
 	const sizes = [
@@ -33,6 +35,22 @@
 		{ id: 'medium', resources: '4 CPU / 8 GB', disk: '50 GB workspace' },
 		{ id: 'large', resources: '8 CPU / 16 GB', disk: '100 GB workspace' }
 	] as const;
+
+	const SIZE_LABELS: Record<string, string> = $derived({
+		small: m['machines.size_small'](),
+		medium: m['machines.size_medium'](),
+		large: m['machines.size_large']()
+	});
+
+	const resourcesLabel = (resources: string) => {
+		const match = resources.match(/^(\d+)\s*CPU\s*\/\s*(\d+)\s*GB$/);
+		return match ? m['machines.size_resources']({ cpu: match[1], mem: match[2] }) : resources;
+	};
+
+	const diskLabel = (disk: string) => {
+		const match = disk.match(/^(\d+)\s*GB\sworkspace$/);
+		return match ? m['machines.size_disk']({ disk: match[1] }) : disk;
+	};
 
 	let {
 		open = $bindable(false),
@@ -274,16 +292,16 @@
 	<Dialog.Content class="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
 		<form onsubmit={submit} class="space-y-5">
 			<Dialog.Header>
-				<Dialog.Title>New Dev Machine</Dialog.Title>
-				<Dialog.Description>Create a reusable code-server and terminal environment. Repositories are attached from issues.</Dialog.Description>
+				<Dialog.Title>{m['machines.create_title']()}</Dialog.Title>
+				<Dialog.Description>{m['machines.create_desc']()}</Dialog.Description>
 			</Dialog.Header>
 
 			{#if policy?.enabled === false}
-				<Alert variant="destructive"><AlertDescription>Dev Machines are disabled by workspace policy.</AlertDescription></Alert>
+				<Alert variant="destructive"><AlertDescription>{m['machines.disabled_policy']()}</AlertDescription></Alert>
 			{/if}
 
 			<div class="space-y-1.5">
-				<Label for="machine-name">Machine name</Label>
+				<Label for="machine-name">{m['machines.machine_name']()}</Label>
 				<div class="flex gap-2">
 					<div class="relative flex-1">
 						<Input id="machine-name" bind:value={name} autocomplete="off" required class="pr-8" />
@@ -293,34 +311,34 @@
 							{:else if nameStatus === 'unavailable'}<X class="size-4 text-destructive" />{/if}
 						</span>
 					</div>
-					<Button type="button" variant="outline" size="icon" onclick={regenerateName} aria-label="Generate another name"><RefreshCw /></Button>
+					<Button type="button" variant="outline" size="icon" onclick={regenerateName} aria-label={m['machines.generate_name']()}><RefreshCw /></Button>
 				</div>
 				<p class="text-xs text-muted-foreground">
-					{#if nameStatus === 'available'}Name is available{:else if nameStatus === 'checking'}Checking availability...{:else if nameStatus === 'unavailable'}Use a unique lowercase name with letters, numbers, and hyphens{/if}
+					{#if nameStatus === 'available'}{m['machines.name_available']()}{:else if nameStatus === 'checking'}{m['machines.checking_availability']()}{:else if nameStatus === 'unavailable'}{m['machines.name_unavailable']()}{/if}
 				</p>
 			</div>
 
 			<div class="space-y-1.5">
-				<Label>Development environment</Label>
+				<Label>{m['machines.development_environment']()}</Label>
 				<Select.Root type="single" value={environmentId} onValueChange={(value) => value && (environmentId = value)}>
-					<Select.Trigger class="w-full">{selectedEnvironment?.name ?? 'Use configured default environment'}</Select.Trigger>
+					<Select.Trigger class="w-full">{selectedEnvironment?.name ?? m['machines.use_default_environment']()}</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="standard" label="Use configured default environment">Use configured default environment</Select.Item>
+						<Select.Item value="standard" label={m['machines.use_default_environment']()}>{m['machines.use_default_environment']()}</Select.Item>
 						{#each environments as environment}<Select.Item value={environment.id} label={environment.name}>{environment.name}</Select.Item>{/each}
 					</Select.Content>
 				</Select.Root>
 			</div>
 
 			<div class="space-y-2">
-				<Label>Machine size</Label>
+				<Label>{m['machines.machine_size']()}</Label>
 				<RadioGroup.Root bind:value={size} class="grid grid-cols-1 gap-2 sm:grid-cols-3">
 					{#each sizes as option}
 						<label class="relative cursor-pointer">
 							<RadioGroup.Item value={option.id} disabled={!!policy && SIZE_DISK_GB[option.id] > policy.max_disk_gb} class="peer sr-only" />
 							<div data-selected={size === option.id} class="rounded-lg border border-border bg-background p-3 transition data-[selected=true]:border-primary data-[selected=true]:bg-primary/10 peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
-								<span class="block text-sm font-semibold capitalize">{option.id}</span>
-								<span class="mt-1 block text-xs text-muted-foreground">{option.resources}</span>
-								<span class="block text-xs text-muted-foreground">{option.disk}</span>
+								<span class="block text-sm font-semibold">{SIZE_LABELS[option.id] ?? option.id}</span>
+								<span class="mt-1 block text-xs text-muted-foreground">{resourcesLabel(option.resources)}</span>
+								<span class="block text-xs text-muted-foreground">{diskLabel(option.disk)}</span>
 							</div>
 						</label>
 					{/each}
@@ -328,40 +346,40 @@
 			</div>
 
 			<div class="space-y-3 rounded-lg border border-border p-4">
-				<div class="flex items-center justify-between gap-4"><div><Label>Browser</Label><p class="text-xs text-muted-foreground">Include the isolated browser service.</p></div><Switch aria-label="Browser" bind:checked={browser} /></div>
-				<div class="flex items-center justify-between gap-4"><div><Label>Keep running</Label><p class="text-xs text-muted-foreground">Skip the {policy?.idle_pause_minutes ?? 240}-minute inactivity pause.</p></div><Switch aria-label="Keep running" bind:checked={keepRunning} /></div>
+				<div class="flex items-center justify-between gap-4"><div><Label>{m['machines.browser']()}</Label><p class="text-xs text-muted-foreground">{m['machines.browser_desc']()}</p></div><Switch aria-label={m['machines.browser']()} bind:checked={browser} /></div>
+				<div class="flex items-center justify-between gap-4"><div><Label>{m['machines.keep_running']()}</Label><p class="text-xs text-muted-foreground">{m['machines.keep_running_desc']({ minutes: policy?.idle_pause_minutes ?? 240 })}</p></div><Switch aria-label={m['machines.keep_running']()} bind:checked={keepRunning} /></div>
 			</div>
 
 			<div class="space-y-3 rounded-lg border border-border p-4">
-				<div class="flex items-center justify-between gap-4"><div><Label>Agent runtime</Label><p class="text-xs text-muted-foreground">Configure an autonomous coding provider.</p></div><Switch aria-label="Agent runtime" bind:checked={useAgent} /></div>
+				<div class="flex items-center justify-between gap-4"><div><Label>{m['machines.agent_runtime']()}</Label><p class="text-xs text-muted-foreground">{m['machines.agent_runtime_desc']()}</p></div><Switch aria-label={m['machines.agent_runtime']()} bind:checked={useAgent} /></div>
 				{#if useAgent}
 					<div class="space-y-1.5">
-						<Label>Provider</Label>
+						<Label>{m['machines.provider']()}</Label>
 						<Select.Root type="single" value={provider} onValueChange={(value) => value && selectProvider(value as AgentProvider['id'])}>
-							<Select.Trigger class="w-full">{selectedProvider?.display_name ?? 'Select provider'}</Select.Trigger>
+							<Select.Trigger class="w-full">{selectedProvider?.display_name ?? m['machines.select_provider']()}</Select.Trigger>
 							<Select.Content>{#each providers as item}<Select.Item value={item.id} label={item.display_name}>{item.display_name}</Select.Item>{/each}</Select.Content>
 						</Select.Root>
 					</div>
 					{#if selectedProvider?.custom}
 						<div class="grid gap-3 sm:grid-cols-2">
-							<label class="space-y-1.5 sm:col-span-2"><Label>Custom image</Label><Input bind:value={customImage} required /></label>
-							<label class="space-y-1.5"><Label>Entrypoint</Label><Input bind:value={customEntrypoint} placeholder="/usr/local/bin/agent" required /></label>
-							<label class="space-y-1.5"><Label>Arguments as JSON argv</Label><Input bind:value={customArgs} /></label>
+							<label class="space-y-1.5 sm:col-span-2"><Label>{m['machines.custom_image']()}</Label><Input bind:value={customImage} required /></label>
+							<label class="space-y-1.5"><Label>{m['machines.entrypoint']()}</Label><Input bind:value={customEntrypoint} placeholder="/usr/local/bin/agent" required /></label>
+							<label class="space-y-1.5"><Label>{m['machines.arguments_json']()}</Label><Input bind:value={customArgs} /></label>
 						</div>
 					{/if}
 					{#each selectedProvider?.required_secrets ?? [] as secret}
 						<label class="block space-y-1.5"><Label>{secret}</Label><Input type="password" value={secretValues[secret] ?? ''} oninput={(event) => (secretValues[secret] = event.currentTarget.value)} autocomplete="off" required /></label>
 					{/each}
 					<div class="grid gap-3 sm:grid-cols-2">
-						<label class="space-y-1.5"><Label>Additional secret name</Label><Input bind:value={extraSecretName} placeholder="Optional" /></label>
-						<label class="space-y-1.5"><Label>Additional secret value</Label><Input bind:value={extraSecretValue} type="password" autocomplete="off" /></label>
+						<label class="space-y-1.5"><Label>{m['machines.additional_secret_name']()}</Label><Input bind:value={extraSecretName} placeholder="Optional" /></label>
+						<label class="space-y-1.5"><Label>{m['machines.additional_secret_value']()}</Label><Input bind:value={extraSecretValue} type="password" autocomplete="off" /></label>
 					</div>
 				{/if}
 			</div>
 
 			<Dialog.Footer>
-				<Button type="button" variant="outline" onclick={() => (open = false)}>Cancel</Button>
-				<Button type="submit" disabled={!canSubmit}>{loading ? 'Queuing...' : 'Create machine'}</Button>
+				<Button type="button" variant="outline" onclick={() => (open = false)}>{m['common.cancel']()}</Button>
+				<Button type="submit" disabled={!canSubmit}>{loading ? m['machines.queuing']() : m['machines.create_machine']()}</Button>
 			</Dialog.Footer>
 		</form>
 	</Dialog.Content>

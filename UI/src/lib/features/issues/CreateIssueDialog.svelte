@@ -10,7 +10,7 @@
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Cycle } from '$lib/types/cycle';
 	import type { Issue, IssueStatus, IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import type { IssueTemplate } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 	import { getIssueCreateDefaults } from './create-defaults';
@@ -23,6 +23,8 @@
 	import DatePickerPopover from '$lib/components/shared/DatePickerPopover.svelte';
 	import { StatusSelector, PrioritySelector, AssigneeSelector, LabelSelector, ProjectSelector, CycleSelector, TeamSelector } from './selectors';
 	import { listTemplates } from '$lib/api/issue-templates';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import {
 		User,
 		Tag,
@@ -314,7 +316,7 @@
 						<span class="flex h-4 w-4 items-center justify-center rounded bg-[var(--app-accent)] text-[9px] font-bold text-[var(--app-accent-foreground)]">
 							{selectedTeam?.key?.charAt(0) ?? 'T'}
 						</span>
-						{selectedTeam?.key ?? 'Team'}
+						{selectedTeam?.key ?? m['sharedComponents.create_issue.team']()}
 					</button>
 				{/snippet}
 			</TeamSelector>
@@ -324,7 +326,7 @@
 					<Popover.Trigger>
 						<button tabindex="-1" class="flex max-w-52 items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
 							<FileText size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
-							<span class="truncate">{selectedTemplate?.title || 'Template'}</span>
+							<span class="truncate">{selectedTemplate?.title || m['sharedComponents.create_issue.template']()}</span>
 						</button>
 					</Popover.Trigger>
 					<Popover.Content class="w-56 p-1" align="start">
@@ -333,7 +335,7 @@
 							class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 						>
 							<FileText size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
-							<span class="truncate">No template</span>
+							<span class="truncate">{m['sharedComponents.create_issue.no_template']()}</span>
 						</button>
 						{#each templates as tmpl (tmpl.id)}
 							<button
@@ -341,14 +343,14 @@
 								class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 							>
 								<FileText size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
-								<span class="truncate">{tmpl.title || 'Untitled template'}</span>
+								<span class="truncate">{tmpl.title || m['sharedComponents.create_issue.untitled_template']()}</span>
 							</button>
 						{/each}
 					</Popover.Content>
 				</Popover.Root>
 			{:else}
 				<span class="text-xs font-medium text-[var(--color-text-secondary)]">
-					{parentIssue ? `New sub-issue of ${parentIssue.identifier}` : 'New Issue'}
+					{parentIssue ? m['sharedComponents.create_issue.new_sub_issue']({ identifier: parentIssue.identifier }) : m['sharedComponents.create_issue.new_issue']()}
 				</span>
 			{/if}
 		</div>
@@ -362,7 +364,7 @@
 				type="text"
 				bind:value={title}
 				onpaste={handleTitlePaste}
-				placeholder="Issue title"
+				placeholder={m['sharedComponents.create_issue.issue_title_placeholder']()}
 				class="w-full bg-transparent text-lg font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] max-sm:shrink-0"
 			/>
 			<div class="mt-4 max-h-[calc(60vh-120px)] overflow-y-auto max-sm:flex-1 max-sm:[max-height:none] max-sm:overflow-y-auto">
@@ -372,7 +374,7 @@
 					workspaceSlug={slug}
 					{members}
 					issues={issuesState.issues}
-					placeholder="Add description..."
+					placeholder={m['sharedComponents.create_issue.description_placeholder']()}
 					bubbleMenu={true}
 					borderless={true}
 					minHeight="120px"
@@ -395,7 +397,7 @@
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
 						<IssueStatusIcon category={selectedStatus?.category} color={selectedStatus?.color} size={12} />
-						{selectedStatus?.name ?? 'Status'}
+						{selectedStatus?.name ?? m['sharedComponents.create_issue.status']()}
 					</button>
 				{/snippet}
 			</StatusSelector>
@@ -409,7 +411,7 @@
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
 						<IssuePriorityIcon {priority} size={12} />
-						{PRIORITY_LABELS[priority]}
+						{getPriorityLabel(priority)}
 					</button>
 				{/snippet}
 			</PrioritySelector>
@@ -424,7 +426,7 @@
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {selectedProject ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						<FolderKanban size={12} />
-						{selectedProject?.name ?? 'Project'}
+						{selectedProject?.name ?? m['sharedComponents.create_issue.project']()}
 					</button>
 				{/snippet}
 			</ProjectSelector>
@@ -446,11 +448,11 @@
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {selectedAssignees.length > 0 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						<User size={12} />
 						{#if selectedAssignees.length === 0}
-							Assignee
+							{m['sharedComponents.create_issue.assignee']()}
 						{:else if selectedAssignees.length === 1}
 							{selectedAssignees[0].name || selectedAssignees[0].email}
 						{:else}
-							{selectedAssignees.length} assignees
+							{m['sharedComponents.create_issue.assignees_count']({ count: selectedAssignees.length })}
 						{/if}
 					</button>
 				{/snippet}
@@ -469,11 +471,11 @@
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {selectedLabels.length > 0 ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						<Tag size={12} />
 						{#if selectedLabels.length === 0}
-							Labels
+							{m['sharedComponents.create_issue.labels']()}
 						{:else if selectedLabels.length === 1}
 							{selectedLabels[0].name}
 						{:else}
-							{selectedLabels.length} labels
+							{m['sharedComponents.create_issue.labels_count']({ count: selectedLabels.length })}
 						{/if}
 					</button>
 				{/snippet}
@@ -489,9 +491,9 @@
 				{#snippet trigger()}
 					<button class="flex items-center gap-1.5 rounded-full border border-[var(--app-border)] px-2.5 py-1 max-sm:px-3 max-sm:py-1.5 text-xs {cycleId ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'} hover:bg-[var(--color-bg-hover)]">
 						{#if cycleId}
-							{cycles?.find(c => c.id === cycleId)?.name ?? 'Cycle'}
+							{cycles?.find(c => c.id === cycleId)?.name ?? m['sharedComponents.create_issue.cycle']()}
 						{:else}
-							Cycle
+							{m['sharedComponents.create_issue.cycle']()}
 						{/if}
 					</button>
 				{/snippet}
@@ -501,7 +503,7 @@
 			<DatePickerPopover
 				value={dueDate}
 				onchange={(d) => (dueDate = d)}
-				placeholder="Due date"
+				placeholder={m['sharedComponents.create_issue.due_date_placeholder']()}
 				dueDateMode
 			/>
 		</div>
@@ -510,7 +512,7 @@
 		<div class="flex items-center justify-end gap-3 px-4 py-2.5 max-sm:sticky max-sm:bottom-0 max-sm:shrink-0 max-sm:flex-col max-sm:items-stretch max-sm:border-t max-sm:border-[var(--app-border)] max-sm:bg-[var(--color-bg-secondary)] max-sm:pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
 			<label class="flex items-center gap-2 text-xs text-[var(--color-text-tertiary)]">
 				<Switch bind:checked={createMore} size="sm" />
-				Create more
+				{m['sharedComponents.create_issue.create_more']()}
 			</label>
 			<Button
 				class="max-sm:w-full"
@@ -518,7 +520,7 @@
 				disabled={!title.trim() || !teamId}
 				onclick={handleSubmit}
 			>
-				Create issue
+				{m['sharedComponents.create_issue.create_issue']()}
 			</Button>
 		</div>
 	</Dialog.Content>

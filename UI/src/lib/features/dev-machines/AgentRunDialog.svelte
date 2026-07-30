@@ -9,6 +9,8 @@
 	import { createAgentRun, listMachineAgentProviders } from '$lib/api/dev-machines';
 	import type { AgentProvider, AgentRun, DevMachine } from '$lib/types/dev-machine';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let { open = $bindable(false), slug, machine, checkoutId, initialPrompt = '', oncreated }: {
 		open: boolean; slug: string; machine: DevMachine; checkoutId?: string; initialPrompt?: string; oncreated?: (run: AgentRun) => void;
@@ -116,26 +118,26 @@
 <Dialog.Root bind:open>
 	<Dialog.Content class="max-h-[90vh] overflow-y-auto border-[var(--app-border)] bg-[var(--color-bg-secondary)] sm:max-w-xl">
 		<form onsubmit={submit} class="space-y-4">
-			<Dialog.Header><Dialog.Title>Run Agent</Dialog.Title><Dialog.Description>{machine.repo_owner && machine.repo_name ? `${machine.repo_owner}/${machine.repo_name} on ${machine.working_branch}` : 'Select a ready issue checkout from the machine page.'}</Dialog.Description></Dialog.Header>
+			<Dialog.Header><Dialog.Title>{m['machines.run_agent_title']()}</Dialog.Title><Dialog.Description>{machine.repo_owner && machine.repo_name ? m['machines.run_agent_desc']({ repo: `${machine.repo_owner}/${machine.repo_name}`, branch: machine.working_branch ?? '' }) : m['machines.run_agent_no_checkout']()}</Dialog.Description></Dialog.Header>
 			{#if providersError}
-				<div class="flex items-center justify-between gap-3 text-xs text-red-400"><span>No autonomous provider is available.</span><Button type="button" size="xs" variant="outline" onclick={loadProviders}>Retry</Button></div>
+				<div class="flex items-center justify-between gap-3 text-xs text-red-400"><span>{m['machines.no_autonomous_provider']()}</span><Button type="button" size="xs" variant="outline" onclick={loadProviders}>{m['machines.refresh']()}</Button></div>
 			{/if}
 			<div class="grid gap-3 sm:grid-cols-2">
-				<div class="space-y-1"><Label>Provider</Label><Select.Root type="single" value={provider} disabled={!providersLoaded || providersError} onValueChange={(value) => value && selectProvider(value as AgentProvider['id'])}><Select.Trigger aria-label="Provider" class="w-full">{selectedProviderLabel}</Select.Trigger><Select.Content>{#each providers as item}<Select.Item value={item.id} label={item.display_name}>{item.display_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
-				<div class="space-y-1"><Label>Mode</Label><div class="flex h-9 items-center rounded-md border border-[var(--app-border)] px-3 text-sm">Autonomous</div></div>
+				<div class="space-y-1"><Label>{m['machines.provider']()}</Label><Select.Root type="single" value={provider} disabled={!providersLoaded || providersError} onValueChange={(value) => value && selectProvider(value as AgentProvider['id'])}><Select.Trigger aria-label={m['machines.provider']()} class="w-full">{selectedProviderLabel}</Select.Trigger><Select.Content>{#each providers as item}<Select.Item value={item.id} label={item.display_name}>{item.display_name}</Select.Item>{/each}</Select.Content></Select.Root></div>
+				<div class="space-y-1"><Label>{m['machines.mode']()}</Label><div class="flex h-9 items-center rounded-md border border-[var(--app-border)] px-3 text-sm">{m['machines.autonomous']()}</div></div>
 			</div>
-			<label class="block space-y-1"><Label>Prompt and context</Label><Textarea bind:value={prompt} required rows={6} /></label>
-			<label class="block space-y-1"><Label>Acceptance criteria, one per line</Label><Textarea bind:value={criteria} rows={3} /></label>
-			<label class="block space-y-1"><Label>Test command argv</Label><Input bind:value={testArgv} placeholder='["go","test","./..."]' /></label>
-			<label class="block space-y-1"><Label>Forbidden paths, one per line</Label><Textarea bind:value={forbiddenPaths} rows={2} /></label>
-			<label class="block space-y-1"><Label>Allowed secret names, one per line</Label><Textarea bind:value={allowedSecrets} rows={2} /></label>
+			<label class="block space-y-1"><Label>{m['machines.prompt_context']()}</Label><Textarea bind:value={prompt} required rows={6} /></label>
+			<label class="block space-y-1"><Label>{m['machines.acceptance_criteria']()}</Label><Textarea bind:value={criteria} rows={3} /></label>
+			<label class="block space-y-1"><Label>{m['machines.test_command']()}</Label><Input bind:value={testArgv} placeholder='["go","test","./..."]' /></label>
+			<label class="block space-y-1"><Label>{m['machines.forbidden_paths']()}</Label><Textarea bind:value={forbiddenPaths} rows={2} /></label>
+			<label class="block space-y-1"><Label>{m['machines.allowed_secrets']()}</Label><Textarea bind:value={allowedSecrets} rows={2} /></label>
 			<label class="block space-y-1">
-				<Label>Maximum runtime in seconds</Label>
+				<Label>{m['machines.max_runtime']()}</Label>
 				<Input bind:value={maxRuntime} type="number" min="30" max={maxRuntimeCap || 86400} />
-				<p class="text-[10px] text-[var(--color-text-tertiary)]">Capped to {maxRuntimeCap} s (machine max {machine.max_runtime_minutes} min, remaining lifetime {Math.round(machineRemainingSeconds / 60)} min)</p>
+				<p class="text-[10px] text-[var(--color-text-tertiary)]">{m['machines.max_runtime_capped']({ max: maxRuntimeCap, machineMax: machine.max_runtime_minutes, remaining: Math.round(machineRemainingSeconds / 60) })}</p>
 			</label>
-			<div class="space-y-3"><label class="flex items-center justify-between gap-4"><span class="text-sm">Push working branch</span><Switch aria-label="Push working branch" checked={pushBranch} onCheckedChange={setPushBranch} /></label><label class="flex items-center justify-between gap-4"><span class="text-sm">Open pull request</span><Switch aria-label="Open pull request" bind:checked={openPullRequest} disabled={!pushBranch} /></label></div>
-			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] pt-4"><Button type="button" variant="outline" onclick={() => (open = false)}>Cancel</Button><Button type="submit" disabled={!submitEnabled}>{loading ? 'Queuing...' : 'Run agent'}</Button></div>
+			<div class="space-y-3"><label class="flex items-center justify-between gap-4"><span class="text-sm">{m['machines.push_branch']()}</span><Switch aria-label={m['machines.push_branch']()} checked={pushBranch} onCheckedChange={setPushBranch} /></label><label class="flex items-center justify-between gap-4"><span class="text-sm">{m['machines.open_pr']()}</span><Switch aria-label={m['machines.open_pr']()} bind:checked={openPullRequest} disabled={!pushBranch} /></label></div>
+			<div class="flex justify-end gap-2 border-t border-[var(--app-border)] pt-4"><Button type="button" variant="outline" onclick={() => (open = false)}>{m['common.cancel']()}</Button><Button type="submit" disabled={!submitEnabled}>{loading ? m['machines.queuing']() : m['machines.run_agent_action']()}</Button></div>
 		</form>
 	</Dialog.Content>
 </Dialog.Root>

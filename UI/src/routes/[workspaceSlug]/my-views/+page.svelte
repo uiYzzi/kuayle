@@ -9,6 +9,8 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { appToast } from '$lib/features/toast/toast';
 	import { Bookmark, CircleUser, Trash2 } from 'lucide-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 
@@ -57,9 +59,9 @@
 		try {
 			await deleteView(slug, view.id);
 			views = views.filter((item) => item.id !== view.id);
-			appToast.success('View deleted');
+			appToast.success(m['views.toast.deleted']());
 		} catch {
-			appToast.error('Failed to delete view');
+			appToast.error(m['views.toast.failed_delete']());
 		} finally {
 			deleteOpen = false;
 			pendingDeleteView = null;
@@ -74,7 +76,7 @@
 			<nav class="flex items-center gap-1.5 text-sm">
 				<span class="flex items-center gap-1.5 font-medium text-[var(--color-text-primary)]">
 					<Bookmark size={14} class="shrink-0" />
-					My Views
+					{m['views.my_views']()}
 				</span>
 			</nav>
 		</div>
@@ -82,8 +84,8 @@
 
 	{#if !loading && views.length === 0}
 		<EmptyState
-			title="No personal views"
-			description="Save filters and choose Personal visibility to keep views here."
+			title={m['views.no_personal_views']()}
+			description={m['views.no_personal_views_desc']()}
 		/>
 	{:else}
 		<div class="divide-y divide-[var(--app-border)]">
@@ -103,7 +105,7 @@
 					<button
 						onclick={() => requestDelete(view)}
 						class="shrink-0 rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-tertiary)] hover:text-red-500"
-						title="Delete view"
+						title={m['views.delete_view']()}
 					>
 						<Trash2 size={14} />
 					</button>
@@ -116,14 +118,14 @@
 <AlertDialog.Root bind:open={deleteOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Delete view?</AlertDialog.Title>
+			<AlertDialog.Title>{m['views.delete_title']()}</AlertDialog.Title>
 			<AlertDialog.Description>
-				This will permanently delete {pendingDeleteView?.name ?? 'this view'}.
+				{m['views.delete_desc']({ name: pendingDeleteView?.name ?? '' })}
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={handleDelete}>Delete view</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>{m['common.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action variant="destructive" onclick={handleDelete}>{m['views.delete_view']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

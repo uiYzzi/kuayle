@@ -12,6 +12,8 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { Plus, SquareUser, Box, ChevronRight } from 'lucide-svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	const teamId = $derived(page.params.teamId ?? '');
@@ -20,12 +22,9 @@
 	let loading = $state(true);
 	let showCreateProject = $state(false);
 
-	const STATUS_LABELS: Record<ProjectStatus, string> = {
-		planned: 'Planned',
-		in_progress: 'In Progress',
-		completed: 'Completed',
-		cancelled: 'Cancelled'
-	};
+	function statusLabel(status: ProjectStatus): string {
+		return m[`projects.status.${status}`]();
+	}
 
 	$effect(() => {
 		if (!slug || !teamId) return;
@@ -46,9 +45,9 @@
 			const project = await createProject(slug, { ...data, team_id: teamId });
 			projects = [...projects, project];
 			sidebarState.addProject(project);
-			appToast.success('Project created');
-		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create project');
+				appToast.success(m['projects.toast.created']());
+			} catch (err: any) {
+				appToast.apiError(err, m['projects.toast.failed_create']());
 		}
 	}
 
@@ -83,14 +82,14 @@
 				{/if}
 				<span class="flex items-center gap-1.5 font-medium text-[var(--color-text-primary)]">
 					<Box size={14} class="shrink-0" />
-					Projects
+					{m['projects.title']()}
 				</span>
 			</nav>
 		</div>
 		<button
 			onclick={() => (showCreateProject = true)}
 			class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			title="New Project"
+			title={m['projects.new_project']()}
 		>
 			<Plus size={16} />
 		</button>
@@ -98,9 +97,9 @@
 
 	{#if !loading && projects.length === 0}
 		<EmptyState
-			title="No projects for this team"
-			description="Create a project to organize this team's issues"
-			action={{ label: 'New Project', onclick: () => (showCreateProject = true) }}
+			title={m['projects.no_team_projects']()}
+			description={m['projects.no_team_projects_desc']()}
+			action={{ label: m['projects.new_project'](), onclick: () => (showCreateProject = true) }}
 		/>
 	{:else}
 		<div class="divide-y divide-[var(--app-border)]">
@@ -113,7 +112,7 @@
 						<div class="flex items-center gap-2">
 							<span class="text-sm font-medium text-[var(--color-text-primary)]">{project.name}</span>
 							<Badge variant={statusVariant(project.status)} class="text-[10px]">
-								{STATUS_LABELS[project.status]}
+								{statusLabel(project.status)}
 							</Badge>
 						</div>
 						{#if project.description}

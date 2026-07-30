@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import type { Issue, Comment, IssueHistory, IssueStatus, IssuePriority, RelationType } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import { teamStatusesState } from './team-statuses.state.svelte';
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Label } from '$lib/types/label';
@@ -253,7 +255,7 @@
 				onupdated?.(updated);
 			} catch {
 				titleValue = issue.title;
-				appToast.error('Failed to update title');
+				appToast.error(m['issue.toast.failed_title']());
 			}
 		} else {
 			titleValue = issue.title;
@@ -277,7 +279,7 @@
 			const updated = await issuesState.update(slug, issue.identifier, { description: html });
 			onupdated?.(updated);
 		} catch {
-			appToast.error('Failed to update description');
+			appToast.error(m['issue.toast.failed_description']());
 		}
 	}
 
@@ -285,10 +287,10 @@
 	async function reworkSelectedDescriptionText(selectedText: string): Promise<string> {
 		try {
 			const result = await expandIssueDescription(slug, issue.identifier, { selected_text: selectedText });
-			appToast.success('Selection reworked');
+			appToast.success(m['issue.toast.selection_reworked']());
 			return result.description;
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to rework selection');
+			appToast.apiError(err, m['issue.toast.failed_rework']());
 			return '';
 		}
 	}
@@ -299,7 +301,7 @@
 			await issuesState.update(slug, issue.identifier, { [field]: value });
 			await refreshIssue();
 		} catch {
-			appToast.error(`Failed to update ${field}`);
+			appToast.error(m['issue.toast.failed_update_field']({ field }));
 		}
 	}
 
@@ -321,9 +323,9 @@
 			const updated = await issuesState.update(slug, issue.identifier, { parent_id: parent.id });
 			onupdated?.(updated);
 			await refreshIssue();
-			appToast.success(`Set parent to ${parent.identifier}`);
+			appToast.success(m['issue.toast.set_parent']({ id: parent.identifier }));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to set parent');
+			appToast.apiError(err, m['issue.toast.failed_set_parent']());
 		}
 	}
 
@@ -333,9 +335,9 @@
 			const updated = await issuesState.update(slug, issue.identifier, { parent_id: '' });
 			onupdated?.(updated);
 			await refreshIssue();
-			appToast.success('Removed parent');
+			appToast.success(m['issue.toast.removed_parent']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to remove parent');
+			appToast.apiError(err, m['issue.toast.failed_remove_parent']());
 		}
 		removeParentOpen = false;
 	}
@@ -351,16 +353,16 @@
 
 	function formatHistoryValue(field: string, value: string | null, displayValue?: string | null): string {
 		if (displayValue?.trim()) return displayValue;
-		if (!value) return 'None';
+		if (!value) return m['issue.history.none']();
 		switch (field) {
 			case 'status':
 				return value;
 			case 'priority':
-				return PRIORITY_LABELS[Number(value) as IssuePriority] ?? value;
+				return getPriorityLabel(Number(value) as IssuePriority) ?? value;
 			case 'assignee':
 			case 'assignee_id': {
 				const member = members.find(m => m.user_id === value);
-				return member ? (member.name || member.email) : 'Unassigned';
+				return member ? (member.name || member.email) : m['issue.history.unassigned']();
 			}
 			case 'project':
 			case 'project_id': {
@@ -374,7 +376,7 @@
 			}
 			case 'parent':
 			case 'parent_id':
-				return 'Unknown issue';
+				return m['issue.history.unknown_issue']();
 			case 'due_date':
 				return value || '-';
 			case 'labels':
@@ -386,13 +388,13 @@
 
 	function historyFieldLabel(field: string): string {
 		switch (field) {
-			case 'assignee_id': return 'assignee';
-			case 'assignees': return 'assignees';
-			case 'due_date': return 'due date';
-			case 'parent_id': return 'parent';
-			case 'project_id': return 'project';
-			case 'cycle_id': return 'cycle';
-			case 'status_id': return 'status';
+			case 'assignee_id': return m['issue.history.assignee']();
+			case 'assignees': return m['issue.history.assignees']();
+			case 'due_date': return m['issue.history.due_date']();
+			case 'parent_id': return m['issue.history.parent']();
+			case 'project_id': return m['issue.history.project']();
+			case 'cycle_id': return m['issue.history.cycle']();
+			case 'status_id': return m['issue.history.status']();
 			default: return field;
 		}
 	}
@@ -436,7 +438,7 @@
 			commentVersion++;
 			refreshActivity();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to add comment');
+			appToast.apiError(err, m['issue.toast.failed_comment']());
 		}
 	}
 
@@ -450,7 +452,7 @@
 			replyVersions = { ...replyVersions };
 			refreshActivity();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to reply');
+			appToast.apiError(err, m['issue.toast.failed_reply']());
 		}
 	}
 
@@ -459,7 +461,7 @@
 			await resolveComment(slug, issue.identifier, commentId);
 			refreshActivity();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to resolve');
+			appToast.apiError(err, m['issue.toast.failed_resolve']());
 		}
 	}
 
@@ -468,7 +470,7 @@
 			await reopenComment(slug, issue.identifier, commentId);
 			refreshActivity();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to reopen');
+			appToast.apiError(err, m['issue.toast.failed_reopen']());
 		}
 	}
 
@@ -497,9 +499,10 @@
 		} catch { /* ignore */ }
 	}
 
-	function copyToClipboard(text: string, label: string) {
+	function copyToClipboard(text: string, toastKey: string) {
 		navigator.clipboard.writeText(text);
-		appToast.success(`${label} copied`);
+		const dynamicMessage = m as unknown as Record<string, () => string>;
+		appToast.success(dynamicMessage[toastKey]());
 	}
 
 	async function toggleSubscription() {
@@ -514,10 +517,10 @@
 			isSubscribed = res.is_subscribed;
 			issuesState.setSubscription(issue.identifier, res.is_subscribed);
 			onupdated?.({ ...issue, is_subscribed: res.is_subscribed });
-			appToast.success(isSubscribed ? 'Notifications enabled' : 'Notifications disabled');
+			appToast.success(isSubscribed ? m['issue.toast.notifications_enabled']() : m['issue.toast.notifications_disabled']());
 		} catch (err: any) {
 			isSubscribed = !nextValue;
-			appToast.apiError(err, 'Failed to update notifications');
+			appToast.apiError(err, m['issue.toast.failed_notifications']());
 		} finally {
 			subscriptionBusy = false;
 		}
@@ -532,9 +535,9 @@
 			]);
 			if (!issueTeam) teams = copyTeams;
 			await navigator.clipboard.writeText(getAIPrompt(assets, settings.issue_copy_prompt, copyTeams.find(t => t.id === issue.team_id)));
-			appToast.success('AI prompt copied');
+			appToast.success(m['issue.toast.ai_prompt_copied']());
 		} catch (error) {
-			appToast.apiError(error, 'Failed to copy AI prompt');
+			appToast.apiError(error, m['issue.toast.failed_ai_prompt']());
 		}
 	}
 
@@ -570,12 +573,12 @@
 				await issuesState.update(slug, issue.identifier, { status_id: startedStatus.id });
 				const fresh = await getIssue(slug, issue.identifier);
 				onupdated?.(fresh);
-				appToast.success('Branch copied & moved to In Progress');
+				appToast.success(m['issue.toast.branch_copied_moved']());
 			} catch {
-				appToast.success('Branch copied');
+				appToast.success(m['issue.toast.branch_copied']());
 			}
 		} else {
-			appToast.success('Branch name copied');
+			appToast.success(m['issue.toast.branch_name_copied']());
 		}
 	}
 
@@ -712,10 +715,10 @@
 		const now = new Date();
 		const diffDays = Math.ceil((due.getTime() - now.getTime()) / 86400000);
 		let label: string;
-		if (diffDays === 0) label = 'Today';
-		else if (diffDays === 1) label = 'Tomorrow';
-		else if (diffDays === -1) label = 'Yesterday';
-		else label = due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+		if (diffDays === 0) label = m['issue.today']();
+		else if (diffDays === 1) label = m['issue.tomorrow']();
+		else if (diffDays === -1) label = m['issue.yesterday']();
+		else label = due.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
 
 		const colorClass = diffDays < 0
 			? 'text-red-400'
@@ -750,35 +753,35 @@
 				disabled={subscriptionBusy}
 				aria-pressed={isSubscribed}
 				class="rounded p-1.5 transition-colors disabled:opacity-50 {isSubscribed ? 'bg-[var(--app-accent)] text-[var(--app-accent-foreground)]' : 'text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
-				title={isSubscribed ? 'Disable issue notifications' : 'Notify me about changes'}
+				title={isSubscribed ? m['issue.disable_notifications']() : m['issue.enable_notifications']()}
 			>
 				<Bell size={14} />
 			</button>
 			<button
-				onclick={() => copyToClipboard(issue.identifier, 'ID')}
+				onclick={() => { navigator.clipboard.writeText(issue.identifier); appToast.success(m['issue.toast.label_copied']({ label: 'ID' })) }}
 				class="rounded p-1.5 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-				title="Copy issue ID"
+				title={m['issue.copy_id']()}
 			>
 				<Copy size={14} />
 			</button>
 			<button
-				onclick={() => copyToClipboard(window.location.href, 'Link')}
+				onclick={() => { navigator.clipboard.writeText(window.location.href); appToast.success(m['issue.toast.label_copied']({ label: 'Link' })) }}
 				class="rounded p-1.5 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-				title="Copy link"
+				title={m['issue.copy_link']()}
 			>
 				<LinkIcon size={14} />
 			</button>
 			<button
 				onclick={copyBranchAndMoveToProgress}
 				class="rounded p-1.5 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-				title="Copy git branch name & move to In Progress"
+				title={m['issue.copy_branch_move']()}
 			>
 				<GitBranch size={14} />
 			</button>
 			<button
 				onclick={copyAIPrompt}
 				class="rounded p-1.5 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-				title="Copy AI prompt"
+				title={m['issue.copy_ai_prompt']()}
 			>
 				<SquareMousePointer size={14} />
 			</button>
@@ -787,7 +790,7 @@
 					<button
 						type="button"
 						class="rounded p-1.5 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-						title="Issue actions"
+						title={m['issue.issue_actions']()}
 					>
 						<MoreHorizontal size={14} />
 					</button>
@@ -801,7 +804,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors"
 					>
 						<CornerDownRight size={14} />
-						{issue.parent ? 'Change parent' : 'Add parent'}
+						{issue.parent ? m['issue.change_parent']() : m['issue.add_parent']()}
 					</button>
 					<div class="my-1 h-px bg-[var(--app-border)]"></div>
 					<button
@@ -810,7 +813,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors"
 					>
 						<LinkIcon size={14} />
-						Add relation
+						{m['issue.add_relation']()}
 					</button>
 					<button
 						type="button"
@@ -818,7 +821,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors"
 					>
 						<Ban size={14} />
-						Blocked by
+						{m['issue.blocked_by']()}
 					</button>
 					<button
 						type="button"
@@ -826,7 +829,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors"
 					>
 						<ArrowRight size={14} />
-						Blocking
+						{m['issue.blocking']()}
 					</button>
 					<button
 						type="button"
@@ -834,7 +837,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors"
 					>
 						<Copy size={14} />
-						Duplicate
+						{m['issue.duplicate']()}
 					</button>
 				</Popover.Content>
 			</Popover.Root>
@@ -864,14 +867,14 @@
 					<button
 						onclick={() => onnavigate?.('prev')}
 						class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-						title="Previous issue (K)"
+						title={m['issue.previous_issue']()}
 					>
 						<ChevronUp size={16} />
 					</button>
 					<button
 						onclick={() => onnavigate?.('next')}
 						class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
-						title="Next issue (J)"
+						title={m['issue.next_issue']()}
 					>
 						<ChevronDown size={16} />
 					</button>
@@ -911,7 +914,7 @@
 
 				{#if issue.parent}
 					<div class="mt-2 flex min-w-0 items-center gap-1.5 text-xs">
-						<span class="shrink-0 text-[var(--color-text-tertiary)]">Sub-issue of</span>
+						<span class="shrink-0 text-[var(--color-text-tertiary)]">{m['issue.sub_issue_of']()}</span>
 						<ContextMenu.Root>
 							<div class="group/parent relative inline-flex max-w-full">
 								<ContextMenu.Trigger>
@@ -940,10 +943,10 @@
 							</div>
 							<ContextMenu.Content class="w-44">
 								<ContextMenu.Item onclick={() => (parentPickerOpen = true)}>
-									<span class="flex items-center gap-2"><CornerDownRight size={14} />Change parent</span>
+									<span class="flex items-center gap-2"><CornerDownRight size={14} />{m['issue.change_parent']()}</span>
 								</ContextMenu.Item>
 								<ContextMenu.Item class="text-red-500 focus:text-red-500" onclick={() => (removeParentOpen = true)}>
-									<span class="flex w-full items-center justify-between gap-2"><span>Remove parent</span><Trash2 size={14} /></span>
+									<span class="flex w-full items-center justify-between gap-2"><span>{m['issue.remove_parent']()}</span><Trash2 size={14} /></span>
 								</ContextMenu.Item>
 							</ContextMenu.Content>
 						</ContextMenu.Root>
@@ -955,7 +958,7 @@
 					<RichEditor
 						content={issue.description ?? ''}
 						workspaceSlug={slug}
-						placeholder="Add description..."
+						placeholder={m['issue.add_description']()}
 						bubbleMenu={true}
 						borderless={true}
 						uploadUrl={imageUploadUrl}
@@ -992,7 +995,7 @@
 							<span class="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 								<Plus size={12} />
 							</span>
-							Add sub-issue
+							{m['issue.add_sub_issue']()}
 						</button>
 					{/if}
 				</div>
@@ -1009,7 +1012,7 @@
 
 				<!-- Activity -->
 				<div class="mt-6 border-t border-[var(--app-border)] pt-4">
-					<h3 class="text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wide mb-3">Activity</h3>
+					<h3 class="text-xs font-medium text-[var(--color-text-tertiary)] uppercase tracking-wide mb-3">{m['issue.activity']()}</h3>
 
 					{#if loaded}
 						{@const GROUP_THRESHOLD_MS = 5000}
@@ -1037,7 +1040,7 @@
 									onclick={() => showAllActivity = true}
 									class="relative z-10 mb-2 rounded-full border border-[var(--app-border)] bg-[var(--color-bg)] px-2.5 py-1 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)] transition-colors"
 								>
-									Show {hiddenCount} earlier {hiddenCount === 1 ? 'event' : 'events'}
+									{m['issue.show_earlier']({ n: hiddenCount })}
 								</button>
 							{/if}
 
@@ -1055,7 +1058,7 @@
 										</div>
 										<div class="flex items-center gap-1.5 text-xs text-[var(--color-text-tertiary)] min-w-0 overflow-hidden">
 											{#if textFields.length > 0}
-												<span>updated <strong class="text-[var(--color-text-secondary)]">{textFields.map(f => historyFieldLabel(f)).join(', ')}</strong></span>
+												<span>{m['issue.updated']()} <strong class="text-[var(--color-text-secondary)]">{textFields.map(f => historyFieldLabel(f)).join(', ')}</strong></span>
 												{#if valueItems.length > 0}<span class="text-[var(--app-border)]">|</span>{/if}
 											{/if}
 											{#each valueItems as change, idx}
@@ -1077,7 +1080,7 @@
 												{/if}
 											{/each}
 											<span>&middot;</span>
-											<span class="shrink-0">{formatRelativeTime(entry.time)}</span>
+											<span class="shrink-0">{formatRelativeTime(entry.time, getLocale())}</span>
 										</div>
 									</div>
 								{/each}
@@ -1089,12 +1092,12 @@
 								onclick={() => showAllActivity = false}
 								class="relative z-10 mt-2 rounded-full border border-[var(--app-border)] bg-[var(--color-bg)] px-2.5 py-1 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)] transition-colors"
 							>
-								Show less
+								{m['issue.show_less']()}
 							</button>
 						{/if}
 
 						{#if historyGroups.length === 0}
-							<p class="text-xs text-[var(--color-text-tertiary)]">No activity yet</p>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['issue.no_activity']()}</p>
 						{/if}
 					{/if}
 				</div>
@@ -1111,26 +1114,26 @@
 										{(comment.user?.name ?? 'U').charAt(0).toUpperCase()}
 									</div>
 									<span class="text-[13px] font-medium text-[var(--color-text-primary)]">{comment.user?.name ?? 'User'}</span>
-									<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(comment.created_at)}</span>
+									<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(comment.created_at, getLocale())}</span>
 									{#if comment.resolved_at}
-										<span class="text-[11px] font-medium text-green-400">Resolved</span>
+										<span class="text-[11px] font-medium text-green-400">{m['issue.resolved']()}</span>
 									{/if}
 									{#if replyViewers.length > 0}
 										<span class="flex items-center gap-1 ml-1">
 											{#each replyViewers as rv (rv.name)}
 												<span class="flex items-center gap-1 text-[10px] font-medium text-white px-1.5 py-0.5 rounded-full" style="background: {rv.color};">
-													{rv.name} is typing...
+													{m['issue.typing']({ name: rv.name })}
 												</span>
 											{/each}
 										</span>
 									{/if}
 									<div class="ml-auto opacity-0 group-hover/comment:opacity-100 transition-opacity">
 										{#if comment.resolved_at}
-											<button onclick={() => handleReopen(comment.id)} class="flex items-center gap-1 rounded-full border border-[var(--app-border)] px-2 py-0.5 text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors" title="Reopen thread">
-												Reopen thread
+											<button onclick={() => handleReopen(comment.id)} class="flex items-center gap-1 rounded-full border border-[var(--app-border)] px-2 py-0.5 text-[11px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] transition-colors" title={m['issue.reopen_thread']()}>
+												{m['issue.reopen_thread']()}
 											</button>
 										{:else}
-											<button onclick={() => handleResolve(comment.id)} class="rounded p-1 text-[var(--color-text-tertiary)] hover:text-green-400 hover:bg-[var(--color-bg-hover)]" title="Resolve thread">
+											<button onclick={() => handleResolve(comment.id)} class="rounded p-1 text-[var(--color-text-tertiary)] hover:text-green-400 hover:bg-[var(--color-bg-hover)]" title={m['issue.resolve_thread']()}>
 												<Check size={14} />
 											</button>
 										{/if}
@@ -1150,7 +1153,7 @@
 												{(reply.user?.name ?? 'U').charAt(0).toUpperCase()}
 											</div>
 											<span class="text-[13px] font-medium text-[var(--color-text-primary)]">{reply.user?.name ?? 'User'}</span>
-											<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(reply.created_at)}</span>
+											<span class="text-[11px] text-[var(--color-text-tertiary)]">{formatRelativeTime(reply.created_at, getLocale())}</span>
 										</div>
 										<div class="prose prose-invert prose-sm max-w-none mt-2.5 text-[13px] text-[var(--color-text-primary)] [&>p:first-child]:mt-0 [&>p:last-child]:mb-0" use:mentionInteractivity={{ slug, members, issues: issuesState.issues }}>
 											{@html sanitizeHtml(reply.body ?? '')}
@@ -1171,7 +1174,7 @@
 												<RichEditor
 													content=""
 													workspaceSlug={slug}
-													placeholder="Leave a reply..."
+													placeholder={m['issue.leave_reply']()}
 													minimal={true}
 													borderless={true}
 													bubbleMenu={true}
@@ -1192,7 +1195,7 @@
 												onclick={() => handleReply(comment.id)}
 												disabled={!(replyContents[comment.id]?.trim()) || replyContents[comment.id] === '<p></p>'}
 												class="rounded-full bg-[var(--app-accent)] p-1.5 text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)] disabled:opacity-30 transition-colors"
-												title="Send (Ctrl+Enter)"
+												title={m['issue.send']()}
 											>
 												<ArrowUp size={12} />
 											</button>
@@ -1208,7 +1211,7 @@
 						<div class="flex items-center gap-1.5 px-1">
 							{#each newCommentViewers as nv (nv.name)}
 								<span class="flex items-center gap-1 text-[10px] font-medium text-white px-1.5 py-0.5 rounded-full" style="background: {nv.color};">
-									{nv.name} is typing...
+									{m['issue.typing']({ name: nv.name })}
 								</span>
 							{/each}
 						</div>
@@ -1219,7 +1222,7 @@
 							<RichEditor
 								content=""
 								workspaceSlug={slug}
-								placeholder="Leave a comment..."
+								placeholder={m['issue.leave_comment']()}
 								minimal={true}
 								borderless={true}
 								bubbleMenu={true}
@@ -1240,7 +1243,7 @@
 								onclick={handleAddComment}
 								disabled={!newComment.trim() || newComment === '<p></p>'}
 								class="rounded-full bg-[var(--app-accent)] p-1.5 text-[var(--app-accent-foreground)] hover:bg-[var(--app-accent-hover)] disabled:opacity-30 transition-colors"
-								title="Send (Ctrl+Enter)"
+								title={m['issue.send']()}
 							>
 								<ArrowUp size={14} />
 							</button>
@@ -1259,13 +1262,13 @@
 					class="flex w-full items-center gap-1.5 px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
 				>
 					<ChevronRight size={12} class="transition-transform {detailsExpanded ? 'rotate-90' : ''}" />
-					Details
+						{m['issue.details']()}
 				</button>
 				{#if detailsExpanded}
 					<div class="px-1.5 pb-2 space-y-0.5">
 						<!-- Status row -->
 						<div class="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-[var(--color-bg-hover)] transition-colors">
-							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)]">Status</span>
+							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)]">{m['issue.status']()}</span>
 							<StatusSelector
 								bind:open={statusOpen}
 								statuses={teamStatusesState.statusOrder}
@@ -1284,7 +1287,7 @@
 
 						<!-- Priority row -->
 						<div class="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-[var(--color-bg-hover)] transition-colors">
-							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)]">Priority</span>
+							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)]">{m['issue.priority']()}</span>
 							<PrioritySelector
 								bind:open={priorityOpen}
 								value={issue.priority}
@@ -1294,7 +1297,7 @@
 								{#snippet trigger()}
 									<button class="flex items-center gap-1.5 text-sm text-[var(--color-text-primary)]">
 										<IssuePriorityIcon priority={issue.priority} size={14} />
-										{PRIORITY_LABELS[issue.priority]}
+										{getPriorityLabel(issue.priority)}
 									</button>
 								{/snippet}
 							</PrioritySelector>
@@ -1302,7 +1305,7 @@
 
 						<!-- Assignee row -->
 						<div class="flex items-start gap-3 rounded-md px-2 py-1.5 hover:bg-[var(--color-bg-hover)] transition-colors">
-							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)] pt-0.5">Assignee</span>
+							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)] pt-0.5">{m['issue.assignee']()}</span>
 							<div class="flex-1">
 								<AssigneeSelector
 									bind:open={assigneeOpen}
@@ -1317,7 +1320,7 @@
 										try {
 											await issuesState.update(slug, issue.identifier, { assignee_ids: newIds });
 											await refreshIssue();
-										} catch { appToast.error('Failed to update assignees'); }
+										} catch { appToast.error(m['issue.toast.failed_assignees']()); }
 									}}
 								>
 									{#snippet trigger()}
@@ -1342,7 +1345,7 @@
 													{issue.assignee.name}
 												</span>
 											{:else}
-												<span class="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">Add assignee</span>
+												<span class="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">{m['issue.assignee']()}</span>
 											{/if}
 										</button>
 									{/snippet}
@@ -1352,11 +1355,11 @@
 
 						<!-- Due date row -->
 						<div class="flex items-center gap-3 rounded-md px-2 py-1.5 hover:bg-[var(--color-bg-hover)] transition-colors">
-							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)]">Due date</span>
+							<span class="w-20 shrink-0 text-xs text-[var(--color-text-tertiary)]">{m['issue.due_date']()}</span>
 							<DatePickerPopover
 								value={issue.due_date}
 								onchange={(d) => updateField('due_date', d ?? '')}
-								placeholder="Set date"
+								placeholder={m['issue.set_date']()}
 								colorClass={issue.due_date ? formatDueDate(issue.due_date).colorClass : ''}
 								dueDateMode
 							/>
@@ -1373,7 +1376,7 @@
 					class="flex w-full items-center gap-1.5 px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
 				>
 					<ChevronRight size={12} class="transition-transform {labelsExpanded ? 'rotate-90' : ''}" />
-					Labels
+						{m['issue.labels']()}
 				</button>
 				{#if labelsExpanded}
 					<div class="px-3 pb-3">
@@ -1401,7 +1404,7 @@
 									try {
 										await issuesState.update(slug, issue.identifier, { label_ids: newIds });
 										await refreshIssue();
-									} catch { appToast.error('Failed to update labels'); }
+									} catch { appToast.error(m['issue.toast.failed_labels']()); }
 								}}
 							>
 								{#snippet trigger()}
@@ -1412,7 +1415,7 @@
 									{:else}
 										<button class="flex items-center gap-1.5 rounded-md px-2 py-1 text-sm text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)] transition-colors">
 											<Plus size={12} />
-											Add label
+											{m['issue.add_label']()}
 										</button>
 									{/if}
 								{/snippet}
@@ -1429,7 +1432,7 @@
 					class="flex w-full items-center gap-1.5 px-3 py-2.5 text-[11px] font-medium uppercase tracking-wider text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
 				>
 					<ChevronRight size={12} class="transition-transform {projectExpanded ? 'rotate-90' : ''}" />
-					Project
+						{m['issue.project']()}
 				</button>
 				{#if projectExpanded}
 					<div class="px-3 pb-3">
@@ -1448,7 +1451,7 @@
 								{:else}
 									<button class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] transition-colors">
 										<FolderKanban size={14} />
-										Add project
+										{m['issue.add_project']()}
 									</button>
 								{/if}
 							{/snippet}
@@ -1473,7 +1476,7 @@
 									{#snippet trigger()}
 										<button class="flex items-center gap-2 rounded-md px-2 py-1 text-xs hover:bg-[var(--color-bg-hover)] transition-colors {issueCycle ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)]'}">
 											<RefreshCw size={12} class="shrink-0 text-[var(--color-text-tertiary)]" />
-											{issueCycle ? issueCycle.name : 'No cycle'}
+											{issueCycle ? issueCycle.name : m['issue.no_cycle']()}
 										</button>
 									{/snippet}
 								</CycleSelector>
@@ -1506,12 +1509,12 @@
 		if (!createDialogParentIssue) return;
 		try {
 			const created = await bulkCreateSubIssues(slug, createDialogParentIssue.identifier, titles.map((title) => ({ title })));
-			appToast.success(`Created ${created.length} sub-issues`);
+			appToast.success(m['issue.toast.created_sub_issues']({ n: created.length }));
 			await refreshIssue();
 			createIssueTitle = '';
 			createDialogParentIssue = null;
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create sub-issues');
+			appToast.apiError(err, m['issue.toast.failed_sub_issues']());
 		}
 	}}
 	onsubmit={async (req) => {
@@ -1525,7 +1528,7 @@
 			createIssueTitle = '';
 			createDialogParentIssue = null;
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create issue');
+			appToast.apiError(err, m['issue.toast.failed_create_issue']());
 		}
 	}}
 />
@@ -1533,9 +1536,9 @@
 <IssuePickerDialog
 	bind:open={parentPickerOpen}
 	{slug}
-	title="Change parent"
-	description={`${issue.identifier} will become a sub-issue of the selected issue.`}
-	actionLabel="Set parent"
+	title={m['issue.change_parent_title']()}
+	description={m['issue.change_parent_desc']({ id: issue.identifier })}
+	actionLabel={m['issue.set_parent']()}
 	excludeIds={[issue.id]}
 	onselect={changeParent}
 />
@@ -1543,12 +1546,12 @@
 <AlertDialog.Root bind:open={removeParentOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Remove parent from {issue.identifier}?</AlertDialog.Title>
-			<AlertDialog.Description>This will turn the issue back into a regular top-level issue.</AlertDialog.Description>
+			<AlertDialog.Title>{m['issue.remove_parent_question']({ id: issue.identifier })}</AlertDialog.Title>
+			<AlertDialog.Description>{m['issue.remove_parent_desc']()}</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel variant="outline">Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={removeParent}>Remove parent</AlertDialog.Action>
+			<AlertDialog.Action variant="destructive" onclick={removeParent}>{m['issue.remove_parent']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

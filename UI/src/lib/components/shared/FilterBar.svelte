@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel, getPriorityLabels } from '$lib/types/issue';
 	import { teamStatusesState } from '$lib/features/issues/team-statuses.state.svelte';
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
 	import IssuePriorityIcon from '$lib/features/issues/IssuePriorityIcon.svelte';
@@ -32,7 +32,7 @@
 		const ts = teamStatusesState.statusById.get(filters.status);
 		return ts ? ts.name : filters.status;
 	});
-	let priorityLabel = $derived(filters.priority ? PRIORITY_LABELS[Number(filters.priority) as IssuePriority] : 'All priorities');
+	let priorityLabel = $derived(filters.priority ? getPriorityLabel(Number(filters.priority) as IssuePriority) : 'All priorities');
 </script>
 
 <div class="flex items-center gap-2 border-b border-[var(--app-border)] px-4 py-2">
@@ -81,7 +81,7 @@
 			>
 				All priorities
 			</button>
-			{#each Object.entries(PRIORITY_LABELS) as [value, label]}
+			{#each Object.entries(getPriorityLabels()) as [value, label]}
 				<button
 					onclick={() => { setFilter('priority', value); priorityOpen = false; }}
 					class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)] {filters.priority === value ? 'bg-[var(--color-bg-hover)]' : ''}"

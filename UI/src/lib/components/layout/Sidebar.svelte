@@ -35,6 +35,8 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { dndzone } from 'svelte-dnd-action';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import {
 		ArrowUpRight,
 		Bookmark,
@@ -360,7 +362,7 @@
 
 	function copyLink(path: string) {
 		navigator.clipboard.writeText(`${window.location.origin}${path}`);
-		appToast.success('Link copied');
+		appToast.success(m['sidebar.link_copied']());
 	}
 
 	function requestDeleteView(view: View) {
@@ -375,10 +377,10 @@
 			await deleteView(slug, view.id);
 			views = views.filter((item) => item.id !== view.id);
 			orderedViews = orderedViews.filter((item) => item.id !== view.id);
-			appToast.success('View deleted');
+			appToast.success(m['sidebar.view_deleted']());
 			if (currentPath === `/${slug}/views/${view.id}`) goto(`/${slug}/my-issues`);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete view');
+			appToast.apiError(err, m['sidebar.failed_delete_view']());
 		} finally {
 			deleteViewOpen = false;
 			pendingDeleteView = null;
@@ -391,10 +393,10 @@
 			projects = projects.filter((item) => item.id !== project.id);
 			orderedProjects = orderedProjects.filter((item) => item.id !== project.id);
 			sidebarState.projects = orderedProjects;
-			appToast.success('Project deleted');
+			appToast.success(m['sidebar.project_deleted']());
 			if (currentPath === `/${slug}/projects/${project.id}`) goto(`/${slug}/projects`);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete project');
+			appToast.apiError(err, m['sidebar.failed_delete_project']());
 		}
 	}
 
@@ -588,7 +590,7 @@
 				ondblclick={onHandleDblClick}
 				onmouseenter={() => (hoveringHandle = true)}
 				onmouseleave={() => (hoveringHandle = false)}
-				title="Drag to resize &#10;Click to collapse"
+				title={m['sidebar.drag_resize']()}
 			>
 				<div
 					class="mx-auto h-full w-[3px] rounded-full transition-colors {hoveringHandle || dragging
@@ -608,7 +610,7 @@
 		<div
 			role="button"
 			tabindex="0"
-			aria-label="Close sidebar"
+			aria-label={m['sidebar.close_sidebar']()}
 			class="fixed inset-0 top-[49px] z-40 transition-[background-color] duration-300 {drawerOpen
 				? 'pointer-events-auto'
 				: 'pointer-events-none'}"
@@ -640,14 +642,14 @@
 <AlertDialog.Root bind:open={deleteViewOpen}>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
-			<AlertDialog.Title>Delete view?</AlertDialog.Title>
+			<AlertDialog.Title>{m['sidebar.delete_view_question']()}</AlertDialog.Title>
 			<AlertDialog.Description>
-				This will permanently delete {pendingDeleteView?.name ?? 'this view'}.
+				{m['sidebar.delete_view_confirm']({ name: pendingDeleteView?.name ?? m['sidebar.this_view']() })}
 			</AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action variant="destructive" onclick={handleDeleteView}>Delete view</AlertDialog.Action>
+			<AlertDialog.Cancel variant="outline" onclick={() => (pendingDeleteView = null)}>{m['sidebar.cancel']()}</AlertDialog.Cancel>
+			<AlertDialog.Action variant="destructive" onclick={handleDeleteView}>{m['sidebar.delete_view_button']()}</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>
@@ -663,7 +665,7 @@
 				<button
 					onclick={onsearch}
 					class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-					title="Search"
+					title={m['sidebar.search']()}
 				>
 					<Search size={16} />
 				</button>
@@ -672,7 +674,7 @@
 				<button
 					onclick={oncreateissue}
 					class="rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-					title="New issue"
+					title={m['sidebar.new_issue']()}
 				>
 					<SquarePen size={16} />
 				</button>
@@ -697,7 +699,7 @@
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<Inbox size={16} class="shrink-0" />
-					<span class="truncate">Inbox</span>
+					<span class="truncate">{m['sidebar.inbox']()}</span>
 					{#if unreadCount > 0}
 						<span
 							class="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--app-accent)] px-1 text-[10px] font-medium text-[var(--app-accent-foreground)]"
@@ -713,7 +715,7 @@
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<CircleUser size={16} class="shrink-0" />
-					<span class="truncate">My Issues</span>
+					<span class="truncate">{m['sidebar.my_issues']()}</span>
 				</a>
 				<a
 					href="/{slug}/insights"
@@ -722,7 +724,7 @@
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<BarChart3 size={16} class="shrink-0" />
-					<span class="truncate">Insights</span>
+					<span class="truncate">{m['sidebar.insights']()}</span>
 				</a>
 				{#if canManageDevMachines}
 				<a
@@ -732,7 +734,7 @@
 						: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 				>
 					<Box size={16} class="shrink-0" />
-					<span class="truncate">Dev Machines</span>
+					<span class="truncate">{m['sidebar.dev_machines']()}</span>
 				</a>
 				{/if}
 			</div>
@@ -745,7 +747,7 @@
 						class="flex w-full items-center px-2 py-1"
 					>
 						<span class="flex items-center gap-1">
-							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">Favorites</span>
+							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.favorites']()}</span>
 							<ChevronDown
 								size={12}
 								class="text-[var(--color-text-tertiary)] transition-transform {favoritesCollapsed ? '-rotate-90' : ''}"
@@ -793,7 +795,7 @@
 					}}
 				>
 					<span class="flex items-center gap-1">
-						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">Teams</span>
+						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.teams']()}</span>
 						<ChevronDown
 							size={12}
 							class="text-[var(--color-text-tertiary)] transition-transform {teamsCollapsed ? '-rotate-90' : ''}"
@@ -806,7 +808,7 @@
 								oncreateteam?.();
 							}}
 							class="rounded p-0.5 text-[var(--color-text-tertiary)] opacity-0 transition-opacity group-hover/teams:opacity-100 hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)]"
-							title="Create team"
+							title={m['sidebar.create_team']()}
 						>
 							<Plus size={14} />
 						</button>
@@ -859,16 +861,16 @@
 												<DropdownMenu.Content side="right" align="start" class="w-44">
 													<DropdownMenu.Item onclick={() => goto(`/${slug}/settings/teams/${team.id}`)}>
 														<Settings size={14} class="mr-2" />
-														Team settings
+														{m['sidebar.team_settings']()}
 													</DropdownMenu.Item>
 													<DropdownMenu.Separator />
 													<DropdownMenu.Item onclick={() => onleaveteam?.(team)} class="text-[var(--color-error)]">
 														<LogOut size={14} class="mr-2" />
-														Leave team...
+														{m['sidebar.leave_team']()}
 													</DropdownMenu.Item>
 													<DropdownMenu.Item onclick={() => ondeleteteam?.(team)} class="text-[var(--color-error)]">
 														<Trash2 size={14} class="mr-2" />
-														Delete team...
+														{m['sidebar.delete_team']()}
 													</DropdownMenu.Item>
 												</DropdownMenu.Content>
 											</DropdownMenu.Root>
@@ -877,11 +879,11 @@
 									<ContextMenu.Content class="w-44">
 										<ContextMenu.Item onclick={() => goto(`/${slug}/teams/${team.id}`)}>
 											<SquareUser class={menuIconClass} />
-											Open team
+											{m['sidebar.open_team']()}
 										</ContextMenu.Item>
 										<ContextMenu.Item onclick={() => goto(`/${slug}/settings/teams/${team.id}`)}>
 											<Settings class={menuIconClass} />
-											Team settings
+											{m['sidebar.team_settings']()}
 										</ContextMenu.Item>
 										<ContextMenu.Separator />
 										<ContextMenu.Item
@@ -889,14 +891,14 @@
 											class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 										>
 											<LogOut class={menuIconClass} />
-											Leave team...
+											{m['sidebar.leave_team']()}
 										</ContextMenu.Item>
 										<ContextMenu.Item
 											onclick={() => ondeleteteam?.(team)}
 											class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 										>
 											<Trash2 class={menuIconClass} />
-											Delete team...
+											{m['sidebar.delete_team']()}
 										</ContextMenu.Item>
 									</ContextMenu.Content>
 								</ContextMenu.Root>
@@ -915,7 +917,7 @@
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<SquaresSubtract size={13} />
-											Issues
+											{m['sidebar.issues']()}
 										</a>
 										<a
 											href="/{slug}/teams/{team.id}/cycles"
@@ -926,7 +928,7 @@
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<RefreshCcwDot size={13} />
-											Cycles
+											{m['sidebar.cycles']()}
 										</a>
 										<a
 											href="/{slug}/teams/{team.id}/projects"
@@ -937,7 +939,7 @@
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<Box size={13} />
-											Projects
+											{m['sidebar.projects']()}
 										</a>
 										{#if teamProjects.length > 0}
 											<div class="relative ml-[31px]">
@@ -971,17 +973,17 @@
 																<ContextMenu.Content class="w-44">
 																	<ContextMenu.Item onclick={() => goto(`/${slug}/projects/${project.id}`)}>
 																		<Box class={menuIconClass} />
-																		Open project
+																		{m['sidebar.open_project']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item
 																		onclick={() => window.open(`/${slug}/projects/${project.id}`, '_blank')}
 																	>
 																		<ArrowUpRight class={menuIconClass} />
-																		Open in new tab
+																		{m['sidebar.open_in_new_tab']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item onclick={() => copyLink(`/${slug}/projects/${project.id}`)}>
 																		<Copy class={menuIconClass} />
-																		Copy link
+																		{m['sidebar.copy_link']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Separator />
 																	<ContextMenu.Item
@@ -989,7 +991,7 @@
 																		class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 																	>
 																		<Trash2 class={menuIconClass} />
-																		Delete project
+																		{m['sidebar.delete_project']()}
 																	</ContextMenu.Item>
 																</ContextMenu.Content>
 															</ContextMenu.Root>
@@ -1007,7 +1009,7 @@
 												: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 										>
 											<Layers size={13} />
-											Views
+											{m['sidebar.views']()}
 										</a>
 										{#if team.triage_enabled}
 											<a
@@ -1019,7 +1021,7 @@
 													: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 											>
 												<ShieldCheck size={13} />
-												Triage
+												{m['sidebar.triage']()}
 											</a>
 										{/if}
 										{#if teamViews.length > 0}
@@ -1055,15 +1057,15 @@
 																<ContextMenu.Content class="w-44">
 																	<ContextMenu.Item onclick={() => goto(`/${slug}/views/${view.id}`)}>
 																		<Layers class={menuIconClass} />
-																		Open view
+																		{m['sidebar.open_view']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item onclick={() => window.open(`/${slug}/views/${view.id}`, '_blank')}>
 																		<ArrowUpRight class={menuIconClass} />
-																		Open in new tab
+																		{m['sidebar.open_in_new_tab']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Item onclick={() => copyLink(`/${slug}/views/${view.id}`)}>
 																		<Copy class={menuIconClass} />
-																		Copy link
+																		{m['sidebar.copy_link']()}
 																	</ContextMenu.Item>
 																	<ContextMenu.Separator />
 																	<ContextMenu.Item
@@ -1071,7 +1073,7 @@
 																		class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 																	>
 																		<Trash2 class={menuIconClass} />
-																		Delete view
+																		{m['sidebar.delete_view']()}
 																	</ContextMenu.Item>
 																</ContextMenu.Content>
 															</ContextMenu.Root>
@@ -1090,7 +1092,7 @@
 								class="flex w-full items-center gap-2 rounded-md px-2 py-1 text-sm text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 							>
 								<Plus size={14} />
-								Create your first team
+								{m['sidebar.create_first_team']()}
 							</button>
 						{/if}
 					</div>
@@ -1105,7 +1107,7 @@
 						class="flex w-full items-center px-2 py-1"
 					>
 						<span class="flex items-center gap-1">
-							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">Views</span>
+							<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.views']()}</span>
 							<ChevronDown
 								size={12}
 								class="text-[var(--color-text-tertiary)] transition-transform {viewsCollapsed ? '-rotate-90' : ''}"
@@ -1121,7 +1123,7 @@
 									: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 							>
 								<Bookmark size={16} class="shrink-0" />
-								<span class="truncate">My Views</span>
+								<span class="truncate">{m['sidebar.my_views']()}</span>
 								{#if personalViews.length > 0}
 									<span class="ml-auto text-[10px] text-[var(--color-text-tertiary)]">{personalViews.length}</span>
 								{/if}
@@ -1160,15 +1162,15 @@
 											<ContextMenu.Content class="w-44">
 												<ContextMenu.Item onclick={() => goto(`/${slug}/views/${view.id}`)}>
 													<Layers class={menuIconClass} />
-													Open view
+													{m['sidebar.open_view']()}
 												</ContextMenu.Item>
 												<ContextMenu.Item onclick={() => window.open(`/${slug}/views/${view.id}`, '_blank')}>
 													<ArrowUpRight class={menuIconClass} />
-													Open in new tab
+													{m['sidebar.open_in_new_tab']()}
 												</ContextMenu.Item>
 												<ContextMenu.Item onclick={() => copyLink(`/${slug}/views/${view.id}`)}>
 													<Copy class={menuIconClass} />
-													Copy link
+													{m['sidebar.copy_link']()}
 												</ContextMenu.Item>
 												<ContextMenu.Separator />
 												<ContextMenu.Item
@@ -1176,7 +1178,7 @@
 													class="text-[var(--color-error)] focus:text-[var(--color-error)]"
 												>
 													<Trash2 class={menuIconClass} />
-													Delete view
+													{m['sidebar.delete_view']()}
 												</ContextMenu.Item>
 											</ContextMenu.Content>
 										</ContextMenu.Root>
@@ -1196,7 +1198,7 @@
 					onclick={() => (projectsCollapsed = toggleSection('projects', projectsCollapsed))}
 				>
 					<span class="flex items-center gap-1">
-						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">Projects</span>
+						<span class="text-[11px] font-semibold text-[var(--color-text-secondary)]">{m['sidebar.projects']()}</span>
 						<ChevronDown
 							size={12}
 							class="text-[var(--color-text-tertiary)] transition-transform {projectsCollapsed ? '-rotate-90' : ''}"
@@ -1212,7 +1214,7 @@
 								: 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]'}"
 						>
 							<Box size={16} />
-							All Projects
+							{m['sidebar.all_projects']()}
 						</a>
 					</div>
 				{/if}
@@ -1244,7 +1246,7 @@
 					class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 				>
 					<Settings size={14} />
-					Settings
+					{m['sidebar.settings']()}
 				</a>
 				<div class="mt-1 border-t border-[var(--app-border)] pt-1">
 					<a
@@ -1261,7 +1263,7 @@
 						class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-hover)]"
 					>
 						<LogOut size={14} />
-						Log out
+						{m['sidebar.log_out']()}
 					</button>
 				</div>
 			</Popover.Content>
@@ -1269,8 +1271,8 @@
 		<button
 			onclick={() => onshortcutshelp?.()}
 			class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--app-border)] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			aria-label="Keyboard shortcuts"
-			title="Keyboard shortcuts (?)"
+			aria-label={m['sidebar.keyboard_shortcuts']()}
+			title={m['sidebar.keyboard_shortcuts_hint']()}
 		>
 			<CircleQuestionMark size={16} />
 		</button>

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import type { SlashGroup, SlashMenuItem } from './slash-items';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		groups,
@@ -107,7 +109,7 @@
 		</div>
 	{/each}
 	{#if flatItems.length === 0}
-		<div class="slash-empty">No results</div>
+		<div class="slash-empty">{m['sharedComponents.slash_command.no_results']()}</div>
 	{/if}
 </div>
 

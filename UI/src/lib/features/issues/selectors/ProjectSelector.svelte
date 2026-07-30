@@ -4,6 +4,8 @@
 	import { FolderKanban } from 'lucide-svelte';
 	import type { Project } from '$lib/types/project';
 	import type { Snippet } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -28,14 +30,14 @@
 	} = $props();
 </script>
 
-<ComboboxPopover bind:open placeholder="Search projects..." emptyMessage="No projects." {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={m['sharedComponents.selectors.search_projects']()} emptyMessage={m['sharedComponents.selectors.no_projects']()} {width} {align} {shortcutKey} {trigger}>
 	{#if showNone}
 		<Command.Item
-			value="No project"
+			value={m['sharedComponents.filter_builder.no_project']()}
 			onSelect={() => { onchange(null); open = false; }}
 			class="text-[var(--color-text-tertiary)]"
 		>
-			No project
+			{m['sharedComponents.filter_builder.no_project']()}
 		</Command.Item>
 	{/if}
 	{#each projects as project (project.id)}

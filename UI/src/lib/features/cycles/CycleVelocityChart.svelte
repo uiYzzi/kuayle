@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { VelocityPoint } from '$lib/types/cycle';
 	import * as echarts from 'echarts';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		data
@@ -74,19 +76,19 @@
 				textStyle: { color: colorText, fontSize: 11 },
 				formatter: (params: any) => {
 					const name = params[0]?.axisValue ?? '';
-					const completed = params.find((p: any) => p.seriesName === 'Completed')?.value ?? 0;
-					const cancelled = params.find((p: any) => p.seriesName === 'Cancelled')?.value ?? 0;
-					const remaining = params.find((p: any) => p.seriesName === 'Remaining')?.value ?? 0;
+					const completed = params.find((p: any) => p.seriesName === m['cycles.chart.completed']())?.value ?? 0;
+					const cancelled = params.find((p: any) => p.seriesName === m['cycles.chart.cancelled']())?.value ?? 0;
+					const remaining = params.find((p: any) => p.seriesName === m['cycles.chart.remaining']())?.value ?? 0;
 					const total = completed + cancelled + remaining;
 					return `<div><strong>${name}</strong></div>`
-						+ `<div style="margin-top:4px">Completed: ${completed}/${total}</div>`
-						+ `<div>Cancelled: ${cancelled}</div>`
-						+ `<div>Remaining: ${remaining}</div>`;
+						+ `<div style="margin-top:4px">${m['cycles.chart.velocity_completed']()}${completed}/${total}</div>`
+						+ `<div>${m['cycles.chart.velocity_cancelled']()}${cancelled}</div>`
+						+ `<div>${m['cycles.chart.velocity_remaining']()}${remaining}</div>`;
 				}
 			},
 			series: [
 				{
-					name: 'Completed',
+					name: m['cycles.chart.completed'](),
 					type: 'bar',
 					stack: 'total',
 					data: completedData,
@@ -94,14 +96,14 @@
 					barMaxWidth: 32
 				},
 				{
-					name: 'Cancelled',
+					name: m['cycles.chart.cancelled'](),
 					type: 'bar',
 					stack: 'total',
 					data: cancelledData,
 					itemStyle: { color: colorCancelled }
 				},
 				{
-					name: 'Remaining',
+					name: m['cycles.chart.remaining'](),
 					type: 'bar',
 					stack: 'total',
 					data: remainingData,

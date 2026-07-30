@@ -4,6 +4,8 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { Snippet } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -26,7 +28,7 @@
 	} = $props();
 </script>
 
-<ComboboxPopover bind:open placeholder="Search members..." emptyMessage="No members." {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={m['sharedComponents.selectors.search_members']()} emptyMessage={m['sharedComponents.selectors.no_members']()} {width} {align} {shortcutKey} {trigger}>
 	{#each members as member (member.user_id)}
 		{@const isAssigned = value.includes(member.user_id)}
 		<Command.Item

@@ -7,6 +7,8 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { Button } from '$lib/components/ui/button';
 	import type { IssueMachineIntent } from './IssueMachinePickerDialog.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { authState } from '$lib/features/auth/auth.state.svelte';
 	import { demoMode } from '$lib/demo';
 
@@ -51,10 +53,10 @@
 </script>
 
 {#if canUseDevMachines}<div class="min-w-0 space-y-0.5">
-	<Button variant="ghost" onclick={() => chooseMachine('ide')} class="w-full min-w-0 justify-start"><Code2 size={14} />Open Code Editor</Button>
-	<Button variant="ghost" onclick={() => chooseMachine('terminal')} class="w-full min-w-0 justify-start"><SquareTerminal size={14} />Open Terminal</Button>
-	<Button variant="ghost" onclick={() => chooseMachine('agent')} class="w-full min-w-0 justify-start"><Bot size={14} />Run Agent</Button>
-	<Button variant="ghost" onclick={() => viewMachine('#agent-runs')} class="w-full min-w-0 justify-start"><Box size={14} />View Agent Runs</Button>
-	<Button variant="ghost" onclick={() => viewMachine('#activity')} class="w-full min-w-0 justify-start"><Activity size={14} />View Machine Activity</Button>
-	<Button variant="ghost" onclick={() => { repositoryOpen = true; onaction?.(); }} class="w-full min-w-0 justify-start"><GitBranch size={14} />Set Development Defaults</Button>
+	<Button variant="ghost" onclick={() => chooseMachine('ide')} class="w-full min-w-0 justify-start"><Code2 size={14} />{m['machines.open_code_editor_action']()}</Button>
+	<Button variant="ghost" onclick={() => chooseMachine('terminal')} class="w-full min-w-0 justify-start"><SquareTerminal size={14} />{m['machines.open_terminal_action']()}</Button>
+	<Button variant="ghost" onclick={() => chooseMachine('agent')} class="w-full min-w-0 justify-start"><Bot size={14} />{m['machines.run_agent_action']()}</Button>
+	<Button variant="ghost" onclick={() => viewMachine('#agent-runs')} class="w-full min-w-0 justify-start"><Box size={14} />{m['machines.view_agent_runs']()}</Button>
+	<Button variant="ghost" onclick={() => viewMachine('#activity')} class="w-full min-w-0 justify-start"><Activity size={14} />{m['machines.view_machine_activity']()}</Button>
+	<Button variant="ghost" onclick={() => { repositoryOpen = true; onaction?.(); }} class="w-full min-w-0 justify-start"><GitBranch size={14} />{m['machines.set_development_defaults']()}</Button>
 </div>{/if}

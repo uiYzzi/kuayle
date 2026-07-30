@@ -18,6 +18,8 @@
 	import CycleVelocityChart from '$lib/features/cycles/CycleVelocityChart.svelte';
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import { appToast } from '$lib/features/toast/toast';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { Plus, SquareUser, RefreshCcwDot, ChevronRight, Clock } from 'lucide-svelte';
 	import SidebarToggle from '$lib/components/layout/SidebarToggle.svelte';
 	import { sidebarState } from '$lib/features/layout/sidebar.state.svelte';
@@ -144,9 +146,9 @@
 		try {
 			const cycle = await createCycle(slug, teamId, data);
 			cycles = [cycle, ...cycles];
-			appToast.success('Cycle created');
+			appToast.success(m['cycles.toast.created']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create cycle');
+			appToast.apiError(err, m['cycles.toast.failed_create']());
 		}
 	}
 
@@ -165,16 +167,10 @@
 				carry_over: data.carry_over
 			});
 			cycles = cycles.map((c) => (c.id === completingCycle!.id ? result.cycle : c));
-			if (result.carried_over_count > 0) {
-				appToast.success(
-					`Cycle completed. ${result.carried_over_count} issue${result.carried_over_count > 1 ? 's' : ''} carried over.`
-				);
-			} else {
-				appToast.success('Cycle completed');
-			}
+			appToast.success(m['cycles.toast.completed']());
 			burndownVersion++;
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to complete cycle');
+			appToast.apiError(err, m['cycles.toast.failed_complete']());
 		}
 	}
 
@@ -182,9 +178,9 @@
 		try {
 			const updated = await updateCycle(slug, teamId, cycleId, { status: 'active' });
 			cycles = cycles.map((c) => (c.id === cycleId ? updated : c));
-			appToast.success('Cycle activated');
+			appToast.success(m['cycles.toast.activated']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to activate cycle');
+			appToast.apiError(err, m['cycles.toast.failed_activate']());
 		}
 	}
 
@@ -192,9 +188,9 @@
 		try {
 			await deleteCycle(slug, teamId, cycleId);
 			cycles = cycles.filter((c) => c.id !== cycleId);
-			appToast.success('Cycle deleted');
+			appToast.success(m['cycles.toast.deleted']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete cycle');
+			appToast.apiError(err, m['cycles.toast.failed_delete']());
 		}
 	}
 
@@ -225,9 +221,9 @@
 				end_date: data.end_date
 			});
 			cycles = cycles.map((c) => (c.id === updated.id ? updated : c));
-			appToast.success('Cycle updated');
+			appToast.success(m['cycles.toast.updated']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update cycle');
+			appToast.apiError(err, m['cycles.toast.failed_update']());
 		}
 	}
 
@@ -235,7 +231,7 @@
 		if (!dateStr) return null;
 		const d = new Date(dateStr);
 		return {
-			month: d.toLocaleDateString('en-US', { month: 'short' }),
+			month: d.toLocaleDateString(getLocale(), { month: 'short' }),
 			day: String(d.getDate())
 		};
 	}
@@ -272,14 +268,14 @@
 				{/if}
 				<span class="flex items-center gap-1.5 font-medium text-[var(--color-text-primary)]">
 					<RefreshCcwDot size={14} class="shrink-0" />
-					<span class="truncate">Cycles</span>
+					<span class="truncate">{m['cycles.title']()}</span>
 				</span>
 			</nav>
 		</div>
 		<button
 			onclick={() => (showCreate = true)}
 			class="shrink-0 rounded-md p-1 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			title="New Cycle"
+			title={m['cycles.new_cycle']()}
 		>
 			<Plus size={16} />
 		</button>
@@ -288,9 +284,9 @@
 	<div class="flex-1 overflow-y-auto">
 		{#if !loading && cycles.length === 0}
 			<EmptyState
-				title="No cycles yet"
-				description="Create a cycle to plan your team's work in sprints"
-				action={{ label: 'New Cycle', onclick: () => (showCreate = true) }}
+				title={m['cycles.no_cycles']()}
+				description={m['cycles.no_cycles_desc']()}
+				action={{ label: m['cycles.new_cycle'](), onclick: () => (showCreate = true) }}
 			/>
 		{:else if !loading}
 			<div class="pt-2">
@@ -399,7 +395,7 @@
 										<CycleBurndownChart {cycle} data={burndownData} />
 									{:else}
 										<div class="flex h-[200px] items-center justify-center text-sm text-[var(--color-text-tertiary)]">
-											No burndown data available
+											{m['cycles.no_burndown']()}
 										</div>
 									{/if}
 								</div>
@@ -420,7 +416,7 @@
 								class="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)]"
 							>
 								<Clock size={12} />
-								{archivedCycles.length} older cycle{archivedCycles.length > 1 ? 's' : ''} (archived)
+								{m['cycles.older_cycles']({ count: archivedCycles.length })}
 							</button>
 
 							{#if archivedExpanded}
@@ -469,7 +465,7 @@
 						class="flex items-center gap-2 text-xs font-medium text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
 					>
 						<ChevronRight size={12} class="transition-transform {velocityExpanded ? 'rotate-90' : ''}" />
-						Velocity ({velocityData.length} completed cycle{velocityData.length > 1 ? 's' : ''})
+						{m['cycles.velocity']({ count: velocityData.length })}
 					</button>
 					{#if velocityExpanded}
 						<div

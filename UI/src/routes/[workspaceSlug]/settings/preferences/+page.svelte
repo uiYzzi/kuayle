@@ -8,6 +8,15 @@
 	import { Checkbox } from '$lib/components/ui/checkbox';
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
 	import { preferencesState } from '$lib/features/preferences/preferences.state.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale, locales } from '$lib/paraglide/runtime.js';
+
+	const LOCALE_LABELS: Record<string, string> = {
+		en: 'English',
+		it: 'Italiano',
+		'zh-CN': '简体中文',
+		'zh-TW': '繁體中文'
+	};
 	import { clearIssueCreateDefaults, getIssueCreateDefaults, setIssueCreateDefaults, type IssueCreateDefaults } from '$lib/features/issues/create-defaults';
 	import { listLabels } from '$lib/api/labels';
 	import { listMembers } from '$lib/api/members';
@@ -20,38 +29,38 @@
 	import type { TeamStatus } from '$lib/types/team-status';
 	import type { WorkspaceMember } from '$lib/types/workspace';
 	import type { IssuePriority } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
-	import { CATEGORY_LABELS, type StatusCategory } from '$lib/types/team-status';
+	import { getPriorityLabel } from '$lib/types/issue';
+	import { getCategoryLabel, type StatusCategory } from '$lib/types/team-status';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 
-	const fontSizeLabels: Record<string, string> = {
-		small: 'Small',
-		default: 'Default',
-		large: 'Large',
-	};
+	const fontSizeLabels = $derived<Record<string, string>>({
+		small: m['prefs.font_size.small'](),
+		default: m['prefs.font_size.default'](),
+		large: m['prefs.font_size.large'](),
+	});
 
-	const lightThemeLabels: Record<string, string> = {
-		light: 'Light',
-		'rose-light': 'Rose Light',
-		'blue-light': 'Blue Light',
-	};
+	const lightThemeLabels = $derived<Record<string, string>>({
+		light: m['prefs.theme.light'](),
+		'rose-light': m['prefs.theme.rose_light'](),
+		'blue-light': m['prefs.theme.blue_light'](),
+	});
 
-	const darkThemeLabels: Record<string, string> = {
-		dark: 'Dark',
-		'dark-gray': 'Dark Gray',
-		'amethyst-dark': 'Amethyst Dark',
-		'emerald-dark': 'Emerald Dark',
-		'cyber-77': 'Cyber 77',
-		'blade-49': 'Blade 49',
-		'pipboy': 'Pip-Boy',
-	};
+	const darkThemeLabels = $derived<Record<string, string>>({
+		dark: m['prefs.theme.dark'](),
+		'dark-gray': m['prefs.theme.dark_gray'](),
+		'amethyst-dark': m['prefs.theme.amethyst_dark'](),
+		'emerald-dark': m['prefs.theme.emerald_dark'](),
+		'cyber-77': m['prefs.theme.cyber_77'](),
+		'blade-49': m['prefs.theme.blade_49'](),
+		'pipboy': m['prefs.theme.pipboy'](),
+	});
 
-	const workflowSortLabels: Record<string, string> = {
-		default: 'Workflow order',
-		'active-first': 'Active first',
-		custom: 'Custom',
-	};
+	const workflowSortLabels = $derived<Record<string, string>>({
+		default: m['prefs.workflow_order'](),
+		'active-first': m['prefs.active_first'](),
+		custom: m['prefs.custom'](),
+	});
 
 	let dragCategory = $state<StatusCategory | null>(null);
 	let dragOverCategory = $state<StatusCategory | null>(null);
@@ -193,17 +202,43 @@
 </script>
 
 <div class="mx-auto max-w-2xl px-8 py-10">
-	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">Preferences</h1>
+	<h1 class="text-2xl font-semibold text-[var(--color-text-primary)]">{m['prefs.title']()}</h1>
 
 	<!-- Interface and theme -->
-	<h2 class="mt-8 text-sm font-medium text-[var(--color-text-secondary)]">Interface and theme</h2>
+	<!-- Language -->
+	<div class="mt-3 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
+		<div class="flex items-center justify-between px-5 py-4">
+			<div>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.language']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.language_desc']()}</p>
+			</div>
+			<Select.Root
+				type="single"
+				value={getLocale()}
+				onValueChange={(v) => {
+					if (v) setLocale(v as (typeof locales)[number]);
+				}}
+			>
+				<Select.Trigger size="sm" class="w-[130px]">
+					{LOCALE_LABELS[getLocale()] ?? 'English'}
+				</Select.Trigger>
+				<Select.Content>
+					{#each locales as locale}
+						<Select.Item value={locale}>{LOCALE_LABELS[locale] ?? locale}</Select.Item>
+					{/each}
+				</Select.Content>
+			</Select.Root>
+		</div>
+	</div>
+
+	<h2 class="mt-8 text-sm font-medium text-[var(--color-text-secondary)]">{m['prefs.interface_theme']()}</h2>
 
 	<div class="mt-3 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<!-- Font size -->
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Font size</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Set the font size for the interface.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.font_size']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.font_size_desc']()}</p>
 			</div>
 			<Select.Root
 				type="single"
@@ -216,9 +251,9 @@
 					{fontSizeLabels[preferencesState.fontSize]}
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value="small">Small</Select.Item>
-					<Select.Item value="default">Default</Select.Item>
-					<Select.Item value="large">Large</Select.Item>
+					<Select.Item value="small">{m['prefs.font_size.small']()}</Select.Item>
+					<Select.Item value="default">{m['prefs.font_size.default']()}</Select.Item>
+					<Select.Item value="large">{m['prefs.font_size.large']()}</Select.Item>
 				</Select.Content>
 			</Select.Root>
 		</div>
@@ -228,8 +263,8 @@
 		<!-- Pointer cursors -->
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Use pointer cursors</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Display a pointer cursor on interactive elements.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.pointer_cursors']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.pointer_cursors_desc']()}</p>
 			</div>
 			<Switch
 				size="sm"
@@ -243,8 +278,8 @@
 		<!-- Interface theme -->
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Interface theme</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Select your preferred color mode.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.interface_theme_label']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.interface_theme_desc']()}</p>
 			</div>
 			<ToggleGroup.Root
 				type="single"
@@ -255,13 +290,13 @@
 					if (v) preferencesState.setThemeMode(v as 'system' | 'light' | 'dark');
 				}}
 			>
-				<ToggleGroup.Item value="system" aria-label="System preference">
+				<ToggleGroup.Item value="system" aria-label={m['prefs.system_pref']()}>
 					<Monitor size={14} />
 				</ToggleGroup.Item>
-				<ToggleGroup.Item value="light" aria-label="Light mode">
+				<ToggleGroup.Item value="light" aria-label={m['prefs.light_mode']()}>
 					<Sun size={14} />
 				</ToggleGroup.Item>
-				<ToggleGroup.Item value="dark" aria-label="Dark mode">
+				<ToggleGroup.Item value="dark" aria-label={m['prefs.dark_mode']()}>
 					<Moon size={14} />
 				</ToggleGroup.Item>
 			</ToggleGroup.Root>
@@ -272,8 +307,8 @@
 		<!-- Light theme variant -->
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Light theme</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Theme variant used in light mode.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.light_theme']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.light_theme_desc']()}</p>
 			</div>
 			<Select.Root
 				type="single"
@@ -286,9 +321,9 @@
 					{lightThemeLabels[preferencesState.lightTheme]}
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value="light">Light</Select.Item>
-					<Select.Item value="rose-light">Rose Light</Select.Item>
-					<Select.Item value="blue-light">Blue Light</Select.Item>
+					<Select.Item value="light">{m['prefs.theme.light']()}</Select.Item>
+					<Select.Item value="rose-light">{m['prefs.theme.rose_light']()}</Select.Item>
+					<Select.Item value="blue-light">{m['prefs.theme.blue_light']()}</Select.Item>
 				</Select.Content>
 			</Select.Root>
 		</div>
@@ -298,8 +333,8 @@
 		<!-- Dark theme variant -->
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Dark theme</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Theme variant used in dark mode.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.dark_theme']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.dark_theme_desc']()}</p>
 			</div>
 			<Select.Root
 				type="single"
@@ -312,26 +347,26 @@
 					{darkThemeLabels[preferencesState.darkTheme]}
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value="dark">Dark</Select.Item>
-					<Select.Item value="dark-gray">Dark Gray</Select.Item>
-					<Select.Item value="amethyst-dark">Amethyst Dark</Select.Item>
-					<Select.Item value="emerald-dark">Emerald Dark</Select.Item>
-					<Select.Item value="cyber-77">Cyber 77</Select.Item>
-					<Select.Item value="blade-49">Blade 49</Select.Item>
-					<Select.Item value="pipboy">Pip-Boy</Select.Item>
+					<Select.Item value="dark">{m['prefs.theme.dark']()}</Select.Item>
+					<Select.Item value="dark-gray">{m['prefs.theme.dark_gray']()}</Select.Item>
+					<Select.Item value="amethyst-dark">{m['prefs.theme.amethyst_dark']()}</Select.Item>
+					<Select.Item value="emerald-dark">{m['prefs.theme.emerald_dark']()}</Select.Item>
+					<Select.Item value="cyber-77">{m['prefs.theme.cyber_77']()}</Select.Item>
+					<Select.Item value="blade-49">{m['prefs.theme.blade_49']()}</Select.Item>
+					<Select.Item value="pipboy">{m['prefs.theme.pipboy']()}</Select.Item>
 				</Select.Content>
 			</Select.Root>
 		</div>
 	</div>
 
 	<!-- Issue list display -->
-	<h2 class="mt-8 text-sm font-medium text-[var(--color-text-secondary)]">Issue list display</h2>
+	<h2 class="mt-8 text-sm font-medium text-[var(--color-text-secondary)]">{m['prefs.issue_list_display']()}</h2>
 
 	<div class="mt-3 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Workflow group sorting</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Controls status group order in issue lists. Kanban keeps the workflow order.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.workflow_sorting']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.workflow_sorting_desc']()}</p>
 			</div>
 			<Select.Root
 				type="single"
@@ -344,9 +379,9 @@
 					{workflowSortLabels[preferencesState.workflowSortMode]}
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Item value="default">Workflow order</Select.Item>
-					<Select.Item value="active-first">Active first</Select.Item>
-					<Select.Item value="custom">Custom</Select.Item>
+					<Select.Item value="default">{m['prefs.workflow_order']()}</Select.Item>
+					<Select.Item value="active-first">{m['prefs.active_first']()}</Select.Item>
+					<Select.Item value="custom">{m['prefs.custom']()}</Select.Item>
 				</Select.Content>
 			</Select.Root>
 		</div>
@@ -354,7 +389,7 @@
 		{#if preferencesState.workflowSortMode === 'custom'}
 			<div class="border-t border-[var(--app-border)]"></div>
 			<div class="px-5 py-4">
-				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">Custom category order</p>
+				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">{m['prefs.custom_category_order']()}</p>
 				<div class="space-y-1">
 					{#each preferencesState.workflowSortOrder as category, index (category)}
 						<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -375,14 +410,14 @@
 								<span class="cursor-grab rounded p-1 text-[var(--color-text-tertiary)] transition-colors group-hover:text-[var(--color-text-secondary)] active:cursor-grabbing">
 									<GripVertical size={14} />
 								</span>
-								<span class="text-sm text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-text-primary)]">{CATEGORY_LABELS[category]}</span>
+								<span class="text-sm text-[var(--color-text-primary)] transition-colors group-hover:text-[var(--color-text-primary)]">{getCategoryLabel(category)}</span>
 							</div>
 							<div class="flex items-center gap-1 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
 								<button
 									onclick={() => moveWorkflowCategory(category, -1)}
 									disabled={index === 0}
 									class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-30"
-									aria-label="Move {CATEGORY_LABELS[category]} up"
+									aria-label={m['prefs.move_up']({ name: getCategoryLabel(category) })}
 								>
 									<ArrowUp size={13} />
 								</button>
@@ -390,7 +425,7 @@
 									onclick={() => moveWorkflowCategory(category, 1)}
 									disabled={index === preferencesState.workflowSortOrder.length - 1}
 									class="rounded p-1 text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-30"
-									aria-label="Move {CATEGORY_LABELS[category]} down"
+									aria-label={m['prefs.move_down']({ name: getCategoryLabel(category) })}
 								>
 									<ArrowDown size={13} />
 								</button>
@@ -403,13 +438,13 @@
 	</div>
 
 	<!-- Issue creation -->
-	<h2 class="mt-8 text-sm font-medium text-[var(--color-text-secondary)]">Issue creation</h2>
+	<h2 class="mt-8 text-sm font-medium text-[var(--color-text-secondary)]">{m['prefs.issue_creation']()}</h2>
 
 	<div class="mt-3 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 		<div class="flex items-center justify-between px-5 py-4">
 			<div>
-				<p class="text-sm font-medium text-[var(--color-text-primary)]">Default prefill</p>
-				<p class="text-xs text-[var(--color-text-tertiary)]">Values used when opening the create issue dialog. Current page filters can still override these.</p>
+				<p class="text-sm font-medium text-[var(--color-text-primary)]">{m['prefs.default_prefill']()}</p>
+				<p class="text-xs text-[var(--color-text-tertiary)]">{m['prefs.default_prefill_desc']()}</p>
 			</div>
 			<button
 				type="button"
@@ -417,7 +452,7 @@
 				onclick={clearDefaults}
 				class="rounded-md border border-[var(--app-border)] px-2 py-1 text-xs text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-secondary)] disabled:opacity-40"
 			>
-				Clear defaults
+				{m['prefs.clear_defaults']()}
 			</button>
 		</div>
 
@@ -425,17 +460,17 @@
 
 		<div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
 			<div>
-				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">Team</p>
+				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">{m['prefs.team']()}</p>
 				<Select.Root
 					type="single"
 					value={issueDefaults.teamId ?? 'none'}
 					onValueChange={(v) => setDefaultTeam(v === 'none' ? undefined : v)}
 				>
 					<Select.Trigger size="sm" class="w-full">
-						{teams.find((team) => team.id === issueDefaults.teamId)?.name ?? 'No default'}
+						{teams.find((team) => team.id === issueDefaults.teamId)?.name ?? m['prefs.no_default']()}
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="none">No default</Select.Item>
+						<Select.Item value="none">{m['prefs.no_default']()}</Select.Item>
 						{#each teams as team (team.id)}
 							<Select.Item value={team.id}>{team.name}</Select.Item>
 						{/each}
@@ -444,7 +479,7 @@
 			</div>
 
 			<div>
-				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">Status</p>
+				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">{m['prefs.status']()}</p>
 				<Select.Root
 					type="single"
 					value={issueDefaults.statusId ?? 'none'}
@@ -452,10 +487,10 @@
 					disabled={!issueDefaults.teamId}
 				>
 					<Select.Trigger size="sm" class="w-full">
-						{statuses.find((status) => status.id === issueDefaults.statusId)?.name ?? 'No default'}
+						{statuses.find((status) => status.id === issueDefaults.statusId)?.name ?? m['prefs.no_default']()}
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="none">No default</Select.Item>
+						<Select.Item value="none">{m['prefs.no_default']()}</Select.Item>
 						{#each statuses as status (status.id)}
 							<Select.Item value={status.id}>{status.name}</Select.Item>
 						{/each}
@@ -464,36 +499,36 @@
 			</div>
 
 			<div>
-				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">Priority</p>
+				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">{m['prefs.priority']()}</p>
 				<Select.Root
 					type="single"
 					value={issueDefaults.priority === undefined ? 'none' : String(issueDefaults.priority)}
 					onValueChange={(v) => setDefaultPriority(v === 'none' ? undefined : Number(v) as IssuePriority)}
 				>
 					<Select.Trigger size="sm" class="w-full">
-						{issueDefaults.priority === undefined ? 'No default' : PRIORITY_LABELS[issueDefaults.priority]}
+						{issueDefaults.priority === undefined ? m['prefs.no_default']() : getPriorityLabel(issueDefaults.priority)}
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="none">No default</Select.Item>
+						<Select.Item value="none">{m['prefs.no_default']()}</Select.Item>
 						{#each priorityValues as value (value)}
-							<Select.Item value={String(value)}>{PRIORITY_LABELS[value]}</Select.Item>
+							<Select.Item value={String(value)}>{getPriorityLabel(value)}</Select.Item>
 						{/each}
 					</Select.Content>
 				</Select.Root>
 			</div>
 
 			<div>
-				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">Project</p>
+				<p class="mb-1.5 text-xs text-[var(--color-text-tertiary)]">{m['prefs.project']()}</p>
 				<Select.Root
 					type="single"
 					value={issueDefaults.projectId ?? 'none'}
 					onValueChange={(v) => setDefaultProject(v === 'none' ? undefined : v)}
 				>
 					<Select.Trigger size="sm" class="w-full">
-						{projects.find((project) => project.id === issueDefaults.projectId)?.name ?? 'No default'}
+						{projects.find((project) => project.id === issueDefaults.projectId)?.name ?? m['prefs.no_default']()}
 					</Select.Trigger>
 					<Select.Content>
-						<Select.Item value="none">No default</Select.Item>
+						<Select.Item value="none">{m['prefs.no_default']()}</Select.Item>
 						{#each projects as project (project.id)}
 							<Select.Item value={project.id}>{project.name}</Select.Item>
 						{/each}
@@ -506,7 +541,7 @@
 
 		<div class="grid gap-4 px-5 py-4 sm:grid-cols-2">
 			<div>
-				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">Assignees</p>
+				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">{m['prefs.assignees']()}</p>
 				<div class="max-h-44 space-y-1 overflow-y-auto rounded-md border border-[var(--app-border)] p-1">
 					{#each members as member (member.user_id)}
 						<button
@@ -519,13 +554,13 @@
 						</button>
 					{/each}
 					{#if members.length === 0}
-						<p class="px-2 py-1.5 text-sm text-[var(--color-text-tertiary)]">No members found</p>
+						<p class="px-2 py-1.5 text-sm text-[var(--color-text-tertiary)]">{m['prefs.no_members']()}</p>
 					{/if}
 				</div>
 			</div>
 
 			<div>
-				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">Labels</p>
+				<p class="mb-2 text-xs text-[var(--color-text-tertiary)]">{m['prefs.labels']()}</p>
 				<div class="max-h-44 space-y-1 overflow-y-auto rounded-md border border-[var(--app-border)] p-1">
 					{#each labels as label (label.id)}
 						<button
@@ -539,7 +574,7 @@
 						</button>
 					{/each}
 					{#if labels.length === 0}
-						<p class="px-2 py-1.5 text-sm text-[var(--color-text-tertiary)]">No labels found</p>
+						<p class="px-2 py-1.5 text-sm text-[var(--color-text-tertiary)]">{m['prefs.no_labels']()}</p>
 					{/if}
 				</div>
 			</div>

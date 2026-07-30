@@ -2,6 +2,8 @@
 	import { onMount, onDestroy } from 'svelte';
 	import type { MentionItem } from './mention.extension';
 	import IssueStatusIcon from '$lib/features/issues/IssueStatusIcon.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		items,
@@ -67,7 +69,7 @@
 >
 	{#if users.length > 0}
 		{#if issues.length > 0}
-			<div class="mention-section-label">Members</div>
+			<div class="mention-section-label">{m['sharedComponents.mention_list.members']()}</div>
 		{/if}
 		{#each users as item (item.id)}
 			{@const idx = globalIndex(item)}
@@ -95,7 +97,7 @@
 		{#if users.length > 0}
 			<div class="mention-separator"></div>
 		{/if}
-		<div class="mention-section-label">Issues</div>
+		<div class="mention-section-label">{m['sharedComponents.mention_list.issues']()}</div>
 		{#each issues as item (item.id)}
 			{@const idx = globalIndex(item)}
 			<button
@@ -123,7 +125,7 @@
 	{/if}
 
 	{#if items.length === 0}
-		<div class="mention-empty">No results</div>
+		<div class="mention-empty">{m['sharedComponents.mention_list.no_results']()}</div>
 	{/if}
 </div>
 

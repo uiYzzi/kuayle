@@ -1,3 +1,5 @@
+import { m } from '$lib/paraglide/messages.js';
+
 export type StatusCategory = 'backlog' | 'unstarted' | 'started' | 'completed' | 'cancelled';
 
 export interface TeamStatus {
@@ -16,10 +18,17 @@ export interface TeamStatus {
 
 export const CATEGORY_ORDER: StatusCategory[] = ['backlog', 'unstarted', 'started', 'completed', 'cancelled'];
 
-export const CATEGORY_LABELS: Record<StatusCategory, string> = {
-	backlog: 'Backlog',
-	unstarted: 'Unstarted',
-	started: 'Started',
-	completed: 'Completed',
-	cancelled: 'Cancelled',
-};
+export function getCategoryLabel(category: StatusCategory): string {
+	const dynamicMessage = m as unknown as Record<string, () => string>;
+	return dynamicMessage[`common.category.${category}`]();
+}
+
+export function getCategoryLabels(): Record<StatusCategory, string> {
+	return {
+		backlog: m['common.category.backlog'](),
+		unstarted: m['common.category.unstarted'](),
+		started: m['common.category.started'](),
+		completed: m['common.category.completed'](),
+		cancelled: m['common.category.cancelled']()
+	};
+}

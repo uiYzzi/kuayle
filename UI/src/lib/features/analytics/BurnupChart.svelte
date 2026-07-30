@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import * as echarts from 'echarts';
 	import type { AnalyticsBurnup } from '$lib/api/analytics';
 	import { getAnalyticsChartTheme, observeAnalyticsTheme } from './chart-theme';
@@ -16,7 +18,7 @@
 		const theme = getAnalyticsChartTheme();
 		const dates = burnup.points.map((p) => {
 			const date = new Date(`${p.date}T00:00:00`);
-			return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+			return date.toLocaleDateString(getLocale(), { month: 'short', day: 'numeric' });
 		});
 		const totalCreated = burnup.points.map((p) => p.total_created ?? 0);
 		const totalCompleted = burnup.points.map((p) => p.total_completed ?? 0);
@@ -36,7 +38,7 @@
 				textStyle: { color: theme.textPrimary, fontSize: 11 }
 			},
 			legend: {
-				data: ['Total created', 'Total completed', 'Scope'],
+				data: [m['insights.total_created'](), m['insights.total_completed'](), m['insights.scope']()],
 				left: 12,
 				top: 8,
 				icon: 'circle',
@@ -69,7 +71,7 @@
 			},
 			series: [
 				{
-					name: 'Total created',
+					name: m['insights.total_created'](),
 					type: 'line',
 					data: totalCreated,
 					smooth: true,
@@ -86,7 +88,7 @@
 					}
 				},
 				{
-					name: 'Total completed',
+					name: m['insights.total_completed'](),
 					type: 'line',
 					data: totalCompleted,
 					smooth: true,
@@ -103,7 +105,7 @@
 					}
 				},
 				{
-					name: 'Scope',
+					name: m['insights.scope'](),
 					type: 'line',
 					data: scope,
 					smooth: true,
@@ -151,12 +153,12 @@
 
 <div class="relative rounded-lg border border-[var(--app-border)] bg-[var(--color-bg-secondary)]">
 	<div class="border-b border-[var(--app-border)] px-3 py-2">
-		<span class="text-xs font-medium text-[var(--color-text-secondary)]">Burn-up</span>
+		<span class="text-xs font-medium text-[var(--color-text-secondary)]">{m['insights.burnup']()}</span>
 	</div>
 	<div bind:this={container} class="h-72 w-full {burnup?.points?.length ? '' : 'invisible'}"></div>
 	{#if !burnup?.points?.length}
 		<div class="absolute inset-x-0 bottom-0 flex h-72 items-center justify-center">
-			<p class="text-sm text-[var(--color-text-tertiary)]">No burn-up data available</p>
+			<p class="text-sm text-[var(--color-text-tertiary)]">{m['insights.no_burnup_data']()}</p>
 		</div>
 	{/if}
 </div>

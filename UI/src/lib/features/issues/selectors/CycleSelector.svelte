@@ -3,6 +3,8 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 	import type { Cycle } from '$lib/types/cycle';
 	import type { Snippet } from 'svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		open = $bindable(false),
@@ -27,14 +29,14 @@
 	} = $props();
 </script>
 
-<ComboboxPopover bind:open placeholder="Search cycles..." emptyMessage="No cycles." {width} {align} {shortcutKey} {trigger}>
+<ComboboxPopover bind:open placeholder={m['sharedComponents.selectors.search_cycles']()} emptyMessage={m['sharedComponents.selectors.no_cycles']()} {width} {align} {shortcutKey} {trigger}>
 	{#if showNone}
 		<Command.Item
-			value="No cycle"
+			value={m['sharedComponents.filter_builder.no_cycle']()}
 			onSelect={() => { onchange(null); open = false; }}
 			class="text-[var(--color-text-tertiary)]"
 		>
-			No cycle
+			{m['sharedComponents.filter_builder.no_cycle']()}
 		</Command.Item>
 	{/if}
 	{#each cycles as cycle (cycle.id)}

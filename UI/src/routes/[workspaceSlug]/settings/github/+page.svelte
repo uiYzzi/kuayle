@@ -25,6 +25,8 @@
 	import { appToast } from '$lib/features/toast/toast';
 	import { ExternalLink, Plus, Trash2, Loader2, Search } from 'lucide-svelte';
 	import { GithubLogoIcon } from 'phosphor-svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	let status = $state<GitHubStatus | null>(null);
@@ -84,11 +86,11 @@
 				} else {
 					sessionStorage.setItem(key, '1');
 					await handleManifestCallback(slug, code);
-					appToast.success('GitHub App created');
+					appToast.success(m['settings.github.app_created']());
 				}
 			} else if (installationId) {
 				await handleGitHubCallback(slug, parseInt(installationId));
-				appToast.success('GitHub connected');
+				appToast.success(m['settings.github.connected_toast']());
 			}
 
 			// Load current status
@@ -99,7 +101,7 @@
 		} catch (err: any) {
 			console.error('GitHub setup error:', err);
 			if (code || installationId) {
-				appToast.apiError(err, 'GitHub setup failed');
+				appToast.apiError(err, m['settings.github.setup_failed']());
 			}
 		} finally {
 			loading = false;
@@ -118,7 +120,7 @@
 			if (!url) throw new Error('Invalid GitHub install URL');
 			window.location.href = url;
 		} catch {
-			appToast.error('Failed to get install URL');
+			appToast.error(m['settings.github.failed_install_url']());
 		}
 	}
 
@@ -127,9 +129,9 @@
 			await disconnectGitHub(slug);
 			status = await getGitHubStatus(slug);
 			transitions = [];
-			appToast.success('GitHub disconnected');
+			appToast.success(m['settings.github.disconnected']());
 		} catch {
-			appToast.error('Failed to disconnect');
+			appToast.error(m['settings.github.failed_disconnect']());
 		}
 	}
 
@@ -138,9 +140,9 @@
 			await deleteGitHubApp(slug);
 			status = await getGitHubStatus(slug);
 			transitions = [];
-			appToast.success('GitHub App removed');
+			appToast.success(m['settings.github.app_removed']());
 		} catch {
-			appToast.error('Failed to remove app');
+			appToast.error(m['settings.github.failed_remove_app']());
 		}
 	}
 
@@ -152,7 +154,7 @@
 			availableRepos = await listGitHubRepos(slug);
 			selectedRepoIds = new Set(availableRepos.filter(r => r.linked).map(r => r.github_repo_id));
 		} catch {
-			appToast.error('Failed to load repos');
+			appToast.error(m['settings.github.failed_load_repos']());
 		} finally {
 			loadingRepos = false;
 		}
@@ -175,9 +177,9 @@
 			if (newIds.length > 0) {
 				try {
 					await linkGitHubRepos(slug, newIds);
-					appToast.success('Repos linked');
+					appToast.success(m['settings.github.repos_linked']());
 				} catch {
-					appToast.error('Failed to link repos');
+					appToast.error(m['settings.github.failed_link_repos']());
 				}
 			}
 			for (const repo of availableRepos.filter(r => r.linked)) {
@@ -202,22 +204,22 @@
 		try {
 			await updateAutoTransitions(slug, updated);
 		} catch {
-			appToast.error('Failed to update');
+			appToast.error(m['settings.github.failed_update']());
 		}
 	}
 
-	const TRANSITION_LABELS: Record<string, { label: string; description: string }> = {
-		branch_created: { label: 'Branch created', description: 'Move issue to In Progress when a branch is created' },
-		pr_opened: { label: 'PR opened', description: 'Move issue to In Review when a PR is opened' },
-		pr_merged: { label: 'PR merged', description: 'Move issue to Done when a PR is merged' },
-	};
+	const TRANSITION_LABELS: Record<string, { label: string; description: string }> = $derived({
+		branch_created: { label: m['settings.github.branch_created'](), description: m['settings.github.branch_created_desc']() },
+		pr_opened: { label: m['settings.github.pr_opened'](), description: m['settings.github.pr_opened_desc']() },
+		pr_merged: { label: m['settings.github.pr_merged'](), description: m['settings.github.pr_merged_desc']() },
+	});
 </script>
 
 <div class="mx-auto max-w-2xl space-y-8 p-6">
 	<div>
-		<h2 class="text-lg font-semibold text-[var(--color-text-primary)]">GitHub</h2>
+		<h2 class="text-lg font-semibold text-[var(--color-text-primary)]">{m['settings.github.title']()}</h2>
 		<p class="mt-1 text-sm text-[var(--color-text-tertiary)]">
-			Connect your GitHub repositories to automatically link pull requests, branches, and commits to issues.
+			{m['settings.github.desc']()}
 		</p>
 	</div>
 
@@ -233,14 +235,14 @@
 					<GithubLogoIcon size={20} class="text-[var(--color-text-secondary)]" />
 				</div>
 				<div class="flex-1">
-					<h3 class="text-sm font-medium text-[var(--color-text-primary)]">Set up GitHub App</h3>
-					<p class="text-xs text-[var(--color-text-tertiary)]">Create a GitHub App to connect your repositories. Takes about 30 seconds.</p>
+					<h3 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.github.setup_app']()}</h3>
+					<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.github.setup_desc']()}</p>
 				</div>
 				<Button size="sm" onclick={handleSetup} disabled={settingUp}>
 					{#if settingUp}
 						<Loader2 size={14} class="animate-spin" />
 					{:else}
-						Set up
+						{m['settings.github.set_up']()}
 					{/if}
 				</Button>
 			</div>
@@ -248,7 +250,7 @@
 
 		<div class="rounded-md bg-[var(--color-bg-secondary)] px-4 py-3">
 			<p class="text-xs text-[var(--color-text-tertiary)]">
-				Clicking "Set up" will redirect you to GitHub with a pre-filled form. Confirm to create the app, then you'll be redirected back here automatically. No manual configuration needed.
+				{m['settings.github.setup_note']()}
 			</p>
 		</div>
 	{:else if !status?.installed}
@@ -261,12 +263,12 @@
 							<GithubLogoIcon size={16} class="text-[var(--color-text-secondary)]" />
 						</div>
 						<div>
-							<span class="text-sm font-medium text-[var(--color-text-primary)]">GitHub App ready</span>
-							<p class="text-xs text-[var(--color-text-tertiary)]">Now install it on your GitHub account to connect repositories.</p>
+							<span class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.github.app_ready']()}</span>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.github.app_ready_desc']()}</p>
 						</div>
 					</div>
 					<Button size="sm" onclick={handleInstall}>
-						Install on GitHub
+						{m['settings.github.install']()}
 					</Button>
 				</div>
 			</div>
@@ -276,7 +278,7 @@
 					onclick={handleDeleteApp}
 					class="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-error)]"
 				>
-					Remove GitHub App
+					{m['settings.github.remove_app']()}
 				</button>
 			{/if}
 		</div>
@@ -295,11 +297,11 @@
 								<span class="text-sm font-medium text-[var(--color-text-primary)]">{status.installation?.account_login}</span>
 								<Badge variant="outline" class="text-[10px]">{status.installation?.account_type}</Badge>
 							</div>
-							<p class="text-xs text-[var(--color-text-tertiary)]">GitHub App connected</p>
+							<p class="text-xs text-[var(--color-text-tertiary)]">{m['settings.github.connected']()}</p>
 						</div>
 					</div>
 					<Button variant="destructive" size="sm" onclick={handleDisconnect}>
-						Disconnect
+						{m['settings.github.disconnect']()}
 					</Button>
 				</div>
 			</div>
@@ -307,14 +309,14 @@
 			<!-- Linked repos -->
 			<div>
 				<div class="flex items-center justify-between">
-					<h3 class="text-sm font-medium text-[var(--color-text-primary)]">Linked Repositories</h3>
+					<h3 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.github.linked_repos']()}</h3>
 					{#if !showRepoSelector}
 						<button
 							onclick={loadAvailableRepos}
 							class="flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)] transition-colors"
 						>
 							<Plus size={13} />
-							Manage
+							{m['settings.github.manage']()}
 						</button>
 					{/if}
 				</div>
@@ -331,7 +333,7 @@
 								<Search size={14} class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
 								<Input
 									type="text"
-									placeholder="Search repositories..."
+									placeholder={m['settings.github.search_repos']()}
 									bind:value={repoSearch}
 									class="pl-8 h-8 text-sm"
 								/>
@@ -347,7 +349,7 @@
 									indeterminate={someFilteredSelected}
 									class="pointer-events-none"
 								/>
-								<span class="text-xs">Select all{repoSearch ? ' filtered' : ''} ({filteredRepos.length})</span>
+								<span class="text-xs">{repoSearch ? m['settings.github.select_all_filtered']({ n: filteredRepos.length }) : m['settings.github.select_all']()} ({filteredRepos.length})</span>
 							</button>
 
 							<!-- Repo list -->
@@ -364,12 +366,12 @@
 										<GithubLogoIcon size={14} class="shrink-0 text-[var(--color-text-tertiary)]" />
 										<span class="truncate text-[var(--color-text-primary)]">{repo.full_name}</span>
 										{#if repo.private}
-											<Badge variant="outline" class="ml-auto shrink-0 text-[9px]">Private</Badge>
+											<Badge variant="outline" class="ml-auto shrink-0 text-[9px]">{m['settings.github.private']()}</Badge>
 										{/if}
 									</button>
 								{:else}
 									<p class="py-4 text-center text-xs text-[var(--color-text-tertiary)]">
-										{repoSearch ? 'No repositories match your search.' : 'No repositories available.'}
+										{repoSearch ? m['settings.github.no_repos_match']() : m['settings.github.no_repos_available']()}
 									</p>
 								{/each}
 							</div>
@@ -377,15 +379,15 @@
 							<!-- Actions -->
 							<div class="mt-3 flex items-center justify-between border-t border-[var(--app-border)] pt-3">
 								<span class="text-xs text-[var(--color-text-tertiary)]">
-									{selectedRepoIds.size} selected
+									{m['settings.github.n_selected']({ n: selectedRepoIds.size })}
 								</span>
 								<div class="flex gap-2">
-									<Button variant="outline" size="sm" onclick={() => { showRepoSelector = false; repoSearch = ''; }}>Cancel</Button>
+									<Button variant="outline" size="sm" onclick={() => { showRepoSelector = false; repoSearch = ''; }}>{m['settings.cancel']()}</Button>
 									<Button size="sm" onclick={saveRepoSelection} disabled={savingRepos}>
 										{#if savingRepos}
 											<Loader2 size={14} class="animate-spin" />
 										{:else}
-											Save
+											{m['settings.github.save']()}
 										{/if}
 									</Button>
 								</div>
@@ -393,7 +395,7 @@
 						{/if}
 					</div>
 				{:else if status.repos.length === 0}
-					<p class="mt-3 text-sm text-[var(--color-text-tertiary)]">No repositories linked yet.</p>
+					<p class="mt-3 text-sm text-[var(--color-text-tertiary)]">{m['settings.github.no_repos_linked']()}</p>
 				{:else}
 					<div class="mt-3 space-y-1">
 						{#each status.repos as repo}
@@ -418,8 +420,8 @@
 			<!-- Auto-transitions -->
 			{#if transitions.length > 0}
 				<div>
-					<h3 class="text-sm font-medium text-[var(--color-text-primary)]">Automations</h3>
-					<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">Automatically transition issue status based on GitHub activity.</p>
+					<h3 class="text-sm font-medium text-[var(--color-text-primary)]">{m['settings.github.automations']()}</h3>
+					<p class="mt-1 text-xs text-[var(--color-text-tertiary)]">{m['settings.github.automations_desc']()}</p>
 					<div class="mt-3 space-y-2">
 						{#each transitions as t}
 							{@const info = TRANSITION_LABELS[t.event]}
@@ -445,7 +447,7 @@
 						class="flex items-center gap-1.5 text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-error)]"
 					>
 						<Trash2 size={12} />
-						Remove GitHub App entirely
+						{m['settings.github.remove_app_entirely']()}
 					</button>
 				</div>
 			{/if}

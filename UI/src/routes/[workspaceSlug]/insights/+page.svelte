@@ -35,6 +35,8 @@
 	import BurnupChart from '$lib/features/analytics/BurnupChart.svelte';
 	import InsightsExplorer from '$lib/features/analytics/InsightsExplorer.svelte';
 	import AnalyticsDateRangePicker from '$lib/features/analytics/AnalyticsDateRangePicker.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 	type Tab = 'overview' | 'explore';
@@ -105,7 +107,7 @@
 			}
 		} catch (error: unknown) {
 			if (id === overviewLoadId) {
-				overviewError = errorMessage(error, 'Failed to load analytics');
+				overviewError = errorMessage(error, m['insights.failed_load']());
 				overview = null;
 				distribution = null;
 			}
@@ -125,7 +127,7 @@
 		burnupLoading = true;
 		burnupError = null;
 		if (!from || !to) {
-			burnupError = 'Choose a date range';
+			burnupError = m['insights.choose_date_range']();
 			burnupLoading = false;
 			return;
 		}
@@ -139,7 +141,7 @@
 			if (id === burnupLoadId) burnup = nextBurnup;
 		} catch (error: unknown) {
 			if (id === burnupLoadId) {
-				burnupError = errorMessage(error, 'Failed to load burn-up');
+				burnupError = errorMessage(error, m['insights.failed_load_burnup']());
 				burnup = null;
 			}
 		} finally {
@@ -203,7 +205,7 @@
 	<header class="flex h-[49px] shrink-0 items-center gap-2 border-b border-[var(--app-border)] px-4 sm:px-6">
 		<SidebarToggle />
 		<BarChart3 size={16} class="text-[var(--color-text-secondary)]" />
-		<h1 class="text-sm font-medium text-[var(--color-text-primary)]">Insights</h1>
+		<h1 class="text-sm font-medium text-[var(--color-text-primary)]">{m['insights.title']()}</h1>
 	</header>
 
 	<Tabs.Root value={activeTab} onValueChange={(value) => { if (value === 'overview' || value === 'explore') activeTab = value; }}>
@@ -211,19 +213,19 @@
 			<div class="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
 				<div class="flex min-w-0 items-center gap-3">
 					<Select.Root type="single" value={selectedTeamId} disabled={teamsLoading} onValueChange={(value) => value && (selectedTeamId = value)}>
-						<Select.Trigger size="sm" aria-label="Team scope" class="w-[220px] max-w-full bg-[var(--color-bg)]">
+						<Select.Trigger size="sm" aria-label={m['insights.team_scope']()} class="w-[220px] max-w-full bg-[var(--color-bg)]">
 							{#if selectedTeam}
 								<TeamIcon team={selectedTeam} size={14} />
 								<span class="truncate">{selectedTeam.name}</span>
 							{:else}
 								<Building2 size={14} class="text-[var(--color-text-tertiary)]" />
-								<span>All workspace teams</span>
+								<span>{m['insights.all_workspace_teams']()}</span>
 							{/if}
 						</Select.Trigger>
 						<Select.Content>
 							<Select.Item value="workspace">
 								<Building2 size={14} class="text-[var(--color-text-tertiary)]" />
-								All workspace teams
+								{m['insights.all_workspace_teams']()}
 							</Select.Item>
 							{#each teams as team}
 								<Select.Item value={team.id}>
@@ -235,10 +237,10 @@
 					</Select.Root>
 					<div class="hidden min-w-0 md:block">
 						<p class="truncate text-xs font-medium text-[var(--color-text-primary)]">
-							{selectedTeam?.name ?? 'Workspace overview'}
+							{selectedTeam?.name ?? m['insights.workspace_overview']()}
 						</p>
 						<p class="truncate text-[11px] text-[var(--color-text-tertiary)]">
-							{teamScoped ? "Using this team's workflow and members" : 'Statuses are grouped by workflow type across teams'}
+							{teamScoped ? m['insights.using_team_workflow']() : m['insights.workflow_types_comparable']()}
 						</p>
 					</div>
 				</div>
@@ -246,11 +248,11 @@
 				<Tabs.List class="h-8 w-fit rounded-lg border border-[var(--app-border)] bg-[var(--color-bg)] p-0.5">
 					<Tabs.Trigger value="overview" class="h-6 gap-1.5 rounded-md px-2.5 text-xs">
 						<LayoutDashboard size={13} />
-						Overview
+						{m['insights.overview']()}
 					</Tabs.Trigger>
 					<Tabs.Trigger value="explore" class="h-6 gap-1.5 rounded-md px-2.5 text-xs">
 						<SlidersHorizontal size={13} />
-						Explore
+						{m['insights.explore']()}
 					</Tabs.Trigger>
 				</Tabs.List>
 			</div>
@@ -263,8 +265,8 @@
 						<div class="mb-3 flex items-center gap-2">
 							<Activity size={14} class="text-[var(--app-accent-light)]" />
 							<div>
-								<h2 class="text-xs font-medium text-[var(--color-text-primary)]">Current state</h2>
-								<p class="text-[11px] text-[var(--color-text-tertiary)]">Live issue and delivery health for this scope</p>
+								<h2 class="text-xs font-medium text-[var(--color-text-primary)]">{m['insights.current_state']()}</h2>
+								<p class="text-[11px] text-[var(--color-text-tertiary)]">{m['insights.current_state_desc']()}</p>
 							</div>
 						</div>
 						{#if overviewLoading}
@@ -281,9 +283,9 @@
 							<div class="mb-3 flex items-center gap-2">
 								<ChartNoAxesCombined size={14} class="text-[var(--app-accent-light)]" />
 								<div>
-									<h2 class="text-xs font-medium text-[var(--color-text-primary)]">Work distribution</h2>
+									<h2 class="text-xs font-medium text-[var(--color-text-primary)]">{m['insights.work_distribution']()}</h2>
 									<p class="text-[11px] text-[var(--color-text-tertiary)]">
-										{teamScoped ? `Using ${selectedTeam?.name ?? 'team'} custom statuses` : 'Workflow types are comparable across team-specific statuses'}
+										{teamScoped ? m['insights.using_custom_statuses']({ team: selectedTeam?.name ?? 'team' }) : m['insights.workflow_types_comparable_teams']()}
 									</p>
 								</div>
 							</div>
@@ -296,8 +298,8 @@
 							<div class="flex items-center gap-2">
 								<TrendingUp size={14} class="text-[var(--app-accent-light)]" />
 								<div>
-									<h2 class="text-xs font-medium text-[var(--color-text-primary)]">Delivery trend</h2>
-									<p class="text-[11px] text-[var(--color-text-tertiary)]">Created work, completed work, and remaining scope</p>
+									<h2 class="text-xs font-medium text-[var(--color-text-primary)]">{m['insights.delivery_trend']()}</h2>
+									<p class="text-[11px] text-[var(--color-text-tertiary)]">{m['insights.delivery_trend_desc']()}</p>
 								</div>
 							</div>
 							<div class="flex flex-wrap items-center gap-2">
@@ -307,14 +309,14 @@
 									onchange={(start, end) => { burnupFrom = start; burnupTo = end; }}
 								/>
 								<Select.Root type="single" value={burnupInterval} onValueChange={(value) => value && (burnupInterval = value as BurnupInterval)}>
-									<Select.Trigger size="sm" aria-label="Burn-up interval" class="w-[112px] bg-[var(--color-bg-secondary)]">
+									<Select.Trigger size="sm" aria-label={m['insights.burnup_interval']()} class="w-[112px] bg-[var(--color-bg-secondary)]">
 										<TrendingUp size={13} />
-										{burnupInterval === 'day' ? 'Daily' : burnupInterval === 'week' ? 'Weekly' : 'Monthly'}
+										{m[burnupInterval === 'day' ? 'insights.daily' : burnupInterval === 'week' ? 'insights.weekly' : 'insights.monthly']()}
 									</Select.Trigger>
 									<Select.Content>
-										<Select.Item value="day">Daily</Select.Item>
-										<Select.Item value="week">Weekly</Select.Item>
-										<Select.Item value="month">Monthly</Select.Item>
+										<Select.Item value="day">{m['insights.daily']()}</Select.Item>
+										<Select.Item value="week">{m['insights.weekly']()}</Select.Item>
+										<Select.Item value="month">{m['insights.monthly']()}</Select.Item>
 									</Select.Content>
 								</Select.Root>
 							</div>
@@ -332,8 +334,8 @@
 						<div class="mb-4 flex items-center gap-2">
 							<UsersRound size={14} class="text-[var(--app-accent-light)]" />
 							<div>
-								<h2 class="text-xs font-medium text-[var(--color-text-primary)]">Build an insight</h2>
-								<p class="text-[11px] text-[var(--color-text-tertiary)]">Choose a measure, grouping, and optional comparison</p>
+								<h2 class="text-xs font-medium text-[var(--color-text-primary)]">{m['insights.build_insight']()}</h2>
+								<p class="text-[11px] text-[var(--color-text-tertiary)]">{m['insights.build_insight_desc']()}</p>
 							</div>
 						</div>
 						<InsightsExplorer {slug} filters={analyticsScope} {statuses} />

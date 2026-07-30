@@ -16,6 +16,8 @@
 	import type { Notification } from '$lib/types/notification';
 	import type { Issue } from '$lib/types/issue';
 	import { formatRelativeTime } from '$lib/utils/format';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import EmptyState from '$lib/components/shared/EmptyState.svelte';
 	import FullPageIssueView from '$lib/features/issues/FullPageIssueView.svelte';
 	import DueDatePickerPanel from '$lib/components/shared/DueDatePickerPanel.svelte';
@@ -47,26 +49,36 @@
 
 	const slug = $derived(page.params.workspaceSlug ?? '');
 
-	const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
-		status_changed: 'Status changed',
-		assigned: 'Assigned to you',
-		commented: 'New comment',
-		mentioned: 'You were mentioned',
-		priority_changed: 'Priority changed',
-		issue_created: 'New issue created',
-		issue_updated: 'Issue updated',
-		due_date_changed: 'Due date changed',
-		label_added: 'Label added',
-		cycle_changed: 'Cycle changed'
-	};
-
 	function normalizeNotificationType(type: string): string {
 		return type.includes('.') ? (type.split('.').pop() ?? type) : type;
 	}
 
 	function getNotificationTypeLabel(type: string): string {
 		const normalizedType = normalizeNotificationType(type);
-		return NOTIFICATION_TYPE_LABELS[normalizedType] || normalizedType.replace(/_/g, ' ');
+		switch (normalizedType) {
+			case 'status_changed':
+				return m['inbox.type.status_changed']();
+			case 'assigned':
+				return m['inbox.type.assigned']();
+			case 'commented':
+				return m['inbox.type.commented']();
+			case 'mentioned':
+				return m['inbox.type.mentioned']();
+			case 'priority_changed':
+				return m['inbox.type.priority_changed']();
+			case 'issue_created':
+				return m['inbox.type.issue_created']();
+			case 'issue_updated':
+				return m['inbox.type.issue_updated']();
+			case 'due_date_changed':
+				return m['inbox.type.due_date_changed']();
+			case 'label_added':
+				return m['inbox.type.label_added']();
+			case 'cycle_changed':
+				return m['inbox.type.cycle_changed']();
+			default:
+				return normalizedType.replace(/_/g, ' ');
+		}
 	}
 
 	const NOTIFICATION_TYPE_STYLE: Record<string, { icon: any; color: string; bg: string }> = {
@@ -163,9 +175,9 @@
 			await markAllRead();
 			notifications = notifications.map((n) => ({ ...n, read_at: new Date().toISOString() }));
 			unreadCount = 0;
-			appToast.success('All marked as read');
+			appToast.success(m['inbox.toast.all_marked_read']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to mark as read');
+			appToast.apiError(err, m['inbox.toast.mark_as_read_failed']());
 		}
 	}
 
@@ -187,9 +199,9 @@
 			await markNotificationUnread(id);
 			notifications = notifications.map((n) => (n.id === id ? { ...n, read_at: null } : n));
 			if (activeTab === 'inbox' && existing?.read_at) unreadCount++;
-			appToast.success('Marked as unread');
+			appToast.success(m['inbox.toast.marked_unread']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to mark as unread');
+			appToast.apiError(err, m['inbox.toast.mark_as_unread_failed']());
 		}
 	}
 
@@ -206,9 +218,9 @@
 		try {
 			await archiveNotification(id);
 			removeNotificationFromList(id);
-			appToast.success('Archived');
+			appToast.success(m['inbox.toast.archived']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to archive');
+			appToast.apiError(err, m['inbox.toast.archive_failed']());
 		}
 	}
 
@@ -217,21 +229,21 @@
 			await unarchiveNotification(id);
 			if (activeTab === 'archived') removeNotificationFromList(id);
 			else await loadNotifications();
-			appToast.success('Removed from archive');
+			appToast.success(m['inbox.toast.unarchived']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to unarchive');
+			appToast.apiError(err, m['inbox.toast.unarchive_failed']());
 		}
 	}
 
 	async function handleSnooze(id: string, hours: number) {
 		const until = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-		await snoozeUntil(id, until, `Snoozed for ${hours}h`);
+		await snoozeUntil(id, until, m['inbox.toast.snoozed_for']({ hours }));
 	}
 
 	async function handleSnoozeDate(id: string, date: string | null) {
 		if (!date) return;
 		const until = snoozeDateToTimestamp(date).toISOString();
-		await snoozeUntil(id, until, `Snoozed until ${formatSnoozeDate(date)}`);
+		await snoozeUntil(id, until, m['inbox.toast.snoozed_until']({ date: formatSnoozeDate(date) }));
 	}
 
 	async function snoozeUntil(id: string, until: string, successMessage: string) {
@@ -240,7 +252,7 @@
 			removeNotificationFromList(id);
 			appToast.success(successMessage);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to snooze');
+			appToast.apiError(err, m['inbox.toast.snooze_failed']());
 		}
 	}
 
@@ -249,9 +261,9 @@
 			await unsnoozeNotification(id);
 			if (activeTab === 'snoozed') removeNotificationFromList(id);
 			else await loadNotifications();
-			appToast.success('Unsnoozed');
+			appToast.success(m['inbox.toast.unsnoozed']());
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to unsnooze');
+			appToast.apiError(err, m['inbox.toast.unsnooze_failed']());
 		}
 	}
 
@@ -275,7 +287,7 @@
 	}
 
 	function formatSnoozeDate(date: string) {
-		return new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
+		return new Date(`${date}T00:00:00`).toLocaleDateString(getLocale(), {
 			month: 'short',
 			day: 'numeric',
 			year: 'numeric'
@@ -312,7 +324,6 @@
 		document.addEventListener('keydown', handleKeydown);
 		return () => document.removeEventListener('keydown', handleKeydown);
 	});
-
 </script>
 
 <div class="flex h-full min-w-0 flex-col">
@@ -322,7 +333,7 @@
 	>
 		<div class="flex min-w-0 items-center gap-2">
 			<SidebarToggle />
-			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">Inbox</h1>
+			<h1 class="text-sm font-medium text-[var(--color-text-primary)]">{m['inbox.title']()}</h1>
 			{#if unreadCount > 0}
 				<Badge variant="default" class="text-[10px]">{unreadCount}</Badge>
 			{/if}
@@ -332,7 +343,7 @@
 				onclick={handleMarkAllRead}
 				class="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
 			>
-				Mark all read
+				{m['inbox.mark_all_read']()}
 			</button>
 		{/if}
 	</div>
@@ -351,21 +362,21 @@
 						class="h-9 flex-none rounded-full border border-[var(--app-border)] px-3 py-1.5 text-xs text-[var(--color-text-tertiary)] shadow-none data-[state=active]:border-[var(--app-accent)]/30 data-[state=active]:bg-[var(--app-accent)]/10 data-[state=active]:text-[var(--app-accent-light)] data-[state=active]:shadow-none md:h-auto md:px-2 md:py-0.5 md:text-[11px]"
 					>
 						<Inbox size={12} class="mr-1" />
-						Inbox
+						{m['inbox.tab.inbox']()}
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="snoozed"
 						class="h-9 flex-none rounded-full border border-[var(--app-border)] px-3 py-1.5 text-xs text-[var(--color-text-tertiary)] shadow-none data-[state=active]:border-[var(--app-accent)]/30 data-[state=active]:bg-[var(--app-accent)]/10 data-[state=active]:text-[var(--app-accent-light)] data-[state=active]:shadow-none md:h-auto md:px-2 md:py-0.5 md:text-[11px]"
 					>
 						<Clock size={12} class="mr-1" />
-						Snoozed
+						{m['inbox.tab.snoozed']()}
 					</Tabs.Trigger>
 					<Tabs.Trigger
 						value="archived"
 						class="h-9 flex-none rounded-full border border-[var(--app-border)] px-3 py-1.5 text-xs text-[var(--color-text-tertiary)] shadow-none data-[state=active]:border-[var(--app-accent)]/30 data-[state=active]:bg-[var(--app-accent)]/10 data-[state=active]:text-[var(--app-accent-light)] data-[state=active]:shadow-none md:h-auto md:px-2 md:py-0.5 md:text-[11px]"
 					>
 						<Archive size={12} class="mr-1" />
-						Archived
+						{m['inbox.tab.archived']()}
 					</Tabs.Trigger>
 				</Tabs.List>
 			</Tabs.Root>
@@ -378,11 +389,11 @@
 					<div class="px-4 py-8">
 						<EmptyState
 							title={activeTab === 'inbox'
-								? 'No notifications'
+								? m['inbox.empty.inbox.title']()
 								: activeTab === 'snoozed'
-									? 'No snoozed'
-									: 'No archived'}
-							description={activeTab === 'inbox' ? "You're all caught up!" : ''}
+									? m['inbox.empty.snoozed.title']()
+									: m['inbox.empty.archived.title']()}
+							description={activeTab === 'inbox' ? m['inbox.empty.inbox.description']() : ''}
 						/>
 					</div>
 				{:else}
@@ -423,7 +434,7 @@
 												{getNotificationTypeLabel(notification.type)}
 											</span>
 											<span class="shrink-0 text-[11px] tabular-nums text-[var(--color-text-secondary)]">
-												{formatRelativeTime(notification.created_at)}
+												{formatRelativeTime(notification.created_at, getLocale())}
 											</span>
 										</div>
 									</div>
@@ -433,40 +444,40 @@
 							<ContextMenu.Content class="w-48 p-1">
 								{#if notification.read_at}
 									<ContextMenu.Item onclick={() => handleMarkUnread(notification.id)}>
-										<span class="flex items-center gap-2"><Eye class="h-4 w-4" />Mark as unread</span>
+										<span class="flex items-center gap-2"><Eye class="h-4 w-4" />{m['inbox.menu.mark_as_unread']()}</span>
 									</ContextMenu.Item>
 								{:else}
 									<ContextMenu.Item onclick={() => handleMarkRead(notification.id)}>
-										<span class="flex items-center gap-2"><Eye class="h-4 w-4" />Mark as read</span>
+										<span class="flex items-center gap-2"><Eye class="h-4 w-4" />{m['inbox.menu.mark_as_read']()}</span>
 									</ContextMenu.Item>
 								{/if}
 
 								{#if activeTab === 'inbox'}
 									<ContextMenu.Sub>
 										<ContextMenu.SubTrigger>
-											<span class="flex items-center gap-2"><AlarmClock class="h-4 w-4" />Snooze</span>
+											<span class="flex items-center gap-2"><AlarmClock class="h-4 w-4" />{m['inbox.menu.snooze']()}</span>
 										</ContextMenu.SubTrigger>
 										<ContextMenu.SubContent class="w-40 p-1">
-											<ContextMenu.Item onclick={() => handleSnooze(notification.id, 1)}>1 hour</ContextMenu.Item>
-											<ContextMenu.Item onclick={() => handleSnooze(notification.id, 3)}>3 hours</ContextMenu.Item>
-											<ContextMenu.Item onclick={() => handleSnooze(notification.id, 24)}>Tomorrow</ContextMenu.Item>
+											<ContextMenu.Item onclick={() => handleSnooze(notification.id, 1)}>{m['inbox.menu.snooze.1_hour']()}</ContextMenu.Item>
+											<ContextMenu.Item onclick={() => handleSnooze(notification.id, 3)}>{m['inbox.menu.snooze.3_hours']()}</ContextMenu.Item>
+											<ContextMenu.Item onclick={() => handleSnooze(notification.id, 24)}>{m['inbox.menu.snooze.tomorrow']()}</ContextMenu.Item>
 											<ContextMenu.Separator />
-											<ContextMenu.Item onclick={() => openSnoozeDatePicker(notification)}>Pick date...</ContextMenu.Item>
+											<ContextMenu.Item onclick={() => openSnoozeDatePicker(notification)}>{m['inbox.menu.snooze.pick_date']()}</ContextMenu.Item>
 										</ContextMenu.SubContent>
 									</ContextMenu.Sub>
 									<ContextMenu.Item onclick={() => handleArchive(notification.id)}>
-										<span class="flex items-center gap-2"><Archive class="h-4 w-4" />Archive</span>
+										<span class="flex items-center gap-2"><Archive class="h-4 w-4" />{m['inbox.menu.archive']()}</span>
 									</ContextMenu.Item>
 								{:else if activeTab === 'snoozed'}
 									<ContextMenu.Item onclick={() => handleUnsnooze(notification.id)}>
-										<span class="flex items-center gap-2"><RefreshCw class="h-4 w-4" />Unsnooze</span>
+										<span class="flex items-center gap-2"><RefreshCw class="h-4 w-4" />{m['inbox.menu.unsnooze']()}</span>
 									</ContextMenu.Item>
 									<ContextMenu.Item onclick={() => handleArchive(notification.id)}>
-										<span class="flex items-center gap-2"><Archive class="h-4 w-4" />Archive</span>
+										<span class="flex items-center gap-2"><Archive class="h-4 w-4" />{m['inbox.menu.archive']()}</span>
 									</ContextMenu.Item>
 								{:else if activeTab === 'archived'}
 									<ContextMenu.Item onclick={() => handleUnarchive(notification.id)}>
-										<span class="flex items-center gap-2"><RefreshCw class="h-4 w-4" />Remove from archive</span>
+										<span class="flex items-center gap-2"><RefreshCw class="h-4 w-4" />{m['inbox.menu.remove_from_archive']()}</span>
 									</ContextMenu.Item>
 								{/if}
 							</ContextMenu.Content>
@@ -493,11 +504,11 @@
 			{:else if selectedNotification}
 				<div class="flex h-full flex-col items-center justify-center gap-2 text-[var(--color-text-tertiary)]">
 					<p class="text-sm">{selectedNotification.title}</p>
-					<p class="text-xs">This notification is not linked to an issue.</p>
+					<p class="text-xs">{m['inbox.detail.not_linked']()}</p>
 				</div>
 			{:else}
 				<div class="flex h-full items-center justify-center">
-					<p class="text-sm text-[var(--color-text-tertiary)]">Select a notification to view details</p>
+					<p class="text-sm text-[var(--color-text-tertiary)]">{m['inbox.detail.select']()}</p>
 				</div>
 			{/if}
 		</div>
@@ -510,19 +521,19 @@
 			class="fixed inset-0 cursor-default bg-black/50"
 			onclick={closeSnoozeDatePicker}
 			tabindex={-1}
-			aria-label="Close snooze date picker"
+			aria-label={m['inbox.snooze_dialog.close_aria']()}
 		></button>
 
 		<div class="relative z-10 w-full max-w-[31rem] overflow-hidden rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)] shadow-2xl">
 			<div class="flex items-center justify-between gap-3 border-b border-[var(--app-border)] px-4 py-3">
 				<div>
-					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">Snooze notification</h2>
+					<h2 class="text-sm font-medium text-[var(--color-text-primary)]">{m['inbox.snooze_dialog.title']()}</h2>
 					<p class="line-clamp-1 text-xs text-[var(--color-text-tertiary)]">{snoozeDateNotification.title}</p>
 				</div>
 				<button
 					onclick={closeSnoozeDatePicker}
 					class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-					title="Close"
+					title={m['inbox.snooze_dialog.close']()}
 				>
 					X
 				</button>
@@ -531,7 +542,7 @@
 			<DueDatePickerPanel
 				value={null}
 				onchange={(date) => handleSnoozeDate(snoozeDateNotification!.id, date)}
-				clearLabel="Cancel"
+				clearLabel={m['inbox.snooze_dialog.cancel']()}
 				close={closeSnoozeDatePicker}
 			/>
 		</div>

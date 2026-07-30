@@ -1,10 +1,13 @@
 <script lang="ts">
 	import type { DevMachineStatus } from '$lib/types/dev-machine';
 	import { Badge } from '$lib/components/ui/badge';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let { status }: { status: DevMachineStatus } = $props();
+	const dynamicMessage = m as unknown as Record<string, () => string>;
 
-	const label = $derived(status.replaceAll('_', ' '));
+	const label = $derived(dynamicMessage['machines.status_' + status]() || status.replaceAll('_', ' '));
 	const style = $derived(
 		status === 'running'
 			? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400'

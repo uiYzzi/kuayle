@@ -2,6 +2,8 @@
 	import * as ToggleGroup from '$lib/components/ui/toggle-group';
 	import { List, LayoutGrid } from 'lucide-svelte';
 	import type { ViewLayout } from '$lib/types/view';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		layout = $bindable<ViewLayout>('list'),
@@ -26,10 +28,10 @@
 	variant="outline"
 	size="sm"
 >
-	<ToggleGroup.Item value="list" aria-label="List view">
+	<ToggleGroup.Item value="list" aria-label={m['sharedComponents.view_switcher.list_view']()}>
 		<List size={14} />
 	</ToggleGroup.Item>
-	<ToggleGroup.Item value="board" aria-label="Board view">
+	<ToggleGroup.Item value="board" aria-label={m['sharedComponents.view_switcher.board_view']()}>
 		<LayoutGrid size={14} />
 	</ToggleGroup.Item>
 </ToggleGroup.Root>

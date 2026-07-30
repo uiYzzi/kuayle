@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Issue, IssuePriority, RelationType } from '$lib/types/issue';
-	import { PRIORITY_LABELS } from '$lib/types/issue';
+	import { getPriorityLabel } from '$lib/types/issue';
 	import type { Label } from '$lib/types/label';
 	import type { Cycle } from '$lib/types/cycle';
 	import type { WorkspaceMember } from '$lib/types/workspace';
@@ -18,6 +18,8 @@
 	import IssueStatusIcon from './IssueStatusIcon.svelte';
 	import IssuePriorityIcon from './IssuePriorityIcon.svelte';
 	import DueDatePickerPanel from '$lib/components/shared/DueDatePickerPanel.svelte';
+	import { m } from '$lib/paraglide/messages.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 
 	let {
 		slug,
@@ -43,6 +45,7 @@
 	}
 
 	const ANIM_DURATION = 100;
+	function _s(n: number): string { return n > 1 ? 's' : ''; }
 	const priorityValues: IssuePriority[] = [0, 1, 2, 3, 4];
 	const commandButtonClass = 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors hover:bg-[var(--color-bg-hover)] data-[selected=true]:bg-[var(--color-bg-hover)] data-[selected=true]:ring-1 data-[selected=true]:ring-[var(--app-border)]';
 	const optionButtonClass = 'flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-[var(--color-text-primary)] transition-colors hover:bg-[var(--color-bg-hover)] disabled:opacity-60 data-[selected=true]:bg-[var(--color-bg-hover)] data-[selected=true]:ring-1 data-[selected=true]:ring-[var(--app-border)]';
@@ -69,23 +72,23 @@
 	]);
 	let commands = $derived.by<BulkCommandOption[]>(() => {
 		const options: BulkCommandOption[] = [
-			{ id: 'assignee', title: 'Assign users', description: 'Replace assignees with one or more users', keywords: 'assignee assign users members owner' },
-			{ id: 'status', title: 'Change status', description: 'Move selected issues to a workflow status', keywords: 'status workflow state' },
-			{ id: 'priority', title: 'Set priority', description: 'Apply a priority to selected issues', keywords: 'priority urgent high medium low none' },
-			{ id: 'label', title: 'Add label', description: 'Add a label to selected issues', keywords: 'label tag' },
-			{ id: 'due_date', title: 'Set due date', description: 'Apply or clear due date on selected issues', keywords: 'due date deadline calendar' },
+			{ id: 'assignee', title: m['bulkActions.commands.assignee_title'](), description: m['bulkActions.commands.assignee_desc'](), keywords: 'assignee assign users members owner' },
+			{ id: 'status', title: m['bulkActions.commands.status_title'](), description: m['bulkActions.commands.status_desc'](), keywords: 'status workflow state' },
+			{ id: 'priority', title: m['bulkActions.commands.priority_title'](), description: m['bulkActions.commands.priority_desc'](), keywords: 'priority urgent high medium low none' },
+			{ id: 'label', title: m['bulkActions.commands.label_title'](), description: m['bulkActions.commands.label_desc'](), keywords: 'label tag' },
+			{ id: 'due_date', title: m['bulkActions.commands.due_date_title'](), description: m['bulkActions.commands.due_date_desc'](), keywords: 'due date deadline calendar' },
 		];
 
 		if (showCycleActions) {
-			options.push({ id: 'cycle', title: 'Assign to cycle', description: 'Add selected issues to a cycle or remove their cycle', keywords: 'cycle sprint iteration' });
+			options.push({ id: 'cycle', title: m['bulkActions.commands.cycle_title'](), description: m['bulkActions.commands.cycle_desc'](), keywords: 'cycle sprint iteration' });
 		}
 
 		options.push(
-			{ id: 'parent', title: 'Set parent', description: 'Move selected issues under another issue', keywords: 'parent subissue sub issue' },
-			{ id: 'subissue', title: 'Make sub-issues of...', description: 'Choose the issue these selected issues belong under', keywords: 'subissue sub issue child parent' },
-			{ id: 'duplicate', title: 'Duplicated of...', description: 'Mark selected issues as duplicates of another issue', keywords: 'duplicate duplicated copy' },
-			{ id: 'related', title: 'Related to...', description: 'Relate selected issues to another issue', keywords: 'related relation link' },
-			{ id: 'unparent', title: 'Remove parent', description: 'Make selected sub-issues top-level issues', keywords: 'unparent remove parent top level' }
+			{ id: 'parent', title: m['bulkActions.commands.parent_title'](), description: m['bulkActions.commands.parent_desc'](), keywords: 'parent subissue sub issue' },
+			{ id: 'subissue', title: m['bulkActions.commands.subissue_title'](), description: m['bulkActions.commands.subissue_desc'](), keywords: 'subissue sub issue child parent' },
+			{ id: 'duplicate', title: m['bulkActions.commands.duplicate_title'](), description: m['bulkActions.commands.duplicate_desc'](), keywords: 'duplicate duplicated copy' },
+			{ id: 'related', title: m['bulkActions.commands.related_title'](), description: m['bulkActions.commands.related_desc'](), keywords: 'related relation link' },
+			{ id: 'unparent', title: m['bulkActions.commands.unparent_title'](), description: m['bulkActions.commands.unparent_desc'](), keywords: 'unparent remove parent top level' }
 		);
 
 		return options;
@@ -108,7 +111,7 @@
 	let filteredPriorities = $derived.by(() => {
 		const term = searchQuery.trim().toLowerCase();
 		if (!term) return priorityValues;
-		return priorityValues.filter((priority) => PRIORITY_LABELS[priority].toLowerCase().includes(term));
+		return priorityValues.filter((priority) => getPriorityLabel(priority).toLowerCase().includes(term));
 	});
 	let filteredLabels = $derived.by(() => {
 		const term = searchQuery.trim().toLowerCase();
@@ -120,15 +123,15 @@
 		if (!term) return cycles ?? [];
 		return (cycles ?? []).filter((cycle) => cycle.name.toLowerCase().includes(term));
 	});
-	let activeTitle = $derived(commands.find((command) => command.id === activeCommand)?.title ?? 'Bulk actions');
-	let searchPlaceholder = $derived(activeCommand ? `Search ${activeTitle.toLowerCase()}...` : 'Search actions...');
+	let activeTitle = $derived(commands.find((command) => command.id === activeCommand)?.title ?? m['bulkActions.title']());
+	let searchPlaceholder = $derived(activeCommand ? m['bulkActions.search_scope']({ scope: activeTitle.toLowerCase() }) : m['bulkActions.search_placeholder']());
 	let canCreateLabel = $derived(activeCommand === 'label' && searchQuery.trim() && !visibleLabels.some((label) => label.name.toLowerCase() === searchQuery.trim().toLowerCase()));
-	let relationPickerTitle = $derived(relationPickerType === 'duplicate' ? 'Mark duplicated of' : 'Relate selected issues');
+	let relationPickerTitle = $derived(relationPickerType === 'duplicate' ? m['bulkActions.relation_picker.duplicate_title']() : m['bulkActions.relation_picker.related_title']());
 	let relationPickerDescription = $derived(relationPickerType === 'duplicate'
-		? `${issuesState.selectionCount} selected issue${issuesState.selectionCount > 1 ? 's' : ''} will be marked as duplicates of the selected issue.`
-		: `${issuesState.selectionCount} selected issue${issuesState.selectionCount > 1 ? 's' : ''} will be related to the selected issue.`);
-	let parentPickerTitle = $derived(parentPickerMode === 'subissue' ? 'Make selected issues sub-issues' : 'Set parent for selected issues');
-	let parentPickerDescription = $derived(`${issuesState.selectionCount} selected issue${issuesState.selectionCount > 1 ? 's' : ''} will become sub-issues of the selected issue.`);
+		? m['bulkActions.relation_picker.duplicate_desc']({ n: issuesState.selectionCount, s: _s(issuesState.selectionCount) })
+		: m['bulkActions.relation_picker.related_desc']({ n: issuesState.selectionCount, s: _s(issuesState.selectionCount) }));
+	let parentPickerTitle = $derived(parentPickerMode === 'subissue' ? m['bulkActions.parent_picker.title_subissue']() : m['bulkActions.parent_picker.title_parent']());
+	let parentPickerDescription = $derived(m['bulkActions.parent_picker.desc']({ n: issuesState.selectionCount, s: _s(issuesState.selectionCount) }));
 	let activeOptionCount = $derived.by(() => {
 		if (!activeCommand) return filteredCommands.length;
 		if (activeCommand === 'assignee') return filteredMembers.length + 1;
@@ -307,7 +310,7 @@
 	}
 
 	function formatDisplayDate(value: string) {
-		return new Date(`${value}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		return new Date(`${value}T00:00:00`).toLocaleDateString(getLocale(), { month: 'short', day: 'numeric', year: 'numeric' });
 	}
 
 	async function bulkSetAssignees(assigneeIds = selectedAssigneeIds) {
@@ -319,10 +322,10 @@
 				selectedIssues.map((issue) => issuesState.update(slug, issue.identifier, { assignee_ids: assigneeIds }))
 			);
 			issuesState.clearSelection();
-			appToast.success(`${assigneeIds.length === 0 ? 'Cleared assignees from' : 'Assigned'} ${selectedIssues.length} issue${selectedIssues.length > 1 ? 's' : ''}`);
+			appToast.success(assigneeIds.length === 0 ? m['bulkActions.toast.cleared_assignees']({ n: selectedIssues.length, s: _s(selectedIssues.length) }) : m['bulkActions.toast.assigned']({ n: selectedIssues.length, s: _s(selectedIssues.length) }));
 			closeActions();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update assignees');
+			appToast.apiError(err, m['bulkActions.toast.failed_assignees']());
 		}
 	}
 
@@ -335,10 +338,10 @@
 				selectedIssues.map((issue) => issuesState.update(slug, issue.identifier, { due_date: date ?? '' }))
 			);
 			issuesState.clearSelection();
-			appToast.success(`${date ? `Set due date to ${formatDisplayDate(date)} for` : 'Cleared due date from'} ${selectedIssues.length} issue${selectedIssues.length > 1 ? 's' : ''}`);
+			appToast.success(date ? m['bulkActions.toast.due_date_set']({ date: formatDisplayDate(date), n: selectedIssues.length, s: _s(selectedIssues.length) }) : m['bulkActions.toast.due_date_cleared']({ n: selectedIssues.length, s: _s(selectedIssues.length) }));
 			closeActions();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update due date');
+			appToast.apiError(err, m['bulkActions.toast.failed_due_date']());
 		}
 	}
 
@@ -351,9 +354,9 @@
 				selectedIssues.map((issue) => createRelation(slug, issue.identifier, { related_identifier: target.identifier, type: relationPickerType }))
 			);
 			issuesState.clearSelection();
-			appToast.success(`${relationPickerType === 'duplicate' ? 'Marked' : 'Related'} ${selectedIssues.length} issue${selectedIssues.length > 1 ? 's' : ''} ${relationPickerType === 'duplicate' ? 'as duplicates of' : 'to'} ${target.identifier}`);
+			appToast.success(relationPickerType === 'duplicate' ? m['bulkActions.toast.marked_duplicate']({ n: selectedIssues.length, s: _s(selectedIssues.length), id: target.identifier }) : m['bulkActions.toast.related']({ n: selectedIssues.length, s: _s(selectedIssues.length), id: target.identifier }));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to add relation');
+			appToast.apiError(err, m['bulkActions.toast.failed_relation']());
 		}
 	}
 
@@ -365,7 +368,7 @@
 		const count = issuesState.selectionCount;
 		try {
 			await issuesState.bulkUpdate(slug, { status_id: statusId } as any);
-			appToast.success(`Updated ${count} issue${count > 1 ? 's' : ''}`);
+			appToast.success(m['bulkActions.toast.updated']({ n: count, s: _s(count) }));
 			closeActions();
 		} catch {
 			appToast.error('Bulk update failed');
@@ -376,7 +379,7 @@
 		const count = issuesState.selectionCount;
 		try {
 			await issuesState.bulkUpdate(slug, { priority });
-			appToast.success(`Updated ${count} issue${count > 1 ? 's' : ''}`);
+			appToast.success(m['bulkActions.toast.updated']({ n: count, s: _s(count) }));
 			closeActions();
 		} catch {
 			appToast.error('Bulk update failed');
@@ -396,10 +399,10 @@
 				})
 			);
 			issuesState.clearSelection();
-			appToast.success(successMessage ?? `Updated ${selectedIssues.length} issue${selectedIssues.length > 1 ? 's' : ''}`);
+			appToast.success(successMessage ?? m['bulkActions.toast.updated']({ n: selectedIssues.length, s: _s(selectedIssues.length) }));
 			closeActions();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update labels');
+			appToast.apiError(err, m['bulkActions.toast.failed_labels']());
 		}
 	}
 
@@ -413,7 +416,7 @@
 			onlabelcreated?.(label);
 			await bulkAddLabel(label.id, `Created and added ${label.name}`);
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to create label');
+			appToast.apiError(err, m['sharedComponents.selectors.create_label_failed']());
 		} finally {
 			creatingLabel = false;
 		}
@@ -428,10 +431,10 @@
 		const count = issuesState.selectionCount;
 		try {
 			await issuesState.bulkUpdate(slug, { cycle_id: cycleId ?? '' });
-			appToast.success(`${cycleId ? 'Assigned' : 'Removed cycle from'} ${count} issue${count > 1 ? 's' : ''}`);
+			appToast.success(cycleId ? m['bulkActions.toast.cycle_assigned']({ n: count, s: _s(count) }) : m['bulkActions.toast.cycle_removed']({ n: count, s: _s(count) }));
 			closeActions();
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to update cycle');
+			appToast.apiError(err, m['bulkActions.toast.failed_cycle']());
 		}
 	}
 
@@ -439,9 +442,9 @@
 		const count = issuesState.selectionCount;
 		try {
 			await issuesState.bulkUpdate(slug, { parent_id: parent.id } as any);
-			appToast.success(`Moved ${count} issue${count > 1 ? 's' : ''} under ${parent.identifier}`);
+			appToast.success(m['bulkActions.toast.moved_under']({ n: count, s: _s(count), id: parent.identifier }));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to set parent');
+			appToast.apiError(err, m['bulkActions.toast.failed_parent']());
 		}
 	}
 
@@ -449,9 +452,9 @@
 		const count = issuesState.selectionCount;
 		try {
 			await issuesState.bulkUpdate(slug, { parent_id: '' } as any);
-			appToast.success(`Removed parent from ${count} issue${count > 1 ? 's' : ''}`);
+			appToast.success(m['bulkActions.toast.removed_parent']({ n: count, s: _s(count) }));
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to remove parent');
+			appToast.apiError(err, m['bulkActions.toast.failed_remove_parent']());
 		}
 		unparentOpen = false;
 	}
@@ -472,7 +475,7 @@
 				showIssuesDeletedToast(ids.length);
 			}
 		} catch (err: any) {
-			appToast.apiError(err, 'Failed to delete issues');
+			appToast.apiError(err, m['bulkActions.toast.failed_delete']());
 		}
 		deleteOpen = false;
 	}
@@ -481,7 +484,7 @@
 {#if issuesState.selectionCount > 0}
 	<div class="fixed bottom-4 left-1/2 z-40 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center justify-center gap-1.5 rounded-xl border border-[var(--app-border)] bg-[var(--color-bg-secondary)]/95 p-1.5 shadow-xl backdrop-blur max-sm:bottom-3">
 		<span class="inline-flex h-7 items-center rounded-md bg-[var(--color-bg-tertiary)] px-2.5 text-xs font-medium whitespace-nowrap text-[var(--color-text-primary)]">
-			{issuesState.selectionCount} selected
+			{m['bulkActions.selected_count']({ n: issuesState.selectionCount })}
 		</span>
 
 		<div class="mx-0.5 h-5 w-px bg-[var(--app-border)] max-sm:hidden"></div>
@@ -491,7 +494,7 @@
 			class="inline-flex h-7 items-center gap-1.5 rounded-md border border-[var(--app-border)] px-2.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
 		>
 			<Command size={12} />
-			Actions
+			{m['bulkActions.actions_button']()}
 		</button>
 
 		<div class="mx-0.5 h-5 w-px bg-[var(--app-border)] max-sm:hidden"></div>
@@ -499,7 +502,7 @@
 		<button
 			onclick={() => (deleteOpen = true)}
 			class="inline-flex h-7 items-center rounded-md border border-red-500/30 px-2 text-xs text-red-500 transition-colors hover:bg-red-500/10"
-			title="Delete selected issues"
+			title={m['bulkActions.delete_selected']()}
 		>
 			<Trash2 size={12} />
 		</button>
@@ -507,7 +510,7 @@
 		<button
 			onclick={() => issuesState.clearSelection()}
 			class="inline-flex h-7 w-7 items-center justify-center rounded-md text-[var(--color-text-tertiary)] transition-colors hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-			title="Clear selection"
+			title={m['bulkActions.clear_selection']()}
 		>
 			<X size={16} />
 		</button>
@@ -521,7 +524,7 @@
 				style="background: rgba(0,0,0,{actionsVisible ? 0.5 : 0}); transition: background {ANIM_DURATION}ms ease;"
 				onclick={closeActions}
 				tabindex={-1}
-				aria-label="Close bulk actions"
+				aria-label={m['bulkActions.close_bulk']()}
 			></button>
 
 			<div
@@ -529,8 +532,8 @@
 				style="opacity: {actionsVisible ? 1 : 0}; transform: scale({actionsVisible ? 1 : 0.95}); transition: opacity {ANIM_DURATION}ms ease, transform {ANIM_DURATION}ms ease;"
 			>
 				<div class="sr-only">
-					<h2>Bulk actions</h2>
-					<p>Search and run a bulk action for selected issues.</p>
+					<h2>{m['bulkActions.title']()}</h2>
+					<p>{m['bulkActions.a11y_description']()}</p>
 				</div>
 
 				<div class="flex items-center gap-2 border-b border-[var(--app-border)] px-3">
@@ -538,7 +541,7 @@
 						<button
 							onclick={backToCommands}
 							class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-							title="Back to actions"
+							title={m['bulkActions.back']()}
 						>
 							<ChevronLeft size={16} />
 						</button>
@@ -547,7 +550,7 @@
 					{/if}
 					{#if activeCommand === 'due_date'}
 						<div id="bulk-actions-search" class="min-w-0 flex-1 py-4 text-sm font-medium text-[var(--color-text-primary)]" tabindex="-1">
-							Choose due date
+							{m['bulkActions.due_date.choose']()}
 						</div>
 					{:else}
 						<!-- svelte-ignore a11y_autofocus -->
@@ -564,7 +567,7 @@
 					<button
 						onclick={closeActions}
 						class="inline-flex h-8 w-8 items-center justify-center rounded-md text-[var(--color-text-tertiary)] hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-primary)]"
-						title="Close"
+						title={m['bulkActions.close']()}
 					>
 						<X size={16} />
 					</button>
@@ -573,7 +576,7 @@
 				<div class="max-h-[60vh] min-h-72 overflow-y-auto p-2">
 					{#if !activeCommand}
 						{#if filteredCommands.length === 0}
-							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">No actions found.</div>
+							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.no_actions']()}</div>
 						{:else}
 							{#each filteredCommands as command, index (command.id)}
 								<button id={`bulk-action-row-${index}`} class={commandButtonClass} data-selected={selectedIndex === index} onpointerenter={() => (selectedIndex = index)} onclick={() => selectCommand(command.id)}>
@@ -611,17 +614,17 @@
 						{/if}
 					{:else if activeCommand === 'assignee'}
 						<div class="mb-2 flex items-center justify-between gap-2 rounded-lg border border-[var(--app-border)] bg-[var(--color-bg)]/50 px-3 py-2">
-							<span class="text-xs text-[var(--color-text-tertiary)]">{selectedAssigneeIds.length} user{selectedAssigneeIds.length === 1 ? '' : 's'} selected</span>
+							<span class="text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.assignee.selected']({ n: selectedAssigneeIds.length, s: _s(selectedAssigneeIds.length) })}</span>
 							<button class="rounded-md bg-[var(--app-accent)] px-2.5 py-1 text-xs font-medium text-[var(--app-accent-foreground)] disabled:opacity-50" disabled={selectedAssigneeIds.length === 0} onclick={() => bulkSetAssignees()}>
-								Assign
+								{m['bulkActions.assignee.assign']()}
 							</button>
 						</div>
 						<button id="bulk-action-row-0" class={optionButtonClass} data-selected={selectedIndex === 0} onpointerenter={() => (selectedIndex = 0)} onclick={() => bulkSetAssignees([])}>
 							<X size={14} class="text-[var(--color-text-tertiary)]" />
-							<span class="truncate text-[var(--color-text-tertiary)]">Clear assignees</span>
+							<span class="truncate text-[var(--color-text-tertiary)]">{m['bulkActions.assignee.clear']()}</span>
 						</button>
 						{#if filteredMembers.length === 0}
-							<div class="py-8 text-center text-xs text-[var(--color-text-tertiary)]">No members found.</div>
+							<div class="py-8 text-center text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.assignee.no_members']()}</div>
 						{:else}
 							{#each filteredMembers as member, index (member.user_id)}
 								{@const rowIndex = index + 1}
@@ -635,7 +638,7 @@
 						{/if}
 					{:else if activeCommand === 'status'}
 						{#if filteredStatuses.length === 0}
-							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">No statuses found.</div>
+							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.no_statuses']()}</div>
 						{:else}
 							{#each filteredStatuses as status, index (status.id)}
 								<button id={`bulk-action-row-${index}`} class={optionButtonClass} data-selected={selectedIndex === index} onpointerenter={() => (selectedIndex = index)} onclick={() => bulkSetStatus(status.id)}>
@@ -646,12 +649,12 @@
 						{/if}
 					{:else if activeCommand === 'priority'}
 						{#if filteredPriorities.length === 0}
-							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">No priorities found.</div>
+							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.no_priorities']()}</div>
 						{:else}
 							{#each filteredPriorities as priority, index (priority)}
 								<button id={`bulk-action-row-${index}`} class={optionButtonClass} data-selected={selectedIndex === index} onpointerenter={() => (selectedIndex = index)} onclick={() => bulkSetPriority(priority)}>
 									<IssuePriorityIcon {priority} size={14} />
-									<span class="truncate">{PRIORITY_LABELS[priority]}</span>
+									<span class="truncate">{getPriorityLabel(priority)}</span>
 								</button>
 							{/each}
 						{/if}
@@ -659,11 +662,11 @@
 						{#if canCreateLabel}
 							<button id="bulk-action-row-0" class={optionButtonClass} data-selected={selectedIndex === 0} onpointerenter={() => (selectedIndex = 0)} onclick={bulkCreateAndAddLabel} disabled={creatingLabel}>
 								<Plus size={14} />
-								<span class="truncate">{creatingLabel ? 'Creating...' : `Create label "${searchQuery.trim()}"`}</span>
+								<span class="truncate">{creatingLabel ? m['bulkActions.label.creating']() : m['bulkActions.label.create']({ name: searchQuery.trim() })}</span>
 							</button>
 						{/if}
 						{#if filteredLabels.length === 0 && !canCreateLabel}
-							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">No labels found.</div>
+							<div class="py-12 text-center text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.no_labels']()}</div>
 						{:else}
 							{#each filteredLabels as label, index (label.id)}
 								{@const rowIndex = index + (canCreateLabel ? 1 : 0)}
@@ -676,10 +679,10 @@
 					{:else if activeCommand === 'cycle'}
 						<button id="bulk-action-row-0" class={optionButtonClass} data-selected={selectedIndex === 0} onpointerenter={() => (selectedIndex = 0)} onclick={() => bulkSetCycle(null)}>
 							<RefreshCw size={14} class="text-[var(--color-text-tertiary)]" />
-							<span class="truncate text-[var(--color-text-tertiary)]">No cycle</span>
+							<span class="truncate text-[var(--color-text-tertiary)]">{m['bulkActions.cycle.no_cycle']()}</span>
 						</button>
 						{#if filteredCycles.length === 0}
-							<div class="py-8 text-center text-xs text-[var(--color-text-tertiary)]">No cycles found.</div>
+							<div class="py-8 text-center text-xs text-[var(--color-text-tertiary)]">{m['bulkActions.no_cycles']()}</div>
 						{:else}
 							{#each filteredCycles as cycle, index (cycle.id)}
 								{@const rowIndex = index + 1}
@@ -702,7 +705,7 @@
 		{slug}
 		title={parentPickerTitle}
 		description={parentPickerDescription}
-		actionLabel="Set parent"
+		actionLabel={m['bulkActions.parent_picker.set_parent']()}
 		excludeIds={Array.from(issuesState.selectedIds)}
 		onselect={bulkSetParent}
 	/>
@@ -712,7 +715,7 @@
 		{slug}
 		title={relationPickerTitle}
 		description={relationPickerDescription}
-		actionLabel={relationPickerType === 'duplicate' ? 'Mark duplicate' : 'Relate'}
+		actionLabel={relationPickerType === 'duplicate' ? m['bulkActions.relation_picker.mark_duplicate']() : m['bulkActions.relation_picker.relate']()}
 		excludeIds={Array.from(issuesState.selectedIds)}
 		onselect={bulkAddRelation}
 	/>
@@ -720,22 +723,22 @@
 	<AlertDialog.Root bind:open={deleteOpen}>
 		<AlertDialog.Content>
 			<AlertDialog.Header>
-				<AlertDialog.Title>Delete {issuesState.selectionCount} issue{issuesState.selectionCount > 1 ? 's' : ''}?</AlertDialog.Title>
-				<AlertDialog.Description>This action cannot be undone.</AlertDialog.Description>
+				<AlertDialog.Title>{m['bulkActions.delete.title']({ n: issuesState.selectionCount, s: _s(issuesState.selectionCount) })}</AlertDialog.Title>
+				<AlertDialog.Description>{m['bulkActions.delete.desc']()}</AlertDialog.Description>
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel
 					variant="outline"
 					class="border-[var(--app-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]"
 				>
-					Cancel
+					{m['bulkActions.delete.cancel']()}
 				</AlertDialog.Cancel>
 				<AlertDialog.Action
 					variant="destructive"
 					class="bg-red-600 text-white hover:bg-red-700"
 					onclick={bulkDelete}
 				>
-					Delete
+					{m['bulkActions.delete.confirm']()}
 				</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
@@ -744,15 +747,15 @@
 	<AlertDialog.Root bind:open={unparentOpen}>
 		<AlertDialog.Content>
 			<AlertDialog.Header>
-				<AlertDialog.Title>Remove parent from {issuesState.selectionCount} issue{issuesState.selectionCount > 1 ? 's' : ''}?</AlertDialog.Title>
-				<AlertDialog.Description>Selected sub-issues will become regular top-level issues.</AlertDialog.Description>
+				<AlertDialog.Title>{m['bulkActions.unparent.title']({ n: issuesState.selectionCount, s: _s(issuesState.selectionCount) })}</AlertDialog.Title>
+				<AlertDialog.Description>{m['bulkActions.unparent.desc']()}</AlertDialog.Description>
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel variant="outline" class="border-[var(--app-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-hover)]">
-					Cancel
+					{m['bulkActions.unparent.cancel']()}
 				</AlertDialog.Cancel>
 				<AlertDialog.Action variant="destructive" class="bg-red-600 text-white hover:bg-red-700" onclick={bulkRemoveParent}>
-					Remove parent
+					{m['bulkActions.unparent.confirm']()}
 				</AlertDialog.Action>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
