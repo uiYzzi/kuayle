@@ -9,6 +9,7 @@ export const settingsNav = {
 	'settings.nav.system': '系统',
 	'settings.nav.profile': '个人资料',
 	'settings.nav.preferences': '偏好设置',
+	'settings.nav.api_tokens': 'API 令牌',
 	'settings.nav.general': '常规',
 	'settings.nav.members': '成员',
 	'settings.nav.labels': '标签',
